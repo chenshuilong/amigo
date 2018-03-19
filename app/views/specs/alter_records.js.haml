@@ -1,0 +1,18 @@
+:plain
+  $("#ajax-modal").html('#{j render :partial => "alter_records", :locals => { :spec => @spec }}')
+  records_window = layer.open({
+    type: 1,
+    title: '<b>#{@spec_name}  修改记录</b>',
+    area: ['988px', '628px'],
+    zIndex: 666,
+    moveType: 1,
+    shadeClose: false,
+    content: $("#ajax-modal"),
+    btn: ['取消', '确定'],
+    yes: function(index, layero){
+      layer.close(records_window)
+    },
+    btn2: function(index, layero){
+      $("#ajax-modal").find("form").submit();
+    }
+  });

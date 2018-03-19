@@ -1,0 +1,8 @@
+- provide :css, "bootstrap"
+
+
+.h2= l(:label_administration)
+#admin-items
+  = render :partial => 'no_data' if @no_configuration_data
+  = render :partial => 'menu'
+- html_title(l(:label_administration))

@@ -1,0 +1,41 @@
+- provide :css, "bootstrap"
+
+.clearfix{style: "margin-top:50px"}
+  = error_messages_for @result
+  = labelled_form_for @task, :url => personal_task_create_tasks_path(@task), :html => {:multipart => true, id: "personalTaskForm"} do |f|
+    = render :partial => 'tasks/personal_task_form', :locals => { :f => f }
+    .button-group.text-center
+      %a.btn.btn-primary.btn-sm{class: "btn btn-primary btn-sm", id:"createPersonalTask", remote: true}= l(:button_send)
+
+:javascript
+  $("#createPersonalTask").on("click", function(){
+    window.onbeforeunload = null;
+
+    var data = $("form#personalTaskForm").serialize();
+    var taskId = "#{@task.id}";
+    $.ajax({
+      url: '/tasks/personal_task_create.json?key=#{User.current.api_key}',
+      type: "post",
+      data: data,
+      dataType: "json"
+    }).done( function(result){
+      success = result.success;
+      messages = result.message;
+      if(success == 1){
+        var url = "#{my_tasks_path(type: 'personal_task', person_type: 'author_id')}";
+        window.parent.location.href = url;
+      }else if(success == 0){
+        var html = '';
+        html = html + "<div id='errorExplanation'><ul>";
+              
+        $.each(messages, function(i, value) {
+          html = html + "<li>" + value + "</li>";
+        });    
+
+        html = html + "</ul></div>";    
+
+        $("#errorExplanation").remove();
+        $("form#personalTaskForm").prepend(html);
+      }
+    });   
+  })

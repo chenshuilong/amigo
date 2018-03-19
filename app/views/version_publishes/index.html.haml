@@ -1,0 +1,101 @@
+- provide :nav, "2,4"
+- provide :css, "bootstrap"
+
+.h2= l(:label_version_publish_preview)
+.top-action-menu.pull-right
+  - if policy(:version_permission).index?
+    %a{:href => version_permissions_path, class:"btn btn-sm btn-primary"}= l(:label_version_permission)
+  - if policy(:native_applist).index?
+    %a{:href => native_applists_path, class:"btn btn-sm btn-primary"}= l(:label_native_applist)
+
+.clearfix
+#roadmap#version-publishes-index.version_publishes_index
+  .roadmap-query
+    %ul.notification-list 
+      %li.notification-list-item
+        .notification-menu
+          %i.fa.fa-chevron-up
+        .notification-content
+          %p
+            %strong= "查询条件"
+        .clearfix
+        .notification-acton.select2-rectify{:style => "display:block;"}          
+          = form_tag({}, {method: :get, class: 'form-horizontal'}) do |f|
+            .form-group
+              = label_tag 'project_ids', l(:field_project), class: "col-sm-1 control-label"
+              .col-sm-2
+                = select_tag 'project_ids', options_for_select(@projects, params[:project_ids]), multiple: true, class: "form-control", style: "min-width:200px;width:200px;max-height: 30px;"
+                = select2_for "project_ids", l(:label_all) , closeOnSelect: false, allowClear: true
+              = label_tag 'spec_ids', l(:version_spec_id), class: "col-sm-1 control-label"
+              .col-sm-2
+                = select_tag 'spec_ids', grouped_options_for_select(@specs.collect{|p| [p.project_name, Hash[p.specs_list.split(",").map!.with_index{|n, i| i.even?? "&nbsp;&nbsp;".html_safe+n : n }.each_slice(2).to_a].to_a]}, params[:spec_ids]), multiple: true, class: "form-control", style: "min-width:200px;width:200px;max-height: 30px;"
+                = select2_for "spec_ids", l(:label_all) , closeOnSelect: false, allowClear: true
+              = label_tag 'version_ids', l(:version_name_tag), class: "col-sm-1 control-label"
+              .col-sm-2
+                = select_tag 'version_ids', options_for_select(@versions, params[:version_ids]), multiple: true, class: "form-control", style: "min-width:200px;width:200px;max-height: 30px;"
+                = select2_for "version_ids", l(:label_all), closeOnSelect: false, allowClear: true
+            .form-group
+              = label_tag 'published_on', l(:version_publish_published_on), class: "col-sm-1 control-label"
+              .col-sm-2
+                = text_field_tag 'published_on_start', @published_on_start, class: "form-control", :id => 'version_publish_published_on_start'
+                = hidden_field_tag 'published_on_end', @published_on_end, class: "form-control", :id => 'version_publish_published_on_end'
+                = calendar_range_for 'version_publish_published_on_start', 'version_publish_published_on_end'
+              .col-sm-2.col-sm-offset-1
+                = submit_tag l(:button_submit), :name => nil, class: "btn btn-primary btn-sm"
+
+    %hr
+  - if @version_publishes.empty?
+    %p.nodata= l(:label_no_data)
+  - else
+    .roadmap-table
+      %table#versionTable.list.table.table-striped.table-bordered
+        %thead
+          %tr
+            %th= "#"
+            = sort_header_tag('project', :caption => l(:field_project))
+            = sort_header_tag('spec', :caption => l(:version_spec_id))
+            = sort_header_tag('version', :caption => l(:version_name_tag))
+            = sort_header_tag('status', :caption => l(:field_status))
+            = sort_header_tag('publisher_id', :caption => l(:version_publish_publisher_id))
+            = sort_header_tag('published_on', :caption => l(:version_publish_published_on))
+            %th= l(:label_remark)
+            %th= l(:option_all)
+        %tbody
+          - @version_publishes.each_with_index do |version_publish, index|
+            %tr
+              %td= index+1
+              %td= link_to version_publish.project_name, project_path(version_publish.project_identifier)
+              %td= link_to version_publish.spec_name, "/projects/#{version_publish.spec.project.identifier}/specs?id=#{version_publish.spec_id}"
+              %td= link_to version_publish.version_name, version_path(version_publish.version)
+              %td= load_value(version_publish.version, :status)
+              %td= link_to_user User.find_by(id: version_publish.publisher_id)
+              %td= version_publish.published_on.try(:strftime,'%Y-%m-%d %H:%M:%S')
+              %td= remark version_publish
+              %td
+                .btn-group
+                  %button.btn.dropdown-toggle.btn-default{"data-toggle" => "dropdown", :type => "button"}
+                    = l(:option_all)
+                    %span.caret
+                  %ul.dropdown-menu.dropdown-menu-right{:role => "menu",:width => "10px;"}
+                    - if version_publish.version.status == 4 && policy(:version_publish).edit?
+                      %li
+                        %a.publish{"data-id"=> "#{version_publish.id}"}= "上传官网" 
+                    -if version_publish.can_change?
+                      %li
+                        %a{href: "/version_publishes/preview?spec_id=#{version_publish.spec_id}"} 预览 
+                    -if version_publish.published
+                      %li
+                        %a{href: "/version_publishes/#{version_publish.id}"} 查看
+                    %li
+                      %a{:href => "/version_publishes/history?spec_id=#{version_publish.spec_id}"} 历史记录
+                    %li
+                      %a{:href => abnormal_report_version_publish_path(version_publish.id)} 异常报告
+    %span.pagination= pagination_links_full @pages, @count
+
+
+:css
+  .select2-selection{
+    min-height: 30px;
+    max-height: 60px;
+    overflow-y: auto;
+  }

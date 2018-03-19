@@ -1,0 +1,170 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+- content_for :header_tags do
+  %link{:href => "http://vitalets.github.io/x-editable/assets/x-editable/bootstrap3-editable/css/bootstrap-editable.css", :rel => "stylesheet"}
+  %link{:href => "/amg/dataTable/datatable.css", :rel => "stylesheet"}
+
+  %script{:src => "/amg/dataTable/dataTables.bootstrap.min.js", :type => "text/javascript"}
+  %script{:src => "https://cdn.datatables.net/select/1.2.2/js/dataTables.select.min.js", :type => "text/javascript"}
+  %script{:src => "http://www.jq22.com/jquery/jquery-migrate-1.2.1.min.js", :type => "text/javascript"}
+  %script{:src => "/javascripts/bootstrap-editable.js", :type => "text/javascript"}
+  %script{:src => "/javascripts/dataTables.editor.min.js", :type => "text/javascript"}
+
+.top-action-menu.pull-right
+  - unless @edit_all
+    - if allow_to_new_product_definition? && (@definition.blank? || @definition.definition_custom_values.blank?)
+      = link_to(l(:product_definition_new), "javascript:initDefinition('#{@project.identifier}');", :class => 'btn btn-primary btn-sm')
+    - if allow_to_copy_product_definition? && @definition.present?
+      = link_to(l(:product_definition_copy), "javascript:copyDefinition();", :class => 'btn btn-primary btn-sm')
+    - if allow_to_manage_definition? && @definition.present?
+      = link_to(l(:manager_definition_feilds), void_js, id: "manager_feilds", :class => 'btn btn-primary btn-sm')
+      - if @definition.definition_custom_values.present?
+        = link_to(l(:product_definition_edit_all), "?edit_all=true", id: "edit_feilds", :class => 'btn btn-primary btn-sm')
+
+    - if @definition.present? && @definition.definition_custom_values.present?
+      = link_to(l(:product_definition_print), "javascript:hideMenu();$('.issue-details').jqprint();", :class => 'btn btn-primary btn-sm')
+      = link_to(l(:product_definition_records), void_js, id: "alter_records", :class => 'btn btn-primary btn-sm')
+
+.h2= l(:product_definition_all)
+
+.clearfix
+
+.issue-details
+  - if @definition.blank? || @definition.definition_custom_values.blank?
+    %p.nodata= l(:label_no_data)
+  - else
+    .row
+      #menu
+        %ul
+          - DefinitionSection.project_module(@project.id).each_with_index do |md,idx|
+            %li
+              %a{:href => "##{md.name}"}= md.name
+          %li
+            %a{:href => "javascript:hideMenu();"}= "关闭"
+      #content.col-md-12
+        = form_tag("/projects/#{@project.id}/definitions/edit_custom_value",:id => "editCustomValueForm", :multipart => true) do
+          / Namespec and market positioning
+          %hr
+            .h4.text-center= main_module_market_positioning.name
+          %hr
+            %table.table.table-bordered{:style => "table-layout: fixed;"}
+              - sub_module_group(@definition.id, main_module_market_positioning.id).each do |parent, fields|
+                %tr
+                  %td{:id => "#{parent}", :class => "module", :rowspan => "#{fields.length + 1}",:style =>"text-align:center;vertical-align:middle;"}
+                    %b{:style => "font-size:15px;"}= parent
+                - fields.each do |field|
+                  %tr
+                    %td
+                      %b= field.name
+                    %td
+                      - if allow_to_manage_definition?
+                        - if @edit_all
+                          = edit_by_field_format field
+                          = calendar_for "fields_cf_#{field.id}" if field.field_format == "date"
+                          -#= wikitoolbar_for "cf_#{feild.id}" if feild.value.to_s.include?("\n") && feild.field_format == "string"
+                        - else
+                          = simple_format field.value, {:id => "cf_#{field.id}",:style => "word-wrap: break-word;"}
+                          -#= edit_custom_value("#{@definition.id}", "#{field.id}", "#{field.field_format}", "#{field.cf_id}")
+
+          / Product definitions
+          %hr
+            .h4.text-center= main_module_product_definition.name
+          %hr
+            %table.table.table-bordered{:style => "table-layout: fixed;"}
+              - sub_custom_field_group(@definition.id, main_module_product_definition.id).each do |m, mfs|
+                %tr
+                  %td{:id => "#{m}", :class => "module", :rowspan => "#{mfs.length + 1}",:style =>"text-align:center;vertical-align:middle;"}
+                    %b{:style => "font-size:15px;"}= m
+                  = table_subsection_heads
+                - mfs.each do |f|
+                  %tr
+                    %td= f.main_name
+                    - (0..3).each do |idx|
+                      %td{:style => "word-wrap:break-word;word-break:break-all;"}
+                        - if allow_to_manage_definition?
+                          - feild = sort_field_by_group(f.cf_names,f.cf_ids,f.dvf_ids, f.cf_formats, f.cf_values)[idx]
+                          - if feild
+                            - if @edit_all
+                              - if idx == 3
+                                = edit_by_compare_model feild
+                                = select2_tag_with_value "fields_cf_#{feild[:id]}", nil, feild[:value]
+                              - else
+                                = edit_by_field_format feild
+                                = calendar_for "fields[cf_#{feild[:id]}]" if feild[:field_format] == "date"
+                            - else
+                              = simple_format feild[:value], {:id => "cf_#{feild[:id]}"}
+                              -#= edit_custom_value("#{@definition.id}", "#{feild[:id]}", "#{feild[:field_format]}", "#{feild[:cf_id]}")
+                          - else
+                            = ""
+          - if @definition.attachments.any?
+            %hr
+            .attachments
+              .label= l(:label_attachments)
+              = link_to_attachments @definition, :thumbnails => true
+          - if @edit_all
+            .box.tabular
+              %p#attachments_form
+                %label= l(:label_attachments)
+                = render :partial => 'attachments/form', :locals => {:container => @definition}
+
+          - if @edit_all
+            .button-group.text-center
+              = submit_tag l(:button_save), data: { disable_with: "#{l(:button_save)}..." }, class: "btn btn-primary"
+              -#= link_to l(:button_save), "javascript:editCustomValueAll(#{@project.id});", class: "btn btn-primary"
+              = link_to l(:button_cancel), "?edit_all=false", class: "btn btn-primary"
+
+- html_title(l(:product_definition_all))
+
+:javascript
+  var c = "inline";
+  $.fn.editable.defaults.mode = c === 'inline' ? 'inline' : 'popup';
+
+  $("#manager_feilds").click(function() {
+      feild_window = layer.open({
+      type: 1,
+      title: '<b>#{l(:manager_definition_feilds)}</b>',
+      area: ['988px', '680px'],
+      zIndex: 666,
+      moveType: 1,
+      shadeClose: false,
+      content: $("#ajax-modal").html('#{j render :partial => "manager_custom_feilds"}'),
+      btn: ['关闭'],
+      yes: function(index, layero){
+        layer.close(feild_window);
+      }
+    });
+  })
+
+  $("#alter_records").click(function() {
+      records_window = layer.open({
+      type: 1,
+      title: '<b>#{l(:product_definition_records)}</b>',
+      area: ['988px', '680px'],
+      zIndex: 666,
+      moveType: 1,
+      shadeClose: false,
+      content: $("#ajax-modal").html('#{j render :partial => "alter_records", :locals => { :definition_id => @definition.id }}'),
+      btn: ['关闭'],
+      yes: function(index, layero){
+        layer.close(records_window)
+      }
+    });
+  })
+
+  function hideMenu() {
+    $('#menu').hide();
+    $('.attachments').hide();
+  }
+
+  function copyDefinition() {
+    var content = $("#ajax-modal").html('#{j render :partial => "copy", :locals => { :definition => @definition }}')
+    openLayer('#{l(:product_definition_copy)}', '488px', content, function(){
+      if($("#ajax-modal").find("select#definitions_copy_project_id").val() == ""){
+          layer.alert("请选择要复制的项目！");
+      }else{
+        $("#ajax-modal").find('form').submit();
+        layer.alert("复制项目产品定义成功！");
+        refreshPage();
+      }
+    })
+  }

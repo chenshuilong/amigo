@@ -1,0 +1,84 @@
+%div{:style => "width:100%;"}
+  %ul.notification-list
+    %li.notification-list-item
+      .notification-content
+        %p
+          %strong= "查询条件"
+      .clearfix
+      .notification-acton.select2-rectify
+        %form#formLeaveAmountAndSolvedRate.form-horizontal{:role => "form"}
+          .form-group
+            %label.col-sm-2.control-label S1必现标准
+            .col-sm-2
+              %input.form-control{:name => "s1b_rate",:value => "100"}
+            %label.col-sm-2.control-label S2必现标准
+            .col-sm-2
+              %input.form-control{:name => "s2b_rate",:value => "100"}
+            %label.col-sm-2.control-label S3必现标准
+            .col-sm-2
+              %input.form-control{:name => "s3b_rate",:value => "100"}
+
+          .form-group
+            %label.col-sm-2.control-label S1随机标准
+            .col-sm-2
+              %input.form-control{:name => "s1s_rate",:value => "100"}
+            %label.col-sm-2.control-label S2随机标准
+            .col-sm-2
+              %input.form-control{:name => "s2s_rate",:value => "100"}
+            %label.col-sm-2.control-label S3随机标准
+            .col-sm-2
+              %input.form-control{:name => "s3s_rate",:value => "100"}
+
+          .form-group
+            %label.col-sm-2.control-label 项目名称
+            .col-sm-6
+              = hidden_field_tag "project","project_id"
+              %select#project_value.form-control{:name => "project_value"}
+                = project_tree_options_for_select(Project.all)
+              -#= select_tag "project_value", project_tree_options_for_select(Project.all), class: 'form-control'
+            -#%label.col-sm-1.control-label 时间:
+            .col-sm-2
+              -#%input#start_dt.form-control{:name => "start_dt",:value => "2016-09-01"}
+            -#%label.col-sm-1.control-label 至
+            .col-sm-2
+              -#%input#end_dt.form-control{:name => "end_dt",:value => "#{Time.now.strftime('%Y-%m-%d')}"}
+            .col-sm-4.text-right
+              -#%input{:id => "dwm_yn",:type => "checkbox",:style => "display:none",:checked => true}
+              %input{:type => "button",:onclick => "queryLeaveAmountAndSolvedRate('leave_amount_and_solved_rate')",:class => "btn btn-primary",:value => "查询"}
+
+.panel.panel-default
+  .panel-heading= "遗留BUG数及解决率"
+  .panel-body
+    .autoscroll
+      %table#table_leave_amount_and_solved_rate.table.table-striped.table-bordered.table-hover
+
+:javascript
+  initSelect("project_value");
+
+  new SMValidator('#formLeaveAmountAndSolvedRate', {
+    focus: true,
+    required: '这是必填项',
+    rules: {
+      onlyNumber: [/^\d*$/, '只能填数字'],
+    },
+    fields: {
+      s1b_rate: 'required|onlyNumber|length(0,4)|range(0,101)',
+      s1s_rate: 'required|onlyNumber|length(0,4)|range(0,101)',
+      s2b_rate: 'required|onlyNumber|length(0,4)|range(0,101)',
+      s2s_rate: 'required|onlyNumber|length(0,4)|range(0,101)',
+      s3b_rate: 'required|onlyNumber|length(0,4)|range(0,101)',
+      s3s_rate: 'required|onlyNumber|length(0,4)|range(0,101)'
+    },
+    submit: function(valid, form) {
+      if(valid) form.submit();
+    }
+  });
+
+  $('#project_value').on("change", function (e) {
+    queryLeaveAmountAndSolvedRate('leave_amount_and_solved_rate');
+  });
+
+  setTimeout(function () {
+        $('.notification-acton').css("display","block");
+        queryLeaveAmountAndSolvedRate('leave_amount_and_solved_rate');
+    }, 500);

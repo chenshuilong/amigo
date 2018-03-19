@@ -1,0 +1,12 @@
+%li.notification-list-item{:id => "notifications-#{n.id}"}
+  .notification-menu
+    %span= format_time(n.created_at)
+    %i.fa.fa-chevron-down
+  .notification-flag{:class => ("unread" unless n.is_read?)}
+  .notification-content
+    %p
+      %strong= n.sender.name
+    %p.text-muted= n.subject
+  .clearfix
+  .notification-acton.wiki{:data => {:handle_read => handle_notification_path(n, :do => "read")}}
+    = link_to("前往收集版本", n.content)

@@ -1,0 +1,23 @@
+= render :partial => 'nav'
+- provide :css, "bootstrap"
+
+- if User.current.is_scm?
+  .top-action-menu.pull-right
+    = link_to(l(:button_edit), edit_repo_path(@repo), :class => 'icon icon-edit')
+    = delete_link repo_path(@repo, :back_url => url_for(:controller => 'repos', :action => 'index'))
+
+.clearfix
+.issue-details
+  .description
+    .label= l(:repo_url)
+    .wiki= @repo.url
+
+  %hr
+  .attributes
+    = issue_fields_rows do |rows|
+      - rows.left l(:repo_category), load_value(@repo, :category)
+      - rows.left l(:field_description), @repo.description
+      - rows.left l(:field_author), link_to_user(@repo.author)
+      - rows.left l(:field_created_on), format_time(@repo.created_at)
+  .clearfix
+

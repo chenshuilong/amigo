@@ -1,0 +1,6 @@
+%fieldset.box
+  %legend= label_tag "user_search", l(:label_user_search)
+  %p= text_field_tag 'user_search', nil
+  = javascript_tag "observeSearchfield('user_search', null, '#{ escape_javascript autocomplete_for_user_group_path(@group) }')"
+  #users
+    = render_principals_for_new_group_users(@group)

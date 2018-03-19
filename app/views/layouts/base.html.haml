@@ -1,0 +1,90 @@
+!!!
+%html{:lang => current_language}
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %meta{:charset => "utf-8"}/
+    %meta{:content => "IE=edge", "http-equiv" => "X-UA-Compatible"}/
+    %title= html_title
+    %meta{:content => "width=device-width, initial-scale=1, maximum-scale=1", :name => "viewport"}/
+    %meta{:content => "#{Redmine::Info.app_name}", :name => "description"}/
+    %meta{:content => "#{Redmine::Info.app_name}", :name => "keywords"}/
+    %meta{:content => "none", :name => "robots"}/
+    = csrf_meta_tag
+    = favicon
+    = stylesheet_link_tag 'jquery/jquery-ui-1.11.0', 'application', 'responsive', :media => 'all' if (yield :css).empty?
+    = stylesheet_link_tag "/stylesheets/jquery.datetimepicker"
+    = stylesheet_link_tag 'rtl', :media => 'all' if l(:direction) == 'rtl'
+    = javascript_heads
+    = javascript_include_tag "applications"
+    = stylesheet_link_tag 'applications'
+    = heads_for_theme if (yield :css).empty?
+    = yield :header_tags
+    = call_hook :view_layouts_base_html_head
+    / page specific tags
+  %body{:class => body_css_classes}
+    = render_browser_notice
+    = render_top_notice
+    = render :partial => "layouts/navigation"
+
+    - if yield(:css).present?
+      #content.contents
+        .container
+          - if display_main_menu?(@project, yield(:_hide_project_menu))
+            .row.seamless
+              .col-md-2.project-menu
+                .notification-left
+                  = project_info(@project)
+                  = render_main_menu(@project)
+              .col-md-10
+                = render_flash_messages
+                = yield
+                = call_hook :view_layouts_base_content
+          - else
+            = render_flash_messages unless yield(:sidebar).present?
+            = yield
+            = call_hook :view_layouts_base_content
+        #ajax-indicator{:style => "display:none;"}
+          %span= l(:label_loading)
+        #ajax-modal{:style => "display:none;"}
+
+    - else
+      .container
+        #wrapper2
+          #wrapper3
+            - if display_main_menu?(@project)
+              #header
+                #main-menu.tabs
+                  = render_main_menu(@project)
+                  .tabs-buttons{:style => "display:none;"}
+                    %button.tab-left{:onclick => "moveTabLeft(this); return false;"}
+                    %button.tab-right{:onclick => "moveTabRight(this); return false;"}
+            #main
+              - if sidebar_content?
+                #sidebar.col-md-2
+                  = yield :sidebar
+                  = view_layouts_base_sidebar_hook_response
+              #content{:class => ('col-md-10' if sidebar_content?)}
+                = render_flash_messages
+                = yield
+                = call_hook :view_layouts_base_content
+                .clearfix
+          #ajax-indicator{:style => "display:none;"}
+            %span= l(:label_loading)
+          #ajax-modal{:style => "display:none;"}
+    .expand-pad.collapse
+      .expand-pad-button
+        %i.fa.fa-angle-double-left
+      .expand-pad-content
+    //notification in bottom
+    -#= render_global_notify
+
+    / Locale Setting
+    = render :partial => "layouts/locale"
+
+
+:javascript
+
+  $(".navbar-default").pin()
+  // $(".nav-content").pin({padding: {top: 70, bottom: 10}})
+  if (#{!params[:controller].in?(["notifications", "my"])})
+    $(".notification-left").pin({padding: {top: 70, bottom: 10}})

@@ -1,0 +1,32 @@
+= labelled_fields_for :version, @version do |ff|
+  %p
+    = ff.select :rule_id, options_from_collection_for_select(@rules, :id, :name, @task.version.rule_id),  |
+      {:required => true, label: :periodic_version_rules},                                                |
+      :data => { :json => VersionNameRule.pluck(:id, :description).to_h.to_json },                        |
+      :onchange => "$(this).siblings('small').text($(this).data('json')[this.value])"
+    %small.form-text.text-muted= (@task.version.rule || @rules.first).try(:description)
+  %p
+    = ff.select :project_id, options_from_collection_for_select(@projects, :id, :name, @task.version.project_id),  |
+      {:required => true}, :disabled => !@task.new_record?
+    = select2_for 'version_project_id'
+    = ff.hidden_field :project_id if !@task.new_record?
+
+
+  %p= ff.select :spec_id, specs_options_for_select(@project), {:required => true, label: :version_spec_id}
+  %p= ff.select :repo_one_id, project_repo_one_options_for_select(@project, @version), :required => true, label: :version_repo_one_of_project
+  %p= ff.select :repo_two_id, project_repo_two_options_for_select(@project, @version), include_blank: true, label: :version_repo_two_of_project
+  %p
+    = ff.select :priority, list_for_select(:version, :priority), :required => true, label: :version_priority
+    - unless User.current.is_scm?
+      - 2.times do
+        = remove_select_option("version_priority")
+  %p= ff.select :compile_type, list_for_select(:version, :compile_type), :required => true, label: :version_compile_type
+  %p= ff.select :ota_whole_compile, bool_for_select, :required => true, label: :version_ota_whole_compile
+  %p= ff.select :ota_increase_compile, bool_for_select, {:required => true, label: :version_ota_increase_compile}
+  %p= ff.select :continue_integration, bool_for_select, :required => true, label: :version_continue_integration
+  %p= ff.select :coverity, bool_for_select, :required => true, label: 'Coverity'
+  %p= ff.select :signature, bool_for_select, :required => true, label: :version_signature
+  %p
+    = ff.select :mail_receivers, mail_receiver_options, {}, {:multiple => "multiple"}
+    %small.form-text.text-muted 版本编译完成后，邮件同时抄送给对方
+    = select2_remote "version_mail_receivers"

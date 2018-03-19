@@ -1,0 +1,13 @@
+= error_messages_for @document
+.box.tabular
+  %p= f.select :category_id, DocumentCategory.active.for_project.collect {|c| [c.name, c.id]}
+  %p= f.text_field :title, :required => true, :size => 60
+  %p= f.text_area :description, :cols => 60, :rows => 15, :class => 'wiki-edit'
+  - @document.custom_field_values.each do |value|
+    %p= custom_field_tag_with_label :document, value
+= wikitoolbar_for 'document_description'
+- if @document.new_record?
+  .box.tabular
+    %p
+      %label= l(:label_attachment_plural)
+      = render :partial => 'attachments/form', :locals => {:container => @document}

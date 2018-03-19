@@ -1,0 +1,18 @@
+:plain
+  $("#ajax-modal").html('#{j render("criterions/forms/#{@criterion.identifier}", :criterion => @criterion)}');
+  layer.open({
+    type: 1,
+    title: '#{l(:button_edit)} #{@criterion.name}',
+    area: ['800px', '600px'],
+    zIndex: 666,
+    moveType: 1,
+    shadeClose: false,
+    content: $("#ajax-modal"),
+    btn: ['#{l(:button_cancel)}', '#{l(:button_submit)}'],
+    yes: function(index, layero){
+      layer.close(index)
+    },
+    btn2: function(index, layero){
+      $("#ajax-modal > form").submit();
+    }
+  })

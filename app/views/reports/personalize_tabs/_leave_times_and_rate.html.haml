@@ -1,0 +1,95 @@
+%div{:style => "width:100%;"}
+  %ul.notification-list
+    %li.notification-list-item
+      .notification-content
+        %p
+          %strong= "查询条件"
+      .clearfix
+      .notification-acton.select2-rectify
+        %form#queryForm.form-horizontal{:role => "form"}
+          .form-group
+            %label.col-sm-2.control-label 角色
+            .col-sm-2
+              %select#role.form-control{:name => "role"}
+                %option{:value => "assigned_to_id"} 个人
+                %option{:value => "depts.id"} 部门
+            .col-sm-3
+              = select_tag "role_value", [], :multiple => :multiple, :class => "form-control"
+              = select2_remote("role_value")
+            %label.col-sm-2.control-label 超时天数
+            .col-sm-2
+              %select#days.form-control{:name => "days"}
+                = (1..10).each do |d|
+                  %option{:value => "#{d}"}= d
+
+          .form-group
+            %label.col-sm-2.control-label 项目
+            .col-sm-2
+              %select#project.form-control{:name => "project"}
+                %option{:value => "project_id"} 名称
+                %option{:value => "category"} 类别
+            .col-sm-3
+              = select_tag "project_value", project_tree_options_for_select(Project.all), class: 'form-control'
+            %label.col-sm-2.control-label 颗粒度
+            .col-sm-2
+              %select.form-control{:name => "dwm"}
+                %option{:value => "day"} 日
+                %option{:value => "week"} 周
+                %option{:value => "month"} 月
+
+          .form-group
+            %label.col-sm-2.control-label 时间
+            .col-sm-2
+              %input#start_dt.form-control{:name => "start_dt",:value => "#{(Time.now-30.days).strftime('%Y-%m-%d')}"}
+            %label.col-sm-1.control-label 至
+            .col-sm-2
+              %input#end_dt.form-control{:name => "end_dt",:value => "#{Time.now.strftime('%Y-%m-%d')}"}
+            .col-sm-4.text-right
+              %input{:type => "button",:onclick => "queryLeaveTimesAndRate()",:class => "btn btn-primary",:value => "查  询"}
+
+#gioneeChart{:style => "height:600px"}
+
+:javascript
+  initSelect("project_value");
+  initSelect("role_value");
+  initDateTimePicker("start_dt","Y-m-d",false);
+  initDateTimePicker("end_dt","Y-m-d",false);
+
+  $('#role').on("change", function (e) {
+    var opts = "";
+    $('#role_value').siblings(".select2-container").remove();
+    $('#role_value').val('').trigger("change");
+    if($('#role').val()=="assigned_to_id"){
+      $('#role_value').select2_remote();
+    }else{
+      opts = #{@depts};
+      $('#role_value').empty().append(opts);
+      $('#role_value').select2();
+    }
+  });
+
+  $('#project').on("change", function (e) {
+    var opts = "";
+    $('#project_value').val('').trigger("change");
+    switch ($('#project').val())
+    {
+      case "project_id":
+        opts = #{@projects};
+        break;
+      case "category":
+        opts = #{@project_categories};
+        break;
+      case "project_hard_category":
+        opts = #{Project::PROJECT_HARD_CATEGORY.map{|p| "<option value=\"#{p}\">#{p}</option>"}};
+        break;
+      case "project_flow":
+        opts = "";
+        break;
+    }
+    $('#project_value').empty().append(opts);
+  });
+
+  setTimeout(function () {
+    $('.notification-acton').css("display","block");
+    queryLeaveTimesAndRate();
+  }, 500);

@@ -1,0 +1,52 @@
+= labelled_fields_for :issue, @issue do |f|
+  = call_hook(:view_issues_form_details_top, { :issue => @issue, :form => f })
+  = hidden_field_tag 'form_update_triggered_by', ''
+  -# - if @issue.safe_attribute? 'is_private'
+  -#   %p#issue_is_private_wrap
+  -#     = f.check_box :is_private, :no_label => true
+  -#     %label#issue_is_private_label.inline{:for => "issue_is_private"}= l(:field_is_private)
+
+  - if @issue.safe_attribute? 'rom_version'
+    %p{:class => (@issue.new_record?? "hidden" : nil), :id => "rom_version_p"}
+      = f.select :rom_version, rom_versions_options_for_select(@project), {:include_blank => true}, |
+        :onchange => "updateIssueFrom('#{escape_javascript update_issue_form_path(@project, @issue)}', this)"
+  - if @issue.safe_attribute?('project_id') && (!@issue.new_record? || @project.nil? || @issue.copy?)
+    - if @issue.rom_version.present?
+      %p= f.select :project_id, project_tree_options_for_select(Project.where(:rom_version => @issue.rom_version), :selected => @issue.project), {:required => true}, |
+        :onchange => "updateIssueFrom('#{escape_javascript update_issue_form_path(@project, @issue)}', this)"
+    - else
+      %p
+        = f.select :project_id, project_tree_options_for_select(@issue.allowed_target_projects, :selected => @issue.project), {:required => true}, |
+          :onchange => "updateIssueFrom('#{escape_javascript update_issue_form_path(@project, @issue)}', this)"
+    = select2_for 'issue_project_id', nil, :no_select2_class => true
+
+  - if @issue.safe_attribute? 'tracker_id'
+    %p= f.select :tracker_id, trackers_options_for_select(@issue), {:required => true}, :disabled => !@issue.new_record?,
+      :onchange => "updateIssueFrom('#{escape_javascript update_issue_form_path(@project, @issue)}', this)"
+  - if @issue.safe_attribute? 'subject'
+    %p
+      = f.text_field :subject, :size => 80, :maxlength => 255, :required => true, :data => {"max-input-length" => 140}
+  - if @issue.safe_attribute? 'description'
+    %p
+      = f.label_for_field :description, :required => @issue.required_attribute?('description')
+      = link_to_function content_tag(:span, l(:button_edit), :class => 'icon icon-edit'), '$(this).hide(); $("#description_and_toolbar").show()' unless @issue.new_record?
+      = content_tag 'span', :id => "description_and_toolbar", :style => (@issue.new_record? ? nil : 'display:none') do
+        = f.text_area :description,                                                                        |
+          :cols => 60,                                                                                     |
+          :rows => (@issue.description.blank? ? 10 : [[10, @issue.description.length / 50].max, 100].min), |
+          :accesskey => accesskey(:edit),                                                                  |
+          :class => 'wiki-edit',                                                                           |
+          :no_label => true,
+          :placeholder => "填写log地址时，您可以使用 %id% 来代替本条问题的id，提交成功后会自动替换。"
+    = wikitoolbar_for 'issue_description'
+  #attributes.attributes
+    = render :partial => 'issues/attributes'
+  = call_hook(:view_issues_form_details_bottom, { :issue => @issue, :form => f })
+- heads_for_wiki_formatter
+
+:javascript
+  $(document).ready(function(){
+    $("#issue_tracker_id, #issue_status_id").each(function(){
+      $(this).val($(this).find("option[selected=selected]").val());
+    });
+  });

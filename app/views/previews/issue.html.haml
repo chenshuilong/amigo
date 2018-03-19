@@ -1,0 +1,8 @@
+- if @notes
+  %fieldset.preview
+    %legend= l(:field_notes)
+    = textilizable @notes, :attachments => @attachments, :object => @issue
+- if @description
+  %fieldset.preview
+    %legend= l(:field_description)
+    = textilizable @description, :attachments => @attachments, :object => @issue

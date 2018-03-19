@@ -1,0 +1,32 @@
+- provide :nav, "5,3"
+- provide :css, "bootstrap"
+- content_for :bread do
+  %li= link_to l(:periodic_versions), periodic_versions_path
+  %li= l(:periodic_version_rules)
+
+
+.h2= l(:periodic_version_rules)
+- if @rules.empty?
+  %p.nodata= l(:label_no_data)
+- else
+  = fields_table :class => 'list issues table table-striped table-bordered' do |t|
+    - t.title '#'
+    - t.title :field_android_platform
+    - t.title :field_name
+    - t.title :field_description
+    - t.title :periodic_version_rule_range
+    - t.title :field_author
+    - t.title :field_created_on
+    - t.title :field_operation if VersionNameRule.permit?
+    - @rules.each do |rule|
+      - t.row do
+        - t.data rule.id
+        - t.data Project::PROJECT_ANDROID_PLATFORM.find{|k,v| v == rule.android_platform}.first
+        - t.data rule.name
+        - t.data rule.description, class: 'subject'
+        - t.data rule.range.present?? rule.range : l(:periodic_version_rule_range_timestamp)
+        - t.data link_to_user rule.author
+        - t.data format_time rule.created_at
+        - t.data link_to l(:label_edit), rule_edit_periodic_versions_path(rule.id) if VersionNameRule.permit?
+
+- html_title(l(:periodic_version_rules))

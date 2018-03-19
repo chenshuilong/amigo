@@ -1,0 +1,17 @@
+- if records.present?
+  .version-issues
+    .wiki
+      = data_table_for 'mokuaiSyncBatchHistory',
+        dom: '<"data-table-top"f>rt<"data-table-bottom"pil><"clear">',
+        lengthMenu: [[-1, 10, 25, 50, 100], ["#{l(:label_all)}", 10, 25, 50, 100]]
+      = fields_table :class => 'list data-table', :id => 'mokuaiSyncBatchHistory' do |t|
+        - t.title "#"
+        - t.title "更新内容"
+        - t.title "操作者"
+        - t.title "更新时间"
+        - records.each_with_index do |record, i|
+          - t.row do
+            - t.data i+1
+            - t.data record.details.last.value
+            - t.data record.user.try(:firstname)
+            - t.data record.created_at.strftime("%F %T")

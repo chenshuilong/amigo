@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SMValidator复杂案例</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="../dist/SMValidator.js"></script>
+</head>
+<body>
+    <h2>使用HTML</h2>
+    <form id="form1">
+        <div>
+            <p>获取焦点后清除样式，失去焦点时不验证，要求长度大于5，验证成功后边框绿色</p>
+            <input type="text" data-rule="focus|disblur|length(5,)|passStyle({'border': '1px solid #090'})">
+        </div>
+        <div>
+            <p>oninput不验证，必填且要求长度小于5，失去焦点时验证</p>
+            <p>失败时不使用默认failStyle，只使用默认配置的failHtml</p>
+            <input type="text" data-rule="required|length(,5)|disinput|!failStyle">
+        </div>
+        <div>
+            <p>手动验证，要求内容为-100~100的数字，使用自定义消息容器</p>
+            <input id="manul1" type="text" data-rule="range(-100,100)|manul|failHtml(#message1)|passHtml(#message11)">
+            <a href="javascript:;" onclick="SMValidator.validate('#manul1')">点击验证</a>
+            <p id="message1" style="color:red"></p>
+            <p id="message11" style="color:green">验证通过</p>
+        </div>
+        <div>
+            <p>要求内容为-100~100的数字，使用自定义消息容器，且容器不会消失</p>
+            <input id="manul1" type="text" data-rule="range(-100,100)|failHtml(*#message14)">
+            <p id="message14" style="color:red;width:200px;height:24px;border:1px solid #f00;margin-top:2px"></p>
+        </div>
+        <div>
+            <p>要求长度大于5，使用自定义类名，不显示规则消息，父容器添加样式</p>
+            <input type="text" data-rule="length(5,)|failCss(error,+error)|failHtml(!#message12)">
+            <span id="message12" style="color:red">长度大于5，这里使用的是自定义文本，不使用规则消息</span>
+        </div>
+        <div>
+            <p>要求必填，正则匹配只能数字，自定义必填提示语</p>
+            <input type="text" data-rule="required(请输入内容)|/^\d*$/只能填数字">
+        </div>
+        <div>
+            <p>长度大于7小于17的密码，必填，获得焦点时不清理样式</p>
+            <input type="password" id="password" data-rule="required|length(7,17)">
+            <p>重复密码</p>
+            <input type="password" data-rule="equal(#password)">
+        </div>
+        <div>
+            <p>测试checkbox</p>
+            <input value="0" name="checkbox1" type="checkbox" data-rule="required|failHtml(#checkMessage)|length(1,)">
+            <input value="1" name="checkbox1" type="checkbox">
+            <input value="2" name="checkbox1" type="checkbox">
+            <div id="checkMessage" style="color:red"></div>
+        </div>
+        <div>
+            <p>测试one select</p>
+            <select data-rule="required">
+                <option value="">请选择</option>
+                <option value="1">A</option>
+                <option value="2">B</option>
+            </select>
+        </div>
+        <div>
+            <p>测试multiple select</p>
+            <select data-rule="required|length(1,)" multiple>
+                <option value="">请选择</option>
+                <option value="1">A</option>
+                <option value="2">B</option>
+                <option value="3">C</option>
+                <option value="4">D</option>
+            </select>
+        </div>
+        <div>
+            <p>只能输入英文数字的textarea</p>
+            <textarea data-rule="/^[a-z0-9]*$/i/只能输入英文或数字|required" cols="30" rows="3"></textarea>
+        </div>
+        <div>
+            <p>测试&amp;分割符，必填，长度大于3的数字，自定义容器</p>
+            <input type="text" data-rule="required&length(3,)&number&failHtml(#message13)">
+            <div style="color:#f00" id="message13"></div>
+        </div>
+    </form>
+    <h2>使用JavaScript，功能更全面</h2>
+    <form id="form2">
+        <div>
+            <p>onblur不验证，必填，只能填数字，使用自定义样式</p>
+            <p>同一个name绑定多个input</p>
+            <div><input name="field1" type="text"></div>
+            <div><input name="field1" type="text"></div>
+        </div>
+        <div>
+            <p>oninput不验证，必填，且要求长度为5，失去焦点时验证</p>
+            <p>局部禁用focus，获得焦点时不清除样式</p>
+            <input name="field2" type="text">
+        </div>
+        <div>
+            <p>正则匹配只能数字</p>
+            <input name="field3" type="text">
+        </div>
+        <div>
+            <p>正则匹配只能英文字母</p>
+            <input name="field4" type="text">
+        </div>
+        <div>
+            <p>手动验证，长度为4，自定义类名，自定义样式，自定义消息容器</p>
+            <input name="field5" id="manul2" type="text">
+            <a href="javascript:;" onclick="onManul()">点击验证</a>
+            <p name="message2" style="color:#39f">要求长度为4</p>
+        </div>
+        <div>
+            <p>测试radio，因为只有required规则，所以请滚到页面底部点击提交按钮测试</p>
+            <input type="radio" name="radio1">
+            <input type="radio" name="radio1">
+            <input type="radio" name="radio1"  data-rule="required">
+        </div>
+        <div>
+            <p>测试async功能，先点击页面底部提交按钮查看效果</p>
+            <p>点击true或false按钮模拟收到服务器结果进行设值</p>
+            <div>
+                <input name="field6" type="text" value="测试值">
+                <button type="button" onclick="async6(1)">true</button>
+                <button type="button" onclick="async6(2)">false</button>
+            </div>
+            <div>
+                <input name="field7" type="text">
+                <button type="button" onclick="async7(1)">true</button>
+                <button type="button" onclick="async7(2)">false</button>
+            </div>
+        </div>
+        <div>
+            <p>测试&amp;分割符，必填，长度大于3，只能数字</p>
+            <input name="field8" type="text">
+        </div>
+        <div>
+            <p>测试fail/pass，必填，只能数字，长度大于5，通过时文字绿色，失败时自定义错误文本格式</p>
+            <input name="field9" type="text" >
+            <div id="field9Message" style="color:#f00"></div>
+        </div>
+        <button type="reset" onclick="resetStyle()">重置</button>
+        <button type="button" onclick="testShort()">当有一个规则失败时短路验证"short"</button>
+        <div style="margin-top:10px"><b>提交按钮在网页底部，测试submit和locate功能</b></div>
+        <button style="margin: 1000px 0 0 5px;" type="submit">提交</button>
+    </form>
+    <script>
+        SMValidator.setLang({
+            number: '请输入数字',
+            email: '请输入正确的邮箱格式',
+            range_equal: '值必须等于{0}',
+            range_scope: '值必须大于{0}且小于{1}',
+            range_greater: '值必须大于{0}',
+            range_less: '值必须小于{0}',
+            renge_no_number: '值必须是数字',
+            error_param: '参数错误',
+            length_equal: '长度必须为{0}',
+            length_scope: '长度必须大于{0}且小于{1}',
+            length_greater: '长度必须大于{0}',
+            length_less: '长度必须小于{0}',
+            password: '两次输入密码不一致'
+        });
+        
+        //偏好使用HTML
+        new SMValidator('#form1');
+
+        //偏好使用JS
+        new SMValidator('#form2', {
+            focus: true,
+            async: '未经过服务器验证数据', //设置async和required的提示消息
+            required: '这是必填项',
+            failHtml: '<span style="color:#f6f"></span>',
+            failStyle: {
+                color: '#f6f',
+                border: '1px dashed #f6f'
+            },
+            rules: {
+                onlyNumber: [/^\d*$/, '只能填数字'],
+            },
+            fields: {
+                field1: 'required|onlyNumber|disblur|failCss(error)',
+                field2: 'required|length(5)|disinput|!focus',
+                field3: [/^\d*$/, '只能填数字'],
+                field4: function(val) {
+                    //在fields里的函数只能使用一个参数val
+                    return /^[A-Za-z]*$/.test(val) || '只能填英文字母';
+                },
+                field5: {
+                    failHtml: '[name="message2"]',
+                    failCss: ['error'],
+                    failStyle: {
+                        color: '#39f',
+                        border: '1px solid #39f'
+                    },
+                    rule: 'length(3,5)',
+                    manul: true
+                },
+                field6: {
+                    async: '还没通过服务器验证',
+                    failHtml: '<span style="color:red"></span>',
+                    passHtml: '<span style="color:green">服务器验证通过</span>'
+                },
+                field7: {
+                    required: true,
+                    async: true
+                },
+                field8: {
+                    rule: 'length(3,)&number',
+                    required: '请输入内容',
+                    failHtml: '<div style="color:#f00"></div>'
+                },
+                field9: {
+                    required: true,
+                    rule: 'onlyNumber&length(5,)',
+                    failHtml: false, //禁用默认样式
+                    failStyle: false,
+                    pass: function() {
+                        this.style.color = '#090';
+                        document.getElementById('field9Message').innerText = '';
+                    },
+                    fail: function(messages) {
+                        this.style.color = '#f00';
+                        document.getElementById('field9Message').innerText = '【' + messages.toString() + '】';
+                    }
+                }
+            },
+            submit: function(valid, form) {
+                if(valid) form.submit();
+            }
+        });
+
+        function onManul() {
+            SMValidator.validate('#manul2');
+        }
+
+        function async6(result) {
+            SMValidator.validate('[name="field6"]', {forceFlag: result, asyncMessage: '服务器验证失败'});
+        }
+
+        function async7(result) {
+            SMValidator.validate('[name="field7"]', {forceFlag: result});
+        }
+
+        function resetStyle() {
+            SMValidator.reset('#form2');
+        }
+        
+        function testShort() {
+            SMValidator.validate('#form2', {short: true});
+        }
+    </script>
+</body>
+</html>

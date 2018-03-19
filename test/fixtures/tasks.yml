@@ -1,0 +1,23 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  container_id: 1
+  container_type: MyString
+  name: MyString
+  assigned_to_id: 1
+  author_id: 1
+  status: 1
+  description: MyText
+  start_date: 2017-05-26 09:46:00
+  due_date: 2017-05-26 09:46:00
+
+two:
+  container_id: 1
+  container_type: MyString
+  name: MyString
+  assigned_to_id: 1
+  author_id: 1
+  status: 1
+  description: MyText
+  start_date: 2017-05-26 09:46:00
+  due_date: 2017-05-26 09:46:00

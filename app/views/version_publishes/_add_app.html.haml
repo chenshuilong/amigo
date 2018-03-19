@@ -1,0 +1,50 @@
+#version-publish-add-app
+  = form_tag('', {method: :get, class: 'form-inline', remote: true}) do |f|
+    .form-group
+      = label_tag 'spec_version_id', l(:version_project_category)
+      = select_tag 'spec_version_id', options_for_select(@app_infos), |
+        class: "form-control", prompt: "请选择", "@change"=>"chooseSpecVersion()"
+      = hidden_field_tag 'id', @version_publish.id
+      %span * 从项目规格中选择相关应用，如Amigo_Weather  
+
+  %hr
+  
+  .roadmap-table
+    %table#versionPublishAddTable.list.table.table-striped.table-bordered
+      %thead
+        %tr
+          %th= l(:spec_version_cn_name)
+          %th= l(:spec_version_desktop_name)
+          %th= l(:spec_version_description)
+          %th= l(:spec_version_developer)
+          %th= l(:version_name_tag)
+          %th= l(:version_applist_apk_permission)
+          %th= l(:version_applist_apk_removable)
+      %tbody
+        %tr
+          %td {{row.cn_name}}
+          %td {{row.desktop_name}}
+          %td {{row.description}}
+          %td {{row.developer}}
+          %td {{apk_info["app_version"]}}
+          %td {{apk_info["apk_permission"]}}
+          %td {{apk_info["apk_removable"]}}
+
+:javascript
+  var add_app_row = new Vue({
+    el: '#version-publish-add-app',
+    data: {
+      row: {},
+      apk_info: {}
+    },
+    methods: {
+      chooseSpecVersion: function() {
+        var selected = $("#spec_version_id").val();
+        var version_publish_id = #{@version_publish.id};
+        $.get("/version_publishes/search_spec_version?name="+selected+"&id="+version_publish_id, function(data){
+          add_app_row.$data.apk_info = data.apk_info
+          add_app_row.$data.row = data.rows
+        })
+      }
+    }
+  })

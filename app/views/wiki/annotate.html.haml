@@ -1,0 +1,33 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+.contextual
+  = link_to(l(:button_edit), {:action => 'edit', :id => @page.title}, :class => 'icon icon-edit')
+  = link_to(l(:label_history),                                                 |
+    {:action => 'history', :id => @page.title}, :class => 'icon icon-history') |
+= wiki_page_breadcrumb(@page)
+= title [@page.pretty_title, project_wiki_page_path(@page.project, @page.title, :version => nil)], |
+  [l(:label_history), history_project_wiki_page_path(@page.project, @page.title)],                 |
+  "#{l(:label_version)} #{@annotate.content.version}"                                              |
+%p
+  %em
+    = @annotate.content.author ? link_to_user(@annotate.content.author) : l(:label_user_anonymous)
+    , #{format_time(@annotate.content.updated_on)}
+  %br/
+  = @annotate.content.comments
+- colors = Hash.new {|k,v| k[v] = (k.size % 12) }
+%table.filecontent.annotate
+  %tbody
+    - line_num = 1
+    - @annotate.lines.each do |line|
+      %tr{:class => "bloc-#{colors[line[0]]}"}
+        %th.line-num= line_num
+        %td.revision= link_to line[0], :controller => 'wiki',     |
+            :action => 'show', :project_id => @project, |
+            :id => @page.title, :version => line[0]     |
+        %td.author= line[1]
+        %td.line-code
+          %pre= line[2]
+      - line_num += 1
+- content_for :header_tags do
+  = stylesheet_link_tag 'scm'

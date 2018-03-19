@@ -1,0 +1,43 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %meta{:charset => "utf-8"}/
+    :css
+      label {display:block;margin:0.5em;}
+  %body
+    %h1 Redmine Mail Handler
+    = form_tag({}, :multipart => true, :action => 'post') do
+      = hidden_field_tag 'key', params[:key]
+      %fieldset
+        %legend Raw Email
+        = text_area_tag 'email', '', :style => 'width:95%; height:400px;'
+      %fieldset
+        %legend Options
+        %label
+          unknown_user: #{select_tag 'unknown_user', options_for_select(['', 'ignore', 'accept', 'create'])}
+        %label
+          default_group: #{text_field_tag 'default_group'}
+        %label
+          no_account_notice: #{check_box_tag 'no_account_notice', 1}
+        %label
+          no_notification: #{check_box_tag 'no_notification', 1}
+        %label
+          no_permission_check: #{check_box_tag 'no_permission_check', 1}
+      %fieldset
+        %legend Issue attributes options
+        %label
+          project: #{text_field_tag 'issue[project]'}
+        %label
+          status: #{text_field_tag 'issue[status]'}
+        %label
+          tracker: #{text_field_tag 'issue[tracker]'}
+        %label
+          category: #{text_field_tag 'issue[category]'}
+        %label
+          priority: #{text_field_tag 'issue[priority]'}
+        %label
+          private: #{check_box_tag 'issue[private]', 1}
+        %label
+          allow_override: #{text_field_tag 'allow_override'}
+      %p= submit_tag 'Submit Email'

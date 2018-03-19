@@ -1,0 +1,12 @@
+= form_tag("#{upload_project_documents_path @project}", method: "post", :multipart => true, :class => "form-horizontal") do
+  .form-group
+    = label_tag :category_id, '文件类型', class: 'control-label col-sm-2'
+    .col-xs-10
+      = select_tag "document[category_id]", options_for_select(@document_category.map{|v| [v.name,v.id]}), { class: 'form-control', style: 'width:100%'}
+      = select2_tag("document_category_id")
+  .form-group
+    = label_tag :description, "文件", class: "control-label col-sm-2"
+    .col-xs-10
+      .box.tabular
+        %p#attachments_form
+          = render :partial => 'attachments/form', :locals => {:container => Document.first}

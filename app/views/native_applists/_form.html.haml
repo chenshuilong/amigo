@@ -1,0 +1,14 @@
+.issue-details#update
+  #all_attributes
+    %p
+      = f.text_field :name, :required => true, label: :apk_base_name, disabled: !@app.new_record?
+      %small.form-text.text-muted 填写apk字母名, 需带.apk后缀, 如Amigo_Account.apk
+    %p= f.select :android_platform, list_for_select(@app, :android_platform), :required => true, label: :apk_base_android_platform
+    %p= f.text_field :cn_name, :required => true, label: :apk_base_cn_name
+    %p= f.text_field :desktop_name, :required => true, label: :apk_base_desktop_name
+    %p= f.text_area :cn_description, :required => true, label: :apk_base_cn_description,:style => "width: 80%; height: 100px"
+    %p= f.text_field :developer, :required => true, label: :apk_base_developer
+    %p= f.text_field :package_name, :required => true, label: :apk_base_package_name
+    %p= f.select :category_id, options_for_select(@categories.pluck(:name, :id), @app.category_id), :required => true, label: :apk_base_category_id
+    %p= f.select :removable, list_for_select(@app, :removable), :required => true, label: :apk_base_removable
+    %p= f.text_field :notes, :required => true, label: :apk_base_notes

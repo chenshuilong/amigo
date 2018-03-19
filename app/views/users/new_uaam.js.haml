@@ -1,0 +1,4 @@
+- if !!@user_saved
+  $(".uaam-wrapper .row").html('<div class="alert alert-success">创建成功，用户现在可以通过用户名和密码来登录本系统了！<a href="/users/uaam">继续创建</a></div>')
+- else
+  $(".uaam-wrapper .row").html('<div class="alert alert-danger">创建失败，请重试！<a href="/users/uaam">重新创建</a></div>')

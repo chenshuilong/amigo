@@ -1,0 +1,26 @@
+---
+:concurrency: 20
+:pidfile: tmp/pids/sidekiq.pid
+:logfile: ./log/sidekiq.log
+:queues:
+  - default
+  - repo_request
+  - issue_to_merge
+  - apply_umpirage
+
+:limits:
+  release: 1
+  export: 1
+  export_quicker: 1
+  repo_request: 1
+  apply_umpirage: 1
+  issue_to_merge: 1
+  copy_project_members: 1
+  thirdparty_release: 1
+  sdk_release: 1
+development:
+  :concurrency: 5
+staging:
+  :concurrency: 10
+production:
+  :concurrency: 25

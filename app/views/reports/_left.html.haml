@@ -1,0 +1,357 @@
+.filter-side
+  .filter-head
+    .filter-add-report-icon{:title => "新建报表"}
+      %i.fa.fa-plus
+    .filter-head-title 报表列表
+  .filter-list
+    #filterList.panel-group
+      .panel.panel-default
+        .panel-heading{"data-parent" => "#filterList", "data-toggle" => "collapse", :href => "#filterStar"}
+          %i.fa.fa-star
+          %span 自定义
+          .panel-heading-addition.panel-heading-newfolder
+            = icon "folder-o"
+        #filterStar.panel-collapse.collapse
+          .panel-body
+            #filterStarList.filter-list-name
+              =  raw condition_report_star_list
+            #filterStarMenu.filter-menu
+              %ul
+                %li.forfile
+                  %a.filter-menu-open{:href => "#"} 打开
+                %li#filter-menu-past
+                  %a.filter-menu-past{:href => "#"} 粘贴
+                %li.forfile
+                  %a.filter-menu-copy{:href => "#"} 复制
+                %li.forfile
+                  %a.filter-menu-share{:href => "#"} 分享
+                %li.forfolder
+                  %a.filter-menu-newfolder{:href => "#"} 新建文件夹
+                %li.forfolder
+                  %a.filter-menu-newcondition-report{:href => "#"} 新建报表
+                %li
+                  %a.filter-menu-delete{:href => "#"} 删除
+      .panel.panel-default
+        .panel-heading{"data-parent" => "#filterList", "data-toggle" => "collapse", :href => "#filterClock"}
+          %i.fa.fa-clock-o
+          %sapn 最近
+        #filterClock.panel-collapse.collapse
+          .panel-body
+            #filterHistoryList.filter-list-name
+              =  raw condition_report_history_list
+            #filterHistoryMenu.filter-menu
+              %ul
+                %li.forfile
+                  %a.filter-menu-open{:href => "#"} 打开
+      .panel.panel-default
+        .panel-heading{"data-parent" => "#filterList", "data-toggle" => "collapse", :href => "#filterCog"}
+          %i.fa.fa-cog
+          %sapn 系统定制
+          - if User.current.admin?
+            .panel-heading-addition.panel-heading-newfolder
+              = icon "folder-o"
+        #filterCog.panel-collapse.collapse
+          .panel-body
+            #filterSystemList.filter-list-name
+              =  raw condition_report_system_list
+            #filterSystemMenu.filter-menu
+              %ul
+                %li.forfile
+                  %a.filter-menu-open{:href => "#"} 打开
+                %li.forfile
+                  %a.filter-menu-sendto{:href => "#"} 转到我的自定义
+                - if User.current.admin?
+                  %li.forfolder
+                    %a.filter-menu-newfolder{:href => "#"} 新建文件夹
+                  %li.forfolder
+                    %a.filter-menu-newcondition-report{:href => "#"} 新建报表
+                  %li
+                    %a.filter-menu-delete{:href => "#"} 删除
+  .filter-menu-func
+    #filterStarRename
+      .filter-window-wrapper
+        .filter-window-name
+          %input.filter-window-rename-value{:type => "text", :placeholder => "请输入新的文件名"}
+    #filterStarNewforlder
+      .filter-window-wrapper
+        .filter-window-name
+          %input.filter-window-newfolder-value{:type => "text", :placeholder => "请输入新的文件夹名"}
+    #filterStarShare
+      .filter-window-wrapper
+        = form_tag(share_conditions_path, :id => "shareForm", :remote => true, :onsubmit => "layer.close(share_window)") do
+          = hidden_field_tag "condition_id", nil, :id => "share_condition_id"
+          = hidden_field_tag "category", "report"
+          .filter-window-search
+            .input-group
+              %input.form-control{:type => "text", :placeholder => "请输入姓名"}
+              %span.input-group-btn
+                %button.btn.btn-primary{:type => "button"}
+                  %i.fa.fa-search
+          .filter-window-select
+            .filter-window-select-list
+            .select-window-select-result
+    #filterChoose
+      .filter-window-wrapper
+        = form_tag(share_conditions_path, :id => "shareForm", :remote => true, :onsubmit => "layer.close(share_window)") do
+          = hidden_field_tag "condition_id", nil, :id => "share_condition_id"
+          .filter-window-search
+            .input-group
+              %input.form-control{:type => "text", :placeholder => "请输入姓名"}
+              %span.input-group-btn
+                %button.btn.btn-primary{:type => "button"}
+                  %i.fa.fa-search
+          .filter-window-select
+            .filter-window-select-list
+            .select-window-select-result
+  .filter-window
+    %input.filter-window-targetID-value{:type => "hidden"}
+    .filter-window-left
+      %input.filter-window-targetID-value{:type => "hidden"}
+      .filter-window-conditions
+        %form#filterform_window.form-horizontal.select2-rectify{:role => "form"}
+          .form-group
+            %label.col-sm-2.control-label 名称
+            .col-sm-2
+              %input#reportname_window.form-control{:name => "reportname"}
+            .col-sm-3
+              %select#reporttype_window.form-control{:name => "reporttype"}
+                %optgroup{:label => "数量"}
+                  %option{:value => "bug数量"} bug数量
+                  %option{:value => "有效数量"} 有效数量
+                  %option{:value => "发现bug数量"} 发现bug数量
+                  %option{:value => "重打开数量"} 重打开次数
+                  %option{:value => "遗留数量"} 遗留数量
+                  %option{:value => "已解决数量"} 已解决数量
+                  %option{:value => "已解的重分配数量"} 已解的重分配数量
+                  %option{:value => "冗余数量"} 冗余数量
+                  %option{:value => "平均已解的重分配数量"} 平均已解的重分配数量
+                %optgroup{:label => "时长"}
+                  %option{:value => "平均未分配时长"} 平均未分配时长
+                  %option{:value => "平均未解决时长"} 平均未解决时长
+                  %option{:value => "平均未处理时长"} 平均未处理时长
+                  -#%option{:value => "平均未走读时长"} 平均未走读时长
+                  %option{:value => "平均未验证时长"} 平均未验证时长
+                  %option{:value => "平均关闭时长"} 平均关闭时长
+                  %option{:value => "平均分配时长"} 平均分配时长
+                  %option{:value => "平均解决时长"} 平均解决时长
+                  -#%option{:value => "平均走读时长"} 平均走读时长
+                  %option{:value => "平均验证时长"} 平均验证时长
+                  -#%option{:value => "bug分析时长"} bug分析时长
+                %optgroup{:label => "比率"}
+                  %option{:value => "解决率"} 解决率
+                  %option{:value => "重打开率"} 重打开率
+                  %option{:value => "重分配率"} 已解BUG的重分配率
+                  %option{:value => "分配准确率"} 分配准确率
+            .col-sm-2
+              %span#calculation
+                = icon "info-circle"
+                = link_to "计算方法", "javascript:onShowCalculation('reporttype_window');"
+
+          .form-group
+            %label.col-sm-2.control-label 角色
+            .col-sm-2
+              %select#role_window.form-control{:name => "role"}
+                %option{:value => "assigned_to_id"} 个人
+                %option{:value => "depts.id"} 部门
+            .col-sm-5
+              = select_tag "role_value_window", [], :multiple => :multiple, class: 'value form-control select-multiple', :name => "role_value"
+
+          .form-group
+            %label.col-sm-2.control-label 项目
+            .col-sm-2
+              %select#project_window.form-control{:name => "project"}
+                %option{:value => "project_id"} 项目名称
+                %option{:value => "category"} 项目类别
+            -#%option{:value => "project_hard_category"} 项目难度分类
+            -#%option{:value => "project_flow"} 流
+            .col-sm-5
+              = select_tag "project_value_window", options_for_select(Project.sorted.collect {|p| [p.name,p.id]}),
+                :multiple => :multiple, class: 'value form-control select-multiple'
+              = select2_remote("role_value_window");
+
+          .form-group
+            %label.col-sm-2.control-label{:for => "probability"} 概率
+            .col-sm-2
+              = select_tag "probability_window", options_for_select(CustomField.visible.find_by_name("概率").possible_values), :multiple => :multiple, class: 'value form-control select-multiple'
+            %label.col-sm-2.control-label{:for => "priority"} 严重等级
+            .col-sm-3
+              = select_tag "priority_id_window", options_for_select(IssuePriority.active.collect{|pty| [pty.name,pty.id]}), :multiple => :multiple, class: 'value form-control select-multiple'
+
+          .form-group
+            %label.col-sm-2.control-label{:for => "groupby_window"} 显示
+            .col-sm-2
+              %select#groupby_window.form-control{:name => "groupby"}
+                %option{:value => "issues.assigned_to_id"} 按个人
+                %option{:value => "users.orgNm"} 按部门
+                %option{:value => "issues.project_id"} 按项目
+                %option{:value => "issues.mokuai_name"} 按模块
+                %option{:value => "issues.mokuai_reason"} 按归属
+            -#%option{:value => "projects.category"} 按项目类别
+            %label.col-sm-2.control-label 图表类型
+            .col-sm-3
+              %select#charttype_window.form-control{:name => "charttype"}
+                %option{:value => "bar"} 柱状图
+                %option{:value => "line"} 折线图
+            -#%option{:value => "pie"} 饼块图
+
+          .form-group
+            .col-sm-2
+              .btn-group-report.text-right
+                %input{:id => "dwm_yn_window",:type => "checkbox"}
+            .col-sm-2
+              %select#day_week_month_window.form-control{:name => "dwm"}
+                %option{:value => "day"} 日
+                %option{:value => "week"} 周
+                %option{:value => "month"} 月
+            .col-sm-2
+              %input#start_dt_window.form-control{:name => "start_dt",:value => "2016-09-01"}
+            %label.col-sm-1.control-label.text-center 至
+            .col-sm-2
+              %input#end_dt_window.form-control{:name => "end_dt",:value => "#{Time.now.strftime('%Y-%m-%d')}"}
+
+:javascript
+  initSelect("reporttype_window")
+  initSelect("role_value_window")
+  initSelect("priority_id_window")
+  initSelect("probability_window")
+  initSelect("project_value_window")
+
+  initDateTimePicker("start_dt_window","Y-m-d",false);
+  initDateTimePicker("end_dt_window","Y-m-d",false);
+
+  $('#role_window').on("change", function (e) {
+    var opts = "";
+    $('#role_value_window').siblings(".select2-container").remove();
+    $('#role_value_window').val(null).trigger("change");
+    if($('#role_window').val()=="assigned_to_id"){
+      $('#role_value_window').select2_remote();
+    }else{
+      opts = #{@depts};
+      $('#role_value_window').empty().append(opts);
+      $('#role_value_window').select2();
+    }
+  });
+
+  $('#project_window').on("change", function (e) {
+    var opts = "";
+    $('#project_value_window').val(null).trigger("change");
+    switch ($('#project_window').val())
+    {
+      case "project_id":
+        opts = #{Project.sorted.collect{|p| "<option value=\"#{p.id}\">#{p.name}</option>"}};
+        break;
+      case "category":
+        opts = #{@project_categories};
+        break;
+      case "project_hard_category":
+        opts = #{Project::PROJECT_HARD_CATEGORY.map{|p| "<option value=\"#{p}\">#{p}</option>"}};
+        break;
+      case "project_flow":
+        opts = "";
+        break;
+    }
+    $('#project_value_window').empty().append(opts);
+  });
+
+  $('#reporttype_window').on("change", function (e) {
+    if($("#reporttype_window").val().toString().indexOf("时长") > -1
+      || $("#reporttype_window").val().toString().indexOf("率") > -1
+      || ["bug数量","发现bug数量","重打开数量"].indexOf($("#reporttype_window").val().toString()) == -1){
+      disabledControl("dwm_yn_window");
+      disabledControl("start_dt_window");
+
+      $("#dwm_yn_window").attr("checked",false);
+    }else{
+      enabledControl("dwm_yn_window");
+      enabledControl("start_dt_window");
+    }
+  });
+
+  $(".filter-add-report-icon, .filter-menu-newcondition-report").click(function(e){
+    var folder_id = "";
+    var category = 3;
+    if($(this).attr("class").indexOf("menu") > -1)
+       folder_id = target_for_ID;
+    if($(this).hasClass("filter-menu-newcondition-report")){
+      var system_star = returnEasyTree(this)
+      if(system_star)
+          category = 4
+    }
+    // Open Report Condtions Window
+    var filter_window_report = layer.open({
+      type: 1,
+      title: '<b>新建报表</b>',
+      area: ['680px', '480px'],
+      zIndex: 888,
+      moveType: 1,
+      shadeClose: false,
+      content: $('.filter-window'),
+      btn: ['取消', '确定'],
+      success: function(layero, index){
+       //initSelect()
+      },
+      yes: function(index, layero){
+        layer.close(filter_window_report)
+      },
+      btn2: function(index, layero){
+        if ($('#reportname_window').val().trim().length == 0) {
+          timeoutMsgBox(1500, "名称不能为空");
+          return false;
+        }else{
+          var conditions = [],role = [],project = [],probability = [],priority_id = [];
+          if($("#role_value_window").val() != null && $("#role_value_window").val().toString() != ""){
+              role.push($("#role_window").val().toString());
+              role.push("=");
+              role.push($("#role_value_window").val().toString().split(","));
+              conditions.push(role);
+          }
+
+          if($("#project_value_window").val() != null && $("#project_value_window").val().toString() != ""){
+              project.push($("#project_window").val().toString());
+              project.push("=");
+              project.push($("#project_value_window").val().toString().split(","));
+              conditions.push(project);
+          }
+
+          if($("#probability_window").val() != null && $("#probability_window").val().toString() != ""){
+              probability.push("cf2");
+              probability.push("=");
+              probability.push($("#probability_window").val().toString().split(","));
+              conditions.push(probability);
+          }
+
+          if($("priority_id_window").val() != null && $("#priority_id_window").val().toString() != ""){
+              priority_id.push("priority_id");
+              priority_id.push("=");
+              priority_id.push($("#priority_id_window").val().toString().split(","));
+              conditions.push(priority_id);
+          }
+
+          var obj = {};
+          obj[" AND 0"] = {};
+          $.each(conditions,function (index, item) {
+              obj[" AND 0"][index] = item;
+          });
+
+          var report_name = $('#reportname_window').val().trim().replace("/", "") + "/" + $('#reporttype_window').val();
+          $.post("/conditions"
+              , {
+                  condition: {
+                      folder_id: folder_id,
+                      category: category,
+                      name: report_name,
+                      is_folder: false,
+                      json: JSON.stringify(obj),
+                      report_conditions: JSON.stringify(getReportConditionWin())
+                  }
+              }
+              , function (result) {
+                  window.location.search = "condition_id=" + result
+              })
+              .fail(function () {
+                  timeoutMsgBox(1500, "新建失败！请确认你是否有权限！");
+              })
+        }
+          }
+        });
+    });

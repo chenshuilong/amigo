@@ -1,0 +1,81 @@
+- provide :nav, "5,1"
+- provide :css, "bootstrap"
+
+.top-action-menu.pull-right
+  = link_to l(:button_edit), edit_repo_request_path(id: @repo_request.id), class: "btn btn-sm btn-primary" if @repo_request.can_edit?
+
+.h2= l("label_repo_request_#{RepoRequest::REPO_REQUEST_CATEGORY.index(@repo_request.category.to_i).to_s}".to_sym)
+
+.clearfix
+.issue-details
+  .attributes
+    %table.table.table-borderless
+      %tbody
+        %tr
+          %th.col-sm-2= l(:repo_request_status)
+          %td.col-sm-10= load_value(@repo_request, :status)
+        %tr
+          %th.col-sm-2= l(:repo_request_server_ip)
+          %td.col-sm-10= load_value(@repo_request, :server_ip)
+        - if @repo_request.category != 3 || (@repo_request.category == 3 && @repo_request.production_type != "other")
+          %tr
+            %th.col-sm-2= l(:repo_request_project_id)
+            %td.col-sm-10= link_to_project @repo_request.project
+        - if @repo_request.category != 3
+          %tr
+            %th.col-sm-2= l(:repo_request_version_id)
+            %td.col-sm-10= @repo_request.version_id.blank? ? @repo_request.tag_number : link_to(@repo_request.version.name, version_path(@repo_request.version))
+          %tr
+            %th.col-sm-2= l(:repo_request_branch)
+            %td.col-sm-10= load_value(@repo_request, :branch)
+        - if @repo_request.category == 3 && @repo_request.production_type == "other"
+          %tr 
+            %th.col-sm-2= l(:repo_request_repo_name)
+            %td.col-sm-10= load_value(@repo_request, :repo_name)
+        - if @repo_request.category == 1
+          - if @repo_request.version_id.present?
+            %tr
+              %th.col-sm-2= l(:repo_request_version_id)+l(:version_repo_one_of_project)
+              %td.col-sm-10= @repo_request.version.try(:repo_one).try(:url)
+          %tr
+            %th.col-sm-2= l(:repo_request_android_repo)
+            %td.col-sm-10= load_value(@repo_request, :android_repo)
+          %tr
+            %th.col-sm-2= l(:repo_request_package_repo)
+            %td.col-sm-10= load_value(@repo_request, :package_repo)
+          %tr
+            %th.col-sm-2= l(:repo_request_use)
+            %td.col-sm-10= load_value(@repo_request, :use)
+        %tr
+          %th.col-sm-2= l(:repo_request_author_id)
+          %td.col-sm-10= link_to_user @repo_request.author
+        - if @repo_request.production_repo?
+          %tr
+            %th.col-sm-2= l(:repo_request_read_users)
+            %td.col-sm-10= load_users(@repo_request, :read_users)
+        %tr
+          %th.col-sm-2= l(:repo_request_write_users)
+          %td.col-sm-10= load_users(@repo_request, :write_users)
+        - if @repo_request.category != 1
+          %tr
+            %th.col-sm-2= l(:repo_request_submit_users)
+            %td.col-sm-10= load_users(@repo_request, :submit_users)
+
+    - if @notes.present?
+      .allchange
+        %ul.nav.nav-tabs
+          - if @notes.present?
+            %li.active
+              %a{"data-toggle" => "tab", :href => "#notes"}= l(:field_notes)
+        .tab-content
+          #notes.tab-pane.in.active
+            .history-details
+              .journal
+                - @notes.each_with_index do |r, idx|
+                  #note
+                    .note-title
+                      = authoring_at r.created_at, r.user, {:label => :label_updated_time_at}
+                    %ul.details
+                      - repo_request_details(r.details.where(prop_key: "notes")).each do |string|
+                        = string
+  .clearfix

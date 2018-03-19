@@ -1,0 +1,25 @@
+= labelled_form_for @apk_base, :url => @apk_base.new_record? ? project_apk_bases_path(@project) : project_apk_basis_path(project_id: @project, id: @apk_base.id), html: {class: "apkBaseForm"} do |f|
+  = back_url_hidden_field_tag
+  = error_messages_for 'apk_base'
+  - url = @apk_base.new_record? ? new_project_apk_basis_path(@project) : edit_project_apk_basis_path(project_id: @project.id, id: @apk_base.id)
+  #update.issue-details
+    #all_attributes
+      %p
+        = f.text_field :name, :required => true, label: :apk_base_name, disabled: !@apk_base.new_record?
+        %small.form-text.text-muted 填写apk字母名, 需带.apk后缀, 如Amigo_Account.apk
+      %p= f.select :android_platform, list_for_select(@apk_base, :android_platform), :required => true, label: :apk_base_android_platform
+      - if @apk_base.app_category.to_i == 1
+        %p= f.select :integrated, options_for_select([[l(:general_text_yes), 'true'], [l(:general_text_no), 'false']], @apk_base.integrated), {:required => true, label: :apk_base_integrated}, :onchange => "apkBaseChangeInfos('#{url}'); return false;"
+      - if (@apk_base.integrated && @apk_base.app_category.to_i == 1) || @apk_base.app_category.to_i == 4
+        %p= f.text_field :cn_name, :required => true, label: :apk_base_cn_name
+        %p= f.text_field :desktop_name, :required => true, label: :apk_base_desktop_name
+        %p= f.text_area :cn_description, :required => true, label: :apk_base_cn_description, :style => "width: 80%; height: 100px"
+        %p= f.text_field :developer, :required => true, label: :apk_base_developer
+        %p= f.text_field :package_name, :required => true, label: :apk_base_package_name
+        %p= f.select :category_id, options_for_select(@categories.pluck(:name, :id), @apk_base.category_id), :required => true, label: :apk_base_category_id
+        %p= f.select :removable, options_for_select([[l(:general_text_no), '0'], [l(:general_text_yes), '1']], @apk_base.removable), :required => true, label: :apk_base_removable
+        %p= f.select :desktop_icon, options_for_select([[l(:general_text_yes), 'true'], [l(:general_text_no), 'false']], @apk_base.desktop_icon), :required => true, label: :apk_base_desktop_icon
+  .button-group.text-center
+    = submit_tag @apk_base.new_record? ? l(:button_create) : l(:button_save), class: "btn btn-primary"
+
+

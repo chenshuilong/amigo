@@ -1,0 +1,173 @@
+.expand-pad
+  position: fixed
+  right: -300px
+  top: 109px
+  transition: 0.5s
+  display: none
+  align-items: center
+  z-index: 999
+  width: 320px
+  height: auto
+  min-height: 500px
+  overflow: hidden
+
+  .expand-pad-button
+    width: 20px
+    height: 50px
+    background: #fff
+    cursor: pointer
+    border-top: 1px solid #f77609
+    border-left: 1px solid #f77609
+    border-bottom: 1px solid #f77609
+    border-radius: 5px 0px 0px 5px
+    line-height: 50px
+    text-align: center
+    color: #f77609
+
+  .expand-pad-content
+    width: 300px
+    height: 100%
+    background: #fff
+    .project-history-box
+      width: 100%
+      height: 100%
+      a
+        color: #f88829
+        
+    .panel-heading
+      +linear-gradient(to right, #f77609, #ef9952)
+
+.expand-pad-active
+  right: 0
+  transition: 0.5s
+
+.nav-faster-new
+  margin-left: -11px
+
+.nav-faster-new:after
+  content: ''
+  position: absolute
+  right: 0
+  z-index: 100
+  top: 12px
+  width: 1px
+  height: 22px
+  background: #fff
+
+#versionPermissions
+  margin-bottom: 30px
+#versionPermissionNotes
+  margin-bottom: 50px
+
+.text-disabled
+  color: #777
+
+.bottom-button-group
+  background: #fff
+  bottom: 0
+  left: 0
+  padding: 20px 0
+
+  a
+    margin: 0 15px
+
+
+.table-borderless
+  border: none
+
+  tbody > tr > td
+    border: none
+
+  tbody > tr > th
+    border: none
+
+.table-row-gray
+  background: #ddd
+
+.table-row-deleted
+  background: #ebccd1
+
+.table-row-missing
+  background: #faebcc
+
+.home-notification
+  position: fixed
+  right: 5px
+  bottom: 0
+  width: 300px
+  z-index: 1009
+
+  .notification-head
+    padding: 0 5px
+    color: #fff
+    +linear-gradient(to right, #f77609, #ef9952)
+    height: 40px
+    line-height: 40px
+
+  .notification-body
+    height: 150px
+    padding: 0
+
+
+    .new-lists
+      height: 150px
+      padding: 0
+      margin: 0
+      overflow-y: scroll
+      overflow-x: hidden
+
+      li
+        height: 60px
+        border-bottom: 1px solid #ddd
+        list-style-type: none
+
+        a
+          height: 100%
+          display: block
+          text-decoration: none
+          color: #f88829
+
+
+          &:hover
+            background: #ddd
+
+          p
+            height: 50%
+            padding: 0 10px
+            margin: 0
+
+          .item-title
+            line-height: 30px
+            font-size: 14px
+            font-weight: bold
+
+          .item-body
+            line-height: 30px
+            font-size: 12px
+            color: #777777
+
+.newmail-badge[data-badge]:after
+  content: attr(data-badge)
+  font-family: monospace
+  position: absolute
+  top: 8px
+  right: 0px
+  font-size: .7em
+  background: #ed1c24
+  color: white
+  width: 18px
+  height: 18px
+  text-align: center
+  line-height: 18px
+  border-radius: 50%
+  box-shadow: 0 0 1px #d67979
+
+.issues-head
+  .issues-head-function-write
+    margin: 8px 0 0
+    background: #f5f5f5
+    padding: 10px 15px 20px 15px
+    border-top-left-radius: 4px
+    border-top-right-radius: 4px
+    .issues-head-function-slider
+      display: none

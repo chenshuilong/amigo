@@ -1,0 +1,26 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+%h2= l(:label_edit_attachments)
+= error_messages_for *@attachments
+= form_tag(container_attachments_path(@container), :method => 'patch', :class => 'form-inline') do
+  = back_url_hidden_field_tag
+  .box.attachments
+    - @attachments.each do |attachment|
+      .label
+        %td{:colspan => "2"}
+          %span.icon.icon-attachment= attachment.filename_was
+          %span.size
+            (#{number_to_human_size attachment.filesize})
+          %span.author
+            = attachment.author
+            , #{format_time(attachment.created_on)}
+      .form-group{:id => "attachment-#{attachment.id}"}
+        = text_field_tag "attachments[#{attachment.id}][filename]", attachment.filename, |
+          :size => 80, :class => 'form-control'
+
+        = text_field_tag "attachments[#{attachment.id}][description]", attachment.description, |
+          :size => 80, :placeholder => l(:label_optional_description), :class => 'form-control'
+  %p
+    = submit_tag l(:button_save), :class => "btn btn-primary"
+    = link_to l(:button_cancel), back_url if back_url.present?

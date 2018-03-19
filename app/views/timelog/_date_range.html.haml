@@ -1,0 +1,23 @@
+#query_form_with_buttons.hide-when-print
+  #query_form_content
+    %fieldset#filters{:class => "collapsible #{@query.new_record? ? "" : "collapsed"}"}
+      %legend{:onclick => "toggleFieldset(this);"}= l(:label_filter_plural)
+      %div{:style => "#{@query.new_record? ? "" : "display: none;"}"}
+        = render :partial => 'queries/filters', :locals => {:query => @query}
+    %fieldset#options.collapsible.collapsed
+      %legend{:onclick => "toggleFieldset(this);"}= l(:label_options)
+      %div{:style => "display: none;"}
+        %table
+          %tr
+            %td.field= l(:field_column_names)
+            %td= render_query_columns_selection(@query)
+  %p.buttons
+    = link_to_function l(:button_apply), '$("#query_form").submit()', :class => 'icon icon-checked'
+    = link_to l(:button_clear), {:project_id => @project, :issue_id => @issue}, :class => 'icon icon-reload'
+.tabs.hide-when-print
+  - query_params = params.slice(:f, :op, :v, :sort)
+  %ul
+    %li= link_to(l(:label_details), _time_entries_path(@project, @issue, query_params), |
+        :class => (action_name == 'index' ? 'selected' : nil))
+    %li= link_to(l(:label_report), _report_time_entries_path(@project, @issue, query_params), |
+        :class => (action_name == 'report' ? 'selected' : nil))

@@ -1,0 +1,28 @@
+= form_for(mokuai, :html => {:id => "mokuai_form", :class => "form-horizontal"}, remote: true) do |f|
+  .form-group
+    = f.label :id, "ID", class: "control-label col-sm-3"
+    .col-xs-9
+      = f.text_field :id, class: 'form-control', :readonly => true
+  .form-group
+    = f.label :category, "类别", class: "control-label col-sm-3"
+    .col-xs-9
+      = f.select :category, Mokuai.pluck(:category).uniq, {}, { :class => 'form-control' }
+  .form-group
+    = f.label :reason, "归属", class: "control-label col-sm-3"
+    .col-xs-9
+      = f.text_field :reason, class: 'form-control'
+  .form-group
+    = f.label :name, "模块", class: "control-label col-sm-3"
+    .col-xs-9
+      = f.text_field :name, class: 'form-control'
+  .form-group
+    = f.label :description, (mokuai.is_xx?? "严重等级" : "描述"), class: "control-label col-sm-3"
+    .col-xs-9
+      - if mokuai.is_xx?
+        = f.select :description, IssuePriority.pluck(:name, :id), { :include_blank => true }, { :class => 'form-control' }
+      - else
+        = f.text_area :description, class: 'form-control'
+  .form-group
+    = f.label :package_name, class: "control-label col-sm-3"
+    .col-xs-9
+      = f.text_field :package_name, class: 'form-control'

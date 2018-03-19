@@ -1,0 +1,71 @@
+%form#formGantt.form-horizontal{:role => "form"}
+  .form-group
+    = label_tag :timelines_name, l(:plan_timelines_name), class: 'control-label col-sm-2'
+    .col-xs-10
+      = text_field_tag "name", nil, { class: 'form-control', style: 'width:100%'}
+  .form-group
+    .col-xs-1
+    .col-xs-1.text-right
+      = check_box_tag :is_branch
+    .col-xs-2.text-left
+      = label_tag :is_branch, l(:plan_is_branch), class: "control-label"
+    = label_tag :group_key, l(:plan_timelines_group_key), class: "control-label col-sm-2"
+    .col-xs-2
+      = select_tag "group_key", options_for_select(@timelines.map{|v| [v.name,v.name]}.unshift(["",""])), { class: 'form-control', style: 'width:100%'}
+      = select2_tag("group_key")
+    = label_tag :timelines_parent, l(:plan_timelines_parent), class: "control-label col-sm-2"
+    .col-xs-2
+      = select_tag "parent_id", options_for_select([]), { class: 'form-control', style: 'width:100%' }
+      = select2_tag("parent_id")
+  .form-group
+    = hidden_field_tag "container_id", "#{@project.id}"
+    = hidden_field_tag "container_type", "Plan"
+    = hidden_field_tag "author_id", "#{User.current.id}"
+
+  .filter-window{:style => "display: inline;"}
+    .filter-window-left
+      .filter-window-conditions
+        .filter-window-conditions-head
+          = display_seetings
+        .filter-window-conditions-body
+          %ul.filter-pane
+
+:javascript
+
+  new SMValidator('#formGantt', {
+      focus: true,
+      required: '这是必填项',
+      rules: {
+        onlyNumber:   [/^\d*$/, '只能输入数字'],
+        onlyAlphabet: [/^[a-z]*$/, '只能输入字母'],
+      },
+      fields: {
+        "name":  'required'
+      },
+      submit: function(valid, form) {
+        if(valid) {
+          window.location.reload();
+        }
+      }
+  });
+
+  $("#group_key").prop({'disabled': true});
+  $("#parent_id").prop({'disabled': true});
+  $('#is_branch').click(function(){
+    if (checkboxStatus('is_branch')){
+      $("#group_key").prop({'disabled': false});
+      $("#parent_id").prop({'disabled': false});
+    } else {
+      $("#group_key").prop({'disabled': true});
+      $("#parent_id").prop({'disabled': true});
+    }
+  })
+
+  $('#group_key').on('change',function() {
+    getBranchPoints($(this).val(), "#{@project.id}");
+  })
+
+:css
+  .filter-window-left{
+    padding: 0px;
+  }

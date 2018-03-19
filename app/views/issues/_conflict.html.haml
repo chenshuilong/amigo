@@ -1,0 +1,26 @@
+.conflict
+  = l(:notice_issue_update_conflict)
+  - if @conflict_journals.present?
+    .conflict-details
+      - @conflict_journals.sort_by(&:id).each do |journal|
+        %p= authoring journal.created_on, journal.user, :label => :label_updated_time_by
+        - if journal.details.any?
+          %ul.details
+            - details_to_strings(journal.details).each do |string|
+              %li= string
+        .wiki
+          = textilizable(journal, :notes) unless journal.notes.blank?
+%p
+  %label
+    = radio_button_tag 'conflict_resolution', 'overwrite'
+    = l(:text_issue_conflict_resolution_overwrite)
+  %br/
+  - if @issue.notes.present?
+    %label
+      = radio_button_tag 'conflict_resolution', 'add_notes'
+      = l(:text_issue_conflict_resolution_add_notes)
+    %br/
+  %label
+    = radio_button_tag 'conflict_resolution', 'cancel'
+    = l(:text_issue_conflict_resolution_cancel, :link => link_to_issue(@issue, :subject => false)).html_safe
+%p= submit_tag l(:button_submit)

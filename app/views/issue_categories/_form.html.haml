@@ -1,0 +1,4 @@
+= error_messages_for 'category'
+.box.tabular
+  %p= f.text_field :name, :size => 60, :required => true
+  %p= f.select :assigned_to_id, principals_options_for_select(@project.assignable_users, @category.assigned_to), :include_blank => true

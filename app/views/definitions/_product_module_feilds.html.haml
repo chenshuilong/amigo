@@ -1,0 +1,53 @@
+%form#formModuleFeild.form-horizontal{:role => "form"}
+  .form-group
+    = label_tag :module_id, l(:definition_module_name), class: 'control-label col-sm-2'
+    .col-xs-2
+      = select_tag "module_fields[definition_module_id]", options_for_select(choose_modules), {class: 'value form-control', style: 'width:100%'}
+    = label_tag :custom_field_id, "字段", class: "control-label col-sm-2"
+    .col-xs-4
+      = select_tag "module_fields[custom_field_id]", options_for_select(choose_module_feilds), :multiple => :multiple, class: 'value form-control select-multiple', style: 'width:100%'
+    .col-xs-2
+      = button_tag l(:definition_custom_field_create), {id: 'btn-add-custom-field', class: "btn btn-primary"}
+.row.text-center
+  = button_tag l(:definition_module_field_clear), {id: 'btn-clear-module_field', class: "btn btn-primary"}
+
+  %hr
+  .roadmap-table
+    %table#moduleFeildTable.list.table.table-striped.table-bordered{:class => "csacsa"}
+      %thead
+        %tr
+          %th= l :numerical_order_all
+          %th= l :definition_module_name
+          %th= l :definition_custom_field_name
+          %th= l :option_all
+      %tbody
+
+
+:javascript
+
+  initSelect("module_fields_definition_module_id");
+  initSelect("module_fields_custom_field_id");
+
+  new SMValidator('#formModuleFeild', {
+      focus: true,
+      required: '这是必填项',
+      rules: {
+        onlyNumber:   [/^\d*$/, '只能输入数字'],
+        onlyAlphabet: [/^[a-z]*$/, '只能输入字母'],
+      },
+      fields: {
+        "module_fields[definition_module_id]":    'required',
+        "module_fields[custom_field_id]":         'required'
+      },
+      submit: function(valid, form) {
+        if(valid) {
+          var url = "&module_fields[definition_module_id]=" + $('#module_fields_definition_module_id').val() + "&module_fields[custom_field_id]=" + $('#module_fields_custom_field_id').val()
+          onCreateModuleField(url, "#{@project.id}")
+        }
+      }
+  });
+
+  $('#btn-clear-module_field').click(function() {
+    $("#module_fields_custom_field_id").val("").trigger("change");
+  })
+

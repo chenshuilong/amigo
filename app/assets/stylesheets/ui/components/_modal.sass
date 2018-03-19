@@ -1,0 +1,24 @@
+=modal($selector: '.modal')
+  +display-inline-block
+  #{$selector}-inner
+    margin: auto
+    max-height: 95%
+    overflow: auto
+    +position-relative
+    width: 95%
+  #{$selector}-open
+    overflow: hidden
+  #{$selector}-overlay
+    background-color: rgba(#000, 0.85)
+    opacity: 0
+    +position-fixed(0, 0, 0, 0)
+    visibility: hidden
+    z-index: 99999999
+  #{$selector}-state
+    +display-none
+    &:checked
+      + #{$selector}-overlay
+        opacity: 1
+        visibility: visible
+  #{$selector}-toggle
+    cursor: pointer

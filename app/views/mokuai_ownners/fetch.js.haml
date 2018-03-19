@@ -1,0 +1,22 @@
+- if @ownners.blank?
+  alert("该项目还没有配置模块Owner，拉取失败！")
+- else
+  :plain
+    $("#ajax-modal").html('#{j render :partial => "other_project_ownner", :locals => { :project => @project, :to => @to, :ownners => @ownners }}')
+    fetch_ownner_window = layer.open({
+      type: 1,
+      title: '<b>从 #{@project.name} 复制 Owner</b>',
+      area: ['800px', '600px'],
+      zIndex: 666,
+      moveType: 1,
+      shadeClose: false,
+      content: $("#ajax-modal"),
+      btn: ['取消', '确定'],
+      yes: function(index, layero){
+        layer.close(fetch_ownner_window)
+      },
+      btn2: function(index, layero){
+        $(".copy_ownner_form").submit();
+      }
+    });
+

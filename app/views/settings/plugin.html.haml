@@ -1,0 +1,6 @@
+= title [l(:label_plugins), {:controller => 'admin', :action => 'plugins'}], @plugin.name
+#settings
+  = form_tag({:action => 'plugin'}) do
+    .box.tabular.settings
+      = render :partial => @partial, :locals => {:settings => @settings}
+    = submit_tag l(:button_apply)

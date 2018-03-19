@@ -1,0 +1,158 @@
+- provide :nav, "4,2"
+- provide :css, "bootstrap"
+
+.row
+  .col-sm-6
+    .h2= release_heading(@release)
+  .col-sm-6.text-right
+    .top-action-menu
+      - if User.current.allowed_to?({:controller=>"version_releases", :action=>"rerelease"}, @release.project)
+        = link_to l(:button_edit), edit_version_release_path(@release)
+        - if @release.completed?
+          = link_to l(:version_release_rerelease), void_js, |
+            :onclick => "layer.confirm('确定重新发布吗？', function(){$.post('#{rerelease_version_release_path(@release)}')})"
+          = link_to '取消存在问题', void_js,                  |
+            :onclick => "layer.confirm('确定将存在问题设置为无吗？', function(){$.post('#{reset_problem_version_release_path(@release)}')})" if @release.has_problem? && @release.is_tm?
+
+- # Render Tips or Edit Field
+= render_flow_tips(@release)
+
+- if @release.can_flow?
+
+  = labelled_form_for @release, :html => {:class => 'form-wrapper version-release-form', :multipart => true} do |f|
+    .box.tabular
+      .label= l(:version_release_handle_flow)
+      #all_attributes
+        %p= f.select :status, avaliable_statues(@release), label: :field_status
+        %p.description
+          = f.text_area :notes, :rows => 8, :label => l(:version_release_add_note), :value => default_value_if_flow_to_sqa
+          = wikitoolbar_for 'version_release_notes'
+      %br/
+      %p= submit_tag l(:button_submit), class: "btn btn-primary"
+
+
+.issue-details
+  .description
+    .label= l(:field_description)
+    - if @release.description?
+      .wiki= textilizable @release, :description
+    - else
+      .wiki= l(:label_no_description)
+
+  %hr
+  .attributes
+    = fields_rows do |rows|
+      - rows.left l(:version_release_version_id), link_to_version(@release.version)
+      - rows.left l(:version_release_category), load_value_and_reason(@release, :category)
+      - rows.left l(:field_status), load_value_and_reason(@release, :status)
+      - rows.left l(:version_release_version_applicable_to), @release.version_applicable_to
+
+      - rows.right l(:field_author), link_to_user(@release.author)
+      - rows.right l(:field_created_on), format_time(@release.created_at)
+      - rows.right l(:version_release_tested_mobile), render_tested_mobile(@release)
+      - rows.right l(:version_release_test_finished_on), format_time(@release.test_finished_on)
+
+      - if @release.show_by(1) # Complete adapt
+        - rows.left l(:version_release_test_type), load_value_and_reason(@release, :test_type)
+        - rows.left l(:version_release_fluency_test), load_value_and_reason(@release, :fluency_test)
+        - rows.left l(:version_release_response_time_test), load_value_and_reason(@release, :response_time_test)
+        - rows.left l(:version_release_sonar_codes_check), load_value_and_reason(@release, :sonar_codes_check)
+        - rows.left l(:version_release_app_standby_test), load_value_and_reason(@release, :app_standby_test)
+
+        - rows.right l(:version_release_monkey_24_test), load_value_and_reason(@release, :monkey_72_test)
+        - rows.right l(:version_release_memory_leak_test), load_value_and_reason(@release, :memory_leak_test)
+        - rows.right l(:version_release_cts_test), load_value_and_reason(@release, :cts_test)
+        - rows.right l(:version_release_cts_verifier_test), load_value_and_reason(@release, :cts_verifier_test)
+        - rows.right l(:version_release_interior_invoke_warning), load_value_and_reason(@release, :interior_invoke_warning)
+        - rows.right l(:version_release_related_invoke_warning), load_value_and_reason(@release, :related_invoke_warning)
+
+        //
+
+        - rows.left l(:version_release_translate_sync), load_value_and_reason(@release, :translate_sync)
+        - rows.left l(:version_release_output_record_sync), load_value_and_reason(@release, :output_record_sync)
+        - rows.left l(:version_release_translate_autocheck_result), load_value_and_reason(@release, :translate_autocheck_result)
+        - rows.left l(:version_release_codes_reviewed), load_value_and_reason(@release, :codes_reviewed)
+        -# - rows.left l(:version_release_cases_sync_updated), load_value_and_reason(@release, :cases_sync_updated)
+        - rows.left l(:version_release_uir_upload_to_svn), load_value_and_reason(@release, :uir_upload_to_svn)
+        - rows.left l(:version_release_has_problem), load_value_and_reason(@release, :has_problem)
+
+        - rows.right l(:version_release_sdk_review), load_value_and_reason(@release, :sdk_review)
+        - rows.right l(:version_release_app_data_test), load_value_and_reason(@release, :app_data_test)
+        - rows.right l(:version_release_app_launch_test), load_value_and_reason(@release, :app_launch_test)
+
+      - if @release.show_by(2) # App adpt
+        - rows.left l(:version_release_comlete_project), link_to_comlete_project
+        - rows.left l(:version_release_fluency_test), load_value_and_reason(@release, :fluency_test)
+        - rows.left l(:version_release_response_time_test), load_value_and_reason(@release, :response_time_test)
+        - rows.left l(:version_release_app_standby_test), load_value_and_reason(@release, :app_standby_test)
+        - rows.left l(:version_release_test_type), load_value_and_reason(@release, :test_type)
+        - rows.left l(:version_release_memory_leak_test), load_value_and_reason(@release, :memory_leak_test)
+
+        - rows.right l(:version_release_comlete_version), link_to_comlete_version
+        - rows.right l(:version_release_monkey_72_test), load_value_and_reason(@release, :monkey_72_test)
+        - rows.right l(:version_release_cts_test), load_value_and_reason(@release, :cts_test)
+        - rows.right l(:version_release_cts_verifier_test), load_value_and_reason(@release, :cts_verifier_test)
+        - rows.right l(:version_release_interior_invoke_warning), load_value_and_reason(@release, :interior_invoke_warning)
+        - rows.right l(:version_release_related_invoke_warning), load_value_and_reason(@release, :related_invoke_warning)
+
+        //
+        - rows.left l(:version_release_translate_sync), load_value_and_reason(@release, :translate_sync)
+        - rows.left l(:version_release_output_record_sync), load_value_and_reason(@release, :output_record_sync)
+        - rows.left l(:version_release_translate_autocheck_result), load_value_and_reason(@release, :translate_autocheck_result)
+        - rows.left l(:version_release_codes_reviewed), load_value_and_reason(@release, :codes_reviewed)
+        -# - rows.left l(:version_release_cases_sync_updated), load_value_and_reason(@release, :cases_sync_updated)
+        - rows.left l(:version_release_uir_upload_to_svn), load_value_and_reason(@release, :uir_upload_to_svn)
+        - rows.left l(:version_release_has_problem), load_value_and_reason(@release, :has_problem)
+        
+        - rows.right l(:version_release_sdk_review), load_value_and_reason(@release, :sdk_review)
+        - rows.right l(:version_release_app_data_test), load_value_and_reason(@release, :app_data_test)
+        - rows.right l(:version_release_app_launch_test), load_value_and_reason(@release, :app_launch_test)
+
+      - if @release.show_by(3) # Bugfix
+        - rows.left l(:version_release_test_type), load_value_and_reason(@release, :test_type)
+        - rows.left l(:version_release_bvt_test), load_value_and_reason(@release, :bvt_test)
+        - rows.left l(:version_release_cts_test), load_value_and_reason(@release, :cts_test)
+
+        - rows.right l(:version_release_codes_reviewed), load_value_and_reason(@release, :codes_reviewed)
+        -# - rows.right l(:version_release_cases_sync_updated), load_value_and_reason(@release, :cases_sync_updated)
+        - rows.right l(:version_release_code_walkthrough_well), load_value_and_reason(@release, :code_walkthrough_well)
+        - rows.right l(:version_release_mode), load_value_and_reason(@release, :mode)
+
+  %hr
+  .attributes
+    = fields_rows do |rows|
+      - rows.line l(:version_release_relative_objects), @release.relative_objects
+      - rows.line l(:version_release_new_issues), @release.new_issues
+      - rows.line l(:version_release_remaining_issues), @release.remaining_issues
+      - rows.line l(:version_release_issues_for_platform), @release.issues_for_platform
+      - rows.line l(:version_release_download_path), auto_link(@release.version.path, :all, :target => "_blank")
+
+  - if @release.note.present?
+    %hr
+    .release-notes
+      .label= l(:version_release_note)
+      - @release.notes.reverse.each do |note|
+        .release-notes-list
+          .note-title= authoring_at note.created_at, note.author, :label => :label_updated_time_at
+          .note-details
+            %ul
+              %li= l(:text_journal_changed, label: l(:field_status),
+                      old: l("version_release_status_#{note.old_status.to_s}"),
+                      new: l("version_release_status_#{note.status.to_s}"))
+          - if note.content.present?
+            .note-content.wiki= textilizable note, :content
+
+  - if @release.attachments.any?
+    %hr
+    .attachments
+      .label= l(:label_attachments)
+      = link_to_attachments @release, :thumbnails => true
+
+  -if @release.result.present?
+    %hr
+    .release-results
+      .label= l(:version_release_result)
+      .release-results-list= render_release_result(@release)
+
+
+- html_title(release_heading @release)

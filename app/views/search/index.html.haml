@@ -1,0 +1,71 @@
+%h2= l(:label_search)
+= form_tag({}, :method => :get, :id => 'search-form') do
+  .box
+    = label_tag "search-input", l(:description_search), :class => "hidden-for-sighted"
+    %p
+      = text_field_tag 'q', @question, :size => 60, :id => 'search-input'
+      = project_select_tag
+      = hidden_field_tag 'all_words', '', :id => nil
+      %label
+        = check_box_tag 'all_words', 1, @all_words
+        = l(:label_all_words)
+      = hidden_field_tag 'titles_only', '', :id => nil
+      %label
+        = check_box_tag 'titles_only', 1, @titles_only
+        = l(:label_search_titles_only)
+    %p#search-types
+      - @object_types.each do |t|
+        %label
+          = check_box_tag t, 1, @scope.include?(t)
+          = link_to type_label(t), "#"
+    %fieldset.collapsible.collapsed
+      %legend{:onclick => "toggleFieldset(this);"}= l(:label_options)
+      #options-content{:style => "display:none;"}
+        %p
+          %label
+            = check_box_tag 'open_issues', 1, @open_issues
+            = l(:label_search_open_issues_only)
+        %p
+          %label
+            = radio_button_tag 'attachments', '0', @search_attachments == '0'
+            = l(:label_search_attachments_no)
+          %label
+            = radio_button_tag 'attachments', '1', @search_attachments == '1'
+            = l(:label_search_attachments_yes)
+          %label
+            = radio_button_tag 'attachments', 'only', @search_attachments == 'only'
+            = l(:label_search_attachments_only)
+    = hidden_field_tag 'options', '', :id => 'show-options'
+  %p= submit_tag l(:button_submit)
+- if @results
+  #search-results-counts
+    = render_results_by_type(@result_count_by_type) unless @scope.size == 1
+  %h3
+    = l(:label_result_plural)
+    (#{@result_count})
+  %dl#search-results
+    - @results.each do |e|
+      %dt{:class => "#{e.event_type}"}
+        = content_tag('span', e.project, :class => 'project') unless @project == e.project
+        = link_to(highlight_tokens(e.event_title.truncate(255), @tokens), e.event_url)
+      %dd
+        %span.description= highlight_tokens(e.event_description, @tokens)
+        %span.author= format_time(e.event_datetime)
+- if @result_pages
+  %span.pagination= pagination_links_full @result_pages, @result_count, :per_page_links => false
+- html_title(l(:label_search))
+= javascript_tag do
+  $("#search-types a").click(function(e){
+  e.preventDefault();
+  $("#search-types input[type=checkbox]").prop('checked', false);
+  $(this).siblings("input[type=checkbox]").prop('checked', true);
+  if ($("#search-input").val() != "") {
+  $("#search-form").submit();
+  }
+  });
+  
+  $("#search-form").submit(function(){
+  $("#show-options").val($("#options-content").is(":visible") ? '1' : '0');
+  });
+  - if params[:options] == '1'
+    toggleFieldset($("#options-content"));

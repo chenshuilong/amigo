@@ -1,0 +1,137 @@
+- provide :nav, "4,3"
+- provide :css, "bootstrap"
+
+.top-action-menu.pull-right
+  - if User.current.allowed_to?(:release_versions, nil, :global => true)
+    %a#new_version_release.btn.btn-primary.btn-sm{:href => "#{void_js}"}
+      %i.fa.fa-plus
+        = l(:thirdparty_version_release_new)
+
+.h2= title_by_category(@category)
+
+.clearfix
+.issue-details
+  - if @releases.blank?
+    %p.nodata= l(:label_no_data)
+  - else
+    .roadmap-query{:style => "width:100%;"}
+      %ul.notification-list
+        %li.notification-list-item
+          .notification-menu
+            %i.fa.fa-chevron-up
+          .notification-content
+            %p
+              %strong= "查询条件"
+          .clearfix
+          .notification-acton.select2-rectify{:style => "display:block;"}
+            = form_tag({}, {method: :get, class: 'form-horizontal'}) do |f|
+              .form-group
+                = label_tag 'spec_id', l(:version_release_project), class: "col-sm-2 control-label"
+                .col-sm-3
+                  = select_tag 'spec_id', options_for_select(@specs.unshift([l(:label_all), '']), @spec_id), class: "form-control", :onchange => "this.form.submit(); return false;"
+                  = select2_for "spec_id"
+                = label_tag 'status', l(:field_status), class: "col-sm-2 control-label"
+                .col-sm-3
+                  = select_tag 'status', options_for_select(list_for_select(:version_release, :status).first(3).unshift([l(:label_all), '']), @status),
+                    class: "form-control", :multiple => true, :onchange => "this.form.submit(); return false;"
+                  = select2_for 'status'
+                .col-sm-2
+                  = submit_tag l(:button_query), :name => nil, class: "btn btn-primary btn-sm"
+
+    .roadmap-table
+      %table#releaseTable.list.table.table-striped.table-bordered
+        %thead
+          %tr
+            = sort_header_tag('id', :caption => "#")
+            %th= @category == Thirdparty::Thirdparty_CATEGORY[:resource] ? l(:thirdparty_version_release_resource_version_name) : l(:field_project)
+            = sort_header_tag('status', :caption => l(:field_status))
+            = sort_header_tag('note', :caption => l(:thirdparty_version_release_note))
+            = sort_header_tag('created_at', :caption => l(:thirdparty_version_release_created_at))
+            = sort_header_tag('author_id', :caption => l(:thirdparty_version_release_author_id))
+        %tbody
+          - @releases.each do |release|
+            %tr
+              %td= link_to release.id, thirdparty_version_release_path(release)
+              %td= @category == Thirdparty::Thirdparty_CATEGORY[:resource] ? (release.version_ids.blank? ? "" : Version.find(release.version_ids.first).fullname) : release.spec.name
+              %td= release.status_name
+              %td
+                = popover(:trigger => "click", :content => simple_format(release.note),:title => "详细信息", :placement => 'bottom') do
+                  = release.note.to_s[0,20]
+              %td= format_time release.created_at
+              %td= link_to_user release.author
+    %span.pagination= pagination_links_full @release_pages, @release_count
+
+
+  .thirdparty-new{:style => "display:none;width:540px;padding:20px;"}
+    = form_tag("#{upload_thirdparty_version_releases_path}",:id => "thirdpartyForm", :multipart => true, :remote => true, :class => "form-horizontal") do
+      - if @category == Thirdparty::Thirdparty_CATEGORY[:resource]
+        .form-group
+          = label_tag :project_id, l(:thirdparty_version_release_resource_name), class: 'control-label col-sm-3'
+          .col-xs-9
+            = select_tag 'thirdparty[project_id]', options_for_select(Production.resource_apps.map{|pd| [pd.name, pd.id]}.unshift(["请选择", ""]), @project_id), { class: 'form-control', style: 'width:100%'}
+            = select2_for "thirdparty_project_id"
+      - else
+        .form-group
+          = label_tag :name, "类型", class: "control-label col-sm-3"
+          .col-sm-9
+            %label.radio-inline
+              %input#type_one{:name => "thirdparty[release_type]", :type => "radio", :value => "1", :checked => "checked"} 预装
+            %label.radio-inline
+              %input#type_two{:name => "thirdparty[release_type]", :type => "radio", :value => "2"} 内置
+      .form-group
+        = label_tag :spec_id, @category == Thirdparty::Thirdparty_CATEGORY[:resource] ? l(:spec_name) : l(:field_project), class: 'control-label col-sm-3'
+        .col-xs-9
+          = select_tag 'thirdparty[spec_id]', @category == Thirdparty::Thirdparty_CATEGORY[:resource] ? [] : options_for_select(@specs.unshift([l(:label_all), ''])), { class: 'form-control', style: 'width:100%'}
+          = select2_for "thirdparty_spec_id"
+      .form-group
+        = label_tag :server_path, l(:thirdparty_version_release_server_path), class: "control-label col-sm-3"
+        .col-xs-9
+          .box.tabular
+            %p#attachments_form
+              - container = Thirdparty.new
+                %span#uploader.attachment-form{:data => {:max_concurrent_uploads => 1,
+                  :upload_path => uploads_path(:format => 'js'),
+                  :description_placeholder => l(:label_optional_description),
+                  :upload_remove_confirm => l(:notice_remove_upload_confirm) }}
+                  %span#uploaderList.attachment-list
+                    - if defined?(container) && container && container.saved_attachments
+                      - container.saved_attachments.each_with_index do |attachment, i|
+                        %span{:id => "WU_FILE_p#{i}"}
+                          = text_field_tag("attachments[p#{i}][filename]", attachment.filename, :class => 'filename readonly')
+                          = text_field_tag("attachments[p#{i}][description]", attachment.description, :maxlength => 255, :placeholder => l(:label_optional_description), :class => 'description')
+                          = link_to((icon "trash"), void_js, :class => 'remove-upload')
+                          = hidden_field_tag "attachments[p#{i}][token]", "#{attachment.token}"
+                  %span.attachment_area
+                    %span.attachment_area_content
+                      = link_to void_js, class: "attachment-upload-file", id: "uploaderPicker" do
+                        = icon "plus"
+                        = l(:notice_click_to_upload_file)
+
+                    - content_for :header_tags do
+                  = javascript_include_tag 'attachments'
+
+      .form-group
+        = label_tag :note, l(:thirdparty_version_release_note), class: "control-label col-sm-3"
+        .col-xs-9
+          = text_area_tag "thirdparty[note]", "", { style: 'width:100%;height:120px;'}
+          = hidden_field_tag "thirdparty[status]", "1"
+          = hidden_field_tag "thirdparty[category]", @category
+
+= production_submenu_by_type(@category == 1 ? 4 : 6)
+= javascript_tag "$('#tab-productions').find('li').eq(1).removeAttr('class');"
+= javascript_tag "$('#tab-productions').find('li').eq(2).attr('class', 'active');"
+
+:javascript
+
+  $('#new_version_release').on('click', function(){
+    openLayer("#{l(:thirdparty_version_release_new)}", "680px", $('.thirdparty-new'), function(){
+      $('#thirdpartyForm').submit();
+      refreshPage();
+    })
+  })
+
+  $('#thirdparty_project_id').on('change', function(){
+    fillSpecs($(this).val(), $(this).val(), 'thirdparty_spec_id');
+  })
+
+- html_title(l(:project_production_type_3rd_version_release))

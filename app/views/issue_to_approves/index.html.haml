@@ -1,0 +1,104 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+.h2= l(:label_issue_to_approve)
+
+.clearfix
+#roadmap
+  .roadmap-query{:style => "width:100%;"}
+    %ul.notification-list
+      %li.notification-list-item
+        .notification-menu
+          %i.fa.fa-chevron-up
+        .notification-content
+          %p
+            %strong= "查询条件"
+        .clearfix
+        .notification-acton.select2-rectify{:style => "display:block;"}
+
+  .roadmap-table
+    %table#issueTable.list.table.table-striped.table-bordered
+      %thead
+        %tr
+          = sort_header_tag('id', :caption => "#")
+          = sort_header_tag('issue_id', :caption => l(:issue_to_merge_issue_id))
+          %th= l(:issue_to_approve_probability)
+          %th= l(:field_priority)
+          %th= l(:field_assigned_to)
+          %th= l(:issue_to_approve_task_created_at)
+          %th= l(:field_status)
+          %th= l(:issue_to_merge_notes)
+          %th= l(:option_all)
+      %tbody
+        - @issues.each do |issue|
+          %tr{"data-id"=> "tr_#{issue.id}"}
+            %td= issue.id
+            %td= link_to_issue issue.issue
+            %td= issue.issue.probability
+            %td= issue.issue.priority
+            %td= link_to_user issue.issue.assigned_to
+            %td= (task = approve_merge_task(issue)).present? ? task.created_at.to_s(:db) : ""
+            %td= task_status_to_name(issue)
+            %td
+              = popover(:trigger => "click", :content => simple_format(issue.notes),:title => "详细信息", :placement => 'bottom') do
+                = issue.notes.to_s[0,20]
+              = hidden_field_tag "issues[normal_notes]", issue.notes
+            %td
+              %a.editIssueBtn{"data-id"=> "#{issue.id}"}
+                %i.fa.fa-edit
+              - if approve_merge_task(issue).blank?
+                = "|"
+                %a.sendTaskBtn{"data-id"=> "#{issue.id}"}
+                  %i.fa.fa-send
+  %span.pagination= pagination_links_full @issue_pages, @issue_count
+
+.editIssue{:style => "display:none;width:640px;padding:20px;"}
+  = form_tag({}, :id => "editIssueForm", :remote => true, :class => "form-horizontal") do
+    .form-group
+      = label_tag :notes, '备注', class: 'control-label col-sm-2'
+      .col-xs-10
+        = text_area_tag "issues[notes]", "", { style: 'width:100%;height:320px;'}
+        -#= wikitoolbar_for 'issues_notes'
+
+.sendTask{:style => "display:none;width:540px;padding:20px;"}
+  = form_tag("/projects/#{@project.identifier}/issue_to_approve_merges/send_task", :id => "sendTaskForm", :remote => true, :class => "form-horizontal") do
+    .form-group
+      = label_tag :mark, '项目组要求合入的原因和要求', class: 'control-label col-sm-6'
+    .form-group
+      = label_tag :notes, '1.原因', class: 'control-label col-sm-3'
+      .col-xs-9
+        = text_area_tag "issues[reason]", "", { style: 'width:100%;height:120px;'}
+    .form-group
+      = label_tag :notes, '2.要求', class: 'control-label col-sm-3'
+      .col-xs-9
+        = text_area_tag "issues[requirement]", "", { style: 'width:100%;height:120px;'}
+    .form-group
+      = label_tag :notes, '状态', class: 'control-label col-sm-3'
+      .col-xs-9
+        = select_tag "issues[status_id]", options_for_select(@status.map{|v| [v[:name],v[:id]]}), { class: 'form-control', style: 'width:100%'}
+        = select2_tag("issues_status_id")
+        = hidden_field_tag "issues[id]"
+
+:javascript
+  $('.editIssueBtn').showToolTip("编辑");
+  $('.sendTaskBtn').showToolTip("生成任务");
+
+  $('.editIssueBtn').click(function() {
+    var row = $("tr[data-id='tr_" + $(this).attr("data-id") + "']").children().eq(1).end();
+    $('#issues_notes').val(row.eq(7).children().eq(2).val())
+    openLayer("编辑评审问题", '680px', $(".editIssue"),function() {
+      var form = $('#editIssueForm');
+      var actionPath = "/projects/#{@project.identifier}/issue_to_approve_merges/" + row.eq(0).text() + "/edit";
+      form.attr("method", "get").attr("action", actionPath).submit();
+      refreshPage();
+    })
+  })
+
+  $('.sendTaskBtn').click(function() {
+    $('#issues_id').val($(this).attr("data-id"));
+    openLayer("编辑评审问题", '580px', $(".sendTask"),function() {
+      $('#sendTaskForm').submit();
+      layer.msg("任务发送成功！")
+      refreshPage();
+    })
+  })

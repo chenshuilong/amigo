@@ -1,0 +1,2 @@
+= form_for @member, :as => :membership, :url => project_memberships_path(@project), :remote => true, :method => :post do |f|
+  = render :partial => 'new_form'

@@ -1,0 +1,236 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+- content_for :header_tags do
+  %link{:href => "/amg/dataTable/datatable.css", :rel => "stylesheet"}
+  %link{:href => "/amg/dataTable/fixedColumns.bootstrap.min.css", :rel => "stylesheet"}
+
+  %script{:src => "/amg/dataTable/dataTables.fixedColumns.min.js", :type => "text/javascript"}
+  %script{:src => "/amg/dataTable/dataTables.bootstrap.min.js", :type => "text/javascript"}
+
+.top-action-menu.pull-right
+  = link_to('版本比较', choose_versions_path(category: (@project.show_by(4)? "other" : "terminal"), from: 'project', project_1: @project.id, project_2: @project.id), :class => 'btn btn-primary btn-sm', :id => "version_compare", remote: true)
+  = link_to(l(:label_version_virtual), void_js, :class => 'btn btn-primary btn-sm', :id => "virtual_version") if User.current.admin? || User.current.is_spm?(@project)
+  = link_to l(:repo_url), void_js, class: "btn btn-primary btn-sm", :id => "add_repo" if User.current.allowed_to?(:manage_versions, @project)
+  - if policy(:repo).compile_machine_status?
+    = link_to l(:repo_compile_machine_status), compile_machine_status_repos_path, class: "btn btn-primary btn-sm"
+  = link_to(l(:label_version_new), new_project_version_path(@project), :class => 'btn btn-primary btn-sm') |
+    if User.current.allowed_to?(:manage_versions, @project)                                                |
+.h2= l(:label_roadmap)
+
+.clearfix
+.issue-details
+  .roadmap-query{:style => "width:100%;"}
+    %ul.notification-list
+      %li.notification-list-item
+        .notification-menu
+          %i.fa.fa-chevron-up
+        .notification-content
+          %p
+            %strong= "查询条件"
+        .clearfix
+        .notification-acton.select2-rectify{:style => "display:block;"}
+          = form_tag({}, {method: :get, class: 'form-horizontal'}) do |f|
+            .form-group
+              = label_tag 'spec', l(:version_spec_id), class: "col-sm-2 control-label"
+              .col-sm-2
+                = select_tag 'spec', options_for_select(@project.specs.undeleted.pluck(:name, :id).unshift([l(:label_all), '']),
+                  @spec), class: "form-control", :onchange => "this.form.submit(); return false;"
+              = label_tag 'name', l(:version_name_tag), class: "col-sm-2 control-label"
+              .col-sm-2
+                = text_field_tag 'name', params[:name], class: "form-control"
+              = label_tag 'compile_status', l(:version_compile_status), class: "col-sm-2 control-label"
+              .col-sm-2
+                = select_tag 'compile_status', options_for_select(list_for_select(:version, :compile_status).unshift([l(:label_all), '']), @compile_status), class: "form-control", :onchange => "this.form.submit(); return false;"
+            - unless @project.show_by(4)
+              .form-group
+                = label_tag 'signature', l(:version_signature), class: "col-sm-2 control-label"
+                .col-sm-2
+                  = select_tag 'signature', options_for_select(bool_for_select(true, false).unshift([l(:label_all), '']), @signature),
+                    class: "form-control", :onchange => "this.form.submit(); return false;"
+                = label_tag 'ota_whole_compile', l(:version_ota_whole_compile), class: "col-sm-2 control-label"
+                .col-sm-2
+                  = select_tag 'ota_whole_compile', options_for_select(bool_for_select(true, false).unshift([l(:label_all), '']), @ota_whole_compile),
+                    class: "form-control", :onchange => "this.form.submit(); return false;"
+                = label_tag 'ota_increase_compile', l(:version_ota_increase_compile), class: "col-sm-2 control-label"
+                .col-sm-2
+                  = select_tag 'ota_increase_compile', options_for_select(bool_for_select(true, false).unshift([l(:label_all), '']), @ota_increase_compile),
+                    class: "form-control", :onchange => "this.form.submit(); return false;"
+            .form-group
+              = label_tag 'status', l(:version_status), class: "col-sm-2 control-label"
+              .col-sm-2
+                = select_tag 'status', options_for_select(list_for_select(:version, :status).unshift([l(:label_all), '']), @status), class: "form-control", :multiple => true, :onchange => "this.form.submit(); return false;"
+                = select2_for 'status'
+              = label_tag 'created_at', l(:field_created_on), class: "col-sm-2 control-label"
+              .col-sm-2
+                = text_field_tag 'created_at_start', @created_at_start, class: "form-control", :id => 'version_release_created_at_start'
+                = hidden_field_tag 'created_at_end', @created_at_end, class: "form-control", :id => 'version_release_created_at_end'
+                = calendar_range_for 'version_release_created_at_start', 'version_release_created_at_end'
+              - if @project.show_by(4)
+                .col-sm-2.col-sm-offset-2
+                  = submit_tag l(:button_query), :name => nil, class: "btn btn-primary btn-sm"
+              - else
+                = label_tag 'as_increase_version', l(:version_as_increase_version), class: "col-sm-2 control-label"
+                .col-sm-2
+                  = select_tag 'as_increase_version', options_for_select(bool_for_select(true, false).unshift([l(:label_all), '']), @as_increase_version),
+                    class: "form-control", :onchange => "this.form.submit(); return false;"
+            - unless @project.show_by(4)
+              .form-group
+                .col-sm-2.col-sm-offset-2
+                  = submit_tag l(:button_query), :name => nil, class: "btn btn-primary btn-sm"
+  .roadmap-table
+    .panel.panel-default
+      .panel-body
+        - if @versions.empty?
+          %p.nodata= l(:label_no_data)
+        - else
+          %table#versionTable.list.table.table-striped.table-bordered
+            %thead
+              %tr
+                = sort_header_tag('id', :caption => "#")
+                = sort_header_tag('name', :caption => l(:version_name))
+                = sort_header_tag('priority', :caption => l(:version_priority))
+                = sort_header_tag('compile_machine', :caption => l(:version_compile_machine))
+                = sort_header_tag('compile_status', :caption => l(:version_compile_status))
+                = sort_header_tag('status', :caption => l(:version_status))
+                = sort_header_tag('compile_due_on', :caption => l(:version_compile_due_on))
+                = sort_header_tag('compile_start_on', :caption => l(:version_compile_start_on))
+                = sort_header_tag('compile_end_on', :caption => l(:version_compile_end_on))
+                - unless @project.show_by(4)
+                  = sort_header_tag('ota_increase_compile', :caption => l(:version_ota_increase_compile))
+                %th= l(:version_compile_total)
+                %th= l(:field_description)
+                - if @project.show_by(4)
+                  %th= '发布ID'
+                  %th= '适配项目'
+                = sort_header_tag('author_id', :caption => l(:field_author))
+                - unless @project.show_by(4)
+                  = sort_header_tag('signature', :caption => l(:version_signature))
+                  = sort_header_tag('compile_type', :caption => l(:version_compile_type))
+            %tbody
+              - @versions.each do |version|
+                %tr
+                  %td= link_to version.id, version
+                  %td= link_to_version version
+                  %td= load_value(version, :priority)
+                  %td= version.compile_machine
+                  %td{class: compile_status_class(version)}= load_value(version, :compile_status)
+                  %td= load_value(version, :status)
+                  %td= format_time version.compile_due_on
+                  %td= format_time version.compile_start_on
+                  %td= format_time version.compile_end_on
+                  - unless @project.show_by(4)
+                    %td= load_value(version, :ota_increase_compile)
+                  %td= version.compile_total_hours
+                  %td
+                    = popover(:trigger => "click", :content => simple_format(version.description), :title => "详细信息", :placement => 'bottom') do
+                      = version.description.to_s[0, 5]
+                  - if @project.show_by(4)
+                    %td= releases_ids(version)
+                    %td= releases_projects(version)
+                  %td= link_to_user version.author
+                  - unless @project.show_by(4)
+                    %td= load_value(version, :signature)
+                    %td= load_value(version, :compile_type)
+                = call_hook :view_projects_roadmap_version_bottom, :version => version
+
+        %span.pagination= pagination_links_full @version_pages, @version_coun
+
+
+-# - @versions.each do |version|
+-#   %article{:class => "version-article #{version.css_classes}"}
+-#     - if User.current.allowed_to?(:manage_versions, version.project)
+-#       .contextual
+-#         = link_to l(:button_edit), edit_version_path(version), :title => l(:button_edit), :class => 'icon-only icon-edit'
+-#     %header
+-#       %h3.version= link_to_version version, :name => version_anchor(version)
+-#     = render :partial => 'versions/overview', :locals => {:version => version}
+-#     = render(:partial => "wiki/content",                                       |
+-#       :locals => {:content => version.wiki_page.content}) if version.wiki_page |
+-#     - if (issues = @issues_by_version[version]) && issues.size > 0
+-#       = form_tag({}) do
+-#         %table.list.related-issues
+-#           %caption= l(:label_related_issues)
+-#           - issues.each do |issue|
+-#             %tr.hascontextmenu
+-#               %td.checkbox= check_box_tag 'ids[]', issue.id, false, :id => nil
+-#               %td.subject= link_to_issue(issue, :project => (@project != issue.project))
+-#     = call_hook :view_projects_roadmap_version_bottom, :version => version
+
+-# - content_for :sidebar do
+-#   = form_tag({}, :method => :get) do
+-#     %h3= l(:label_roadmap)
+-#     %ul
+-#       - @trackers.each do |tracker|
+-#         %li
+-#           %label
+-#             = check_box_tag("tracker_ids[]", tracker.id,        |
+-#               (@selected_tracker_ids.include? tracker.id.to_s), |
+-#               :id => nil)                                       |
+-#             = tracker.name
+-#     %p
+-#     %ul
+-#       %li
+-#         %label{:for => "completed"}
+-#           = check_box_tag "completed", 1, params[:completed]
+-#           = l(:label_show_completed_versions)
+-#       - if @project.descendants.active.any?
+-#         %li
+-#           = hidden_field_tag 'with_subprojects', 0, :id => nil
+-#           %label
+-#             = check_box_tag 'with_subprojects', 1, @with_subprojects
+-#             = l(:label_subproject_plural)
+-#     %p= submit_tag l(:button_apply), :class => 'button-small', :name => nil
+-#   %h3= l(:label_version_plural)
+-#   %ul
+-#     - @versions.each do |version|
+-#       %li
+-#         = link_to(format_version_name(version), "##{version_anchor(version)}")
+-#   - if @completed_versions.present?
+-#     %p
+-#       = link_to_function l(:label_completed_versions),                                                 |
+-#         '$("#toggle-completed-versions").toggleClass("collapsed"); $("#completed-versions").toggle()', |
+-#         :id => 'toggle-completed-versions', :class => 'collapsible collapsed'                          |
+-#     %ul#completed-versions{:style => "display:none;"}
+-#       - @completed_versions.each do |version|
+-#         %li= link_to_version version
+
+- html_title(l(:label_roadmap))
+= context_menu issues_context_menu_path
+
+
+:javascript
+
+  initDataTable('versionTable',{
+    paging: false, ordering: false, info: false, searching: false, select: true, scrollX: true
+  });
+
+  $("#add_repo").click(function() {
+    layer.open({
+      type: 1,
+      title: '<b>#{l(:repo_url)}</b>',
+      area: ['1000px', '80%'],
+      zIndex: 666,
+      moveType: 1,
+      shadeClose: false,
+      content: $("#ajax-modal").html('#{j render :partial => "repos/repo_link", :locals => { :project_id => @project.id }}'),
+      btn: ['#{l(:button_close)}'],
+      yes: function(index, layero){
+        layer.close(index)
+      }
+    });
+  })
+
+  $("#virtual_version").click(function() {
+    layer.open({
+      type: 1,
+      title: '<b>#{l(:label_version_virtual)}</b>',
+      area: ['650px', 'auto'],
+      zIndex: 666,
+      moveType: 1,
+      shadeClose: false,
+      content: $("#ajax-modal").html('#{j render :partial => "virtual_version", :locals => { :project => @project }}'),
+      yes: function(index, layero){
+        layer.close(index)
+      }
+    });
+  })

@@ -1,0 +1,113 @@
+- provide :nav, "4,2"
+- provide :css, "bootstrap"
+- content_for :header_tags do
+  %link{:href => "/amg/dataTable/datatable.css", :rel => "stylesheet"}
+  %script{:src => "/amg/dataTable/dataTables.bootstrap.min.js", :type => "text/javascript"}
+
+.row
+  .col-sm-6
+    .h2= release_heading @third
+  .col-sm-6.text-right
+    .top-action-menu
+      - if @third.attachments.last.disk_filename.to_s.end_with?('.zip')
+        = link_to l(:thirdparty_version_release_reupload), void_js, :onclick => "reupload()"
+      - if User.current.allowed_to?({:controller=>"thirdparty_version_releases", :action=>"rerelease"}, @third.spec.project)
+        - if @third.completed?
+          = link_to l(:version_release_rerelease), void_js,
+            :onclick => "layer.confirm('确定重新发布吗？', function(){$.post('#{rerelease_thirdparty_version_release_path(@third)}')})"
+
+.issue-details
+  .description
+    .label= l(:thirdparty_version_release_note)
+    - if @third.note
+      .wiki= textilizable @third, :note
+    - else
+      .wiki= l(:label_no_description)
+
+  %hr
+  .attributes
+    = fields_rows do |rows|
+      - rows.left l(:thirdparty_version_release_created_at), @third.created_at.to_s(:db)
+      - rows.left l(:thirdparty_version_release_status), @third.status_name
+      - rows.right l(:field_author), link_to_user(@third.author)
+      - rows.line l(:thirdparty_version_release_server_path), @third.attachments.blank? ? "未上传" : link_to(@third.attachments.last.filename, @third.attachments.last.ftp_file_url)
+
+  -if @third.version_ids.present?
+    %hr
+    .issues-body
+      .panel.panel-danger
+        .panel-heading
+          %h4.panel-title= l(:thirdparty_version_release_version_lists)
+        .panel-body
+          %table#versionLists.list.issues-relations-table.table.table-bordered.table-hover{:style => "table-layout: auto;"}
+            %thead
+              %tr
+                %th= "#"
+                %th= "应用版本"
+                %th= "版本路径"
+            %tbody
+              - @third.version_ids.each_with_index do |vid, idx|
+                - if version = Version.find(vid)
+                  %tr{:class => "#{cycle("odd", "even")}"}
+                    %td
+                      = check_box_tag "fields"
+                      = hidden_field_tag "version_id", version.id
+                      = idx + 1
+                    %td{:style => "word-wrap:break-word;word-break:break-all;"}
+                      = link_to_version(version)
+                    %td{:style => "word-wrap:break-word;word-break:break-all;"}
+                      = link_to("\\\\#{software_release_path}\\#{version.project.identifier}\\#{version.fullname}.zip", "ftp://amige:OS_amigo@18.8.8.2/software_release/Applications/#{version.project.identifier}/#{version.fullname}.zip")
+          %a#release.btn.btn-primary.btn-sm{:href => "#{void_js}"}
+            %i.fa.fa-send
+              = l(:thirdparty_version_release_option_release)
+          = check_box_tag "check_all"
+          = l(:check_all)
+
+  - if @third.release_ids.present?
+    %hr
+    .release-results
+      .label= l(:version_release_result)
+      .release-results-list= render_release_result(@third)
+
+= production_submenu_by_type(@third.category == 1 ? 4 : 6)
+= javascript_tag "$('#tab-productions').find('li').eq(1).removeAttr('class');"
+= javascript_tag "$('#tab-productions').find('li').eq(2).attr('class', 'active');"
+
+- html_title(release_heading @third)
+
+:javascript
+
+  $('#check_all').on('click', function() {
+    if($(this).is(':checked')){
+      $("[name = fields]:checkbox").attr("checked", true);
+    }else{
+      $("[name = fields]:checkbox").attr("checked", false);
+    }
+  })
+
+  $('#release').on('click', function() {
+    var release_version_ids = [];
+    $("[name = fields]:checkbox").each(function(index, item){
+      if($(item).is(':checked')){
+        release_version_ids.push($(item).next().val())
+      }
+    })
+    if (release_version_ids.length > 0){
+      openConfirmDiaiog("确定要发布吗", function() {
+        remote("#{release_thirdparty_version_releases_path}", 'POST', {id: #{@third.id}, release_vids: release_version_ids}, function(res){
+          layer.alert("发布中......");
+        })
+      })
+    } else {
+      layer.msg("无任何可发布的版本");
+    }
+  })
+
+  function reupload(){
+    openConfirmDiaiog('确定#{l(:thirdparty_version_release_reupload)}吗？', function(){
+      remote('#{reupload_thirdparty_version_releases_path}', 'POST', {id: #{@third.id}}, function(){
+        layer.alert('#{l(:thirdparty_version_release_reupload)}成功');
+        refreshPage();
+      })
+    })
+  }

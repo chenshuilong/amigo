@@ -1,0 +1,23 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %meta{:charset => "utf-8"}/
+    %meta{:content => "IE=edge", "http-equiv" => "X-UA-Compatible"}/
+    %title= html_title
+    %meta{:content => "width=device-width, initial-scale=1, maximum-scale=1", :name => "viewport"}/
+    %meta{:content => "#{Redmine::Info.app_name}", :name => "description"}/
+    %meta{:content => "#{Redmine::Info.app_name}", :name => "keywords"}/
+    %meta{:content => "none", :name => "robots"}/
+    = csrf_meta_tag
+    = favicon
+    = javascript_heads
+    = javascript_include_tag "applications"
+    = stylesheet_link_tag 'applications'
+    = yield :header_tags
+    / page specific tags
+  %body
+    = render :partial => "layouts/navigation"
+    .container
+      = yield
+

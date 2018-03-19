@@ -1,0 +1,52 @@
+%div{:style => "width:100%;"}
+  %ul.notification-list
+    %li.notification-list-item
+      .notification-content
+        %p
+          %strong= "查询条件"
+      .clearfix
+      .notification-acton.select2-rectify
+        %form#formBugAnalysisTimeout.form-horizontal{:role => "form"}
+          .form-group
+            .input-group
+              .input-group-addon 项目
+              = hidden_field_tag "project","project_id"
+              %select#project_value.form-control{:name => "project_value",:multiple => :multiple}
+                = project_tree_options_for_select(Project.all)
+
+              .input-group-addon 严重等级
+              = select_tag "priority_id", options_for_select(IssuePriority.active.collect{|pty| [pty.name,pty.id]}), :multiple => :multiple, class: 'value form-control select-multiple'
+
+          .form-group
+            .input-group
+              .input-group-addon 时间
+              %input#start_dt_analysis.form-control{:name => "start_dt",:value => "#{(Time.now-30.days).strftime('%Y-%m-%d')}"}
+              .input-group-addon 至
+              %input#end_dt_analysis.form-control{:name => "end_dt",:value => "#{Time.now.strftime('%Y-%m-%d')}"}
+
+              = hidden_field_tag "created_time_yn","2"
+              = hidden_field_tag "dwm_yn","1"
+          .text-right
+            %input{:type => "button",:onclick => "queryBugAnalysisTimeout('bug_analysis_timeout')",:class => "btn btn-primary",:value => "查询"}
+
+.panel.panel-default
+  .panel-heading= "研发分析超时BUG数量"
+  .panel-body
+    .button-group-report.text-right
+      %input{:type => "button",:onclick => "exportPersonalize('bug_analysis_timeout','formBugAnalysisTimeout')",:class => "btn btn-primary",:value => "导出Excel"}
+    #contentAnalysisTimeoutBug
+
+:javascript
+  initSelect("project_value");
+  initSelect("priority_id");
+  initDateTimePicker("start_dt_analysis","Y-m-d",false);
+  initDateTimePicker("end_dt_analysis","Y-m-d",false);
+
+  $('#project_value,#start_dt_analysis,#end_dt_analysis,#priority_id').on("change", function (e) {
+    // queryBugAnalysisTimeout('bug_analysis_timeout');
+  });
+
+  setTimeout(function () {
+        $('.notification-acton').css("display","block");
+        // queryBugAnalysisTimeout('bug_analysis_timeout');
+    }, 500);

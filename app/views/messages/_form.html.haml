@@ -1,0 +1,27 @@
+= error_messages_for 'message'
+- replying ||= false
+.box
+  %p
+    = f.text_field :subject, :size => 120, :id => "message_subject", class: "collapse"
+    - unless replying
+      = f.text_field :subject, :size => 120, :id => "message_subject", placeholder: l(:field_subject), :data => {"max-input-length" => 60}
+      - if @message.safe_attribute? 'sticky'
+        = f.check_box :sticky
+        = label_tag 'message_sticky', l(:label_board_sticky)
+      - if @message.safe_attribute? 'locked'
+        = f.check_box :locked
+        = label_tag 'message_locked', l(:label_board_locked)
+  - if !replying && !@message.new_record? && @message.safe_attribute?('board_id')
+    %p
+      %label= l(:label_board)
+      %br/
+      = f.select :board_id, boards_options_for_select(@message.project.boards)
+  %p
+    -# = label_tag "message_content", l(:description_message_content), :class => "hidden-for-sighted"
+    = f.text_area :content, :cols => 50, :rows => 8, :class => 'wiki-edit message-wiki', :id => 'message_content'
+    = wikitoolbar_for 'message_content'
+  / [eoform:message]
+  %p
+    -# = l(:label_attachment_plural)
+    -# %br/
+    = render :partial => 'attachments/form', :locals => {:container => @message}

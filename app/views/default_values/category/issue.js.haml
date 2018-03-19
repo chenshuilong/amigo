@@ -1,0 +1,48 @@
+:plain
+  var json = #{@default_value.json};
+  var reasons = #{mokuai_reasons(@default_value.json)}
+  var mokuais = #{mokuai_options(@default_value.json)};
+  var trackers = #{tracker_options(@default_value.json)};
+  var pinzhis = #{pinzhi_options(@default_value.json)};
+  var delay = 100;
+  $(".defalut-value").trigger("click");
+
+  if(json['issue[tracker_id]'] != $("#issue_tracker_id").val()) { // Refresh tracker
+    delay = 600;
+    $("#issue_tracker_id").val(json['issue[tracker_id]']);
+    updateIssueFrom('/issues/new.js', $("#issue_tracker_id")[0])
+  }
+
+  setTimeout(function(){
+    $.each(json, function(i,v){
+      if(i == "issue[mokuai_reason]"){
+        if(!reasons) {return;}
+        $(".mokuai-reason").empty();
+        $.each(reasons, function(i, v){$(".mokuai-reason").append("<option value='"+v+"'>"+v+"</option>")})
+      } else if(i == "issue[mokuai_name]"){ //Render Mokuais Option
+        if(!mokuais) {return;}
+        $(".mokuai-name").empty();
+        $.each(mokuais, function(i, v){$(".mokuai-name").append("<option value='"+v[1]+"'>"+v[0]+"</option>")})
+      } else if(i == "issue[tracker_id]") {
+        $("#issue_tracker_id").empty();
+        $.each(trackers, function(i, v){$("#issue_tracker_id").append("<option value='"+v[0]+"'>"+v[1]+"</option>")})
+      } else if(i == "issue[custom_field_values][#{IssueCustomField.xianxiang.try(:id)}]") {
+        $("#issue_custom_field_values_#{IssueCustomField.pinzhi.try(:id)}").data('relation', pinzhis.relation).select2({data: pinzhis.names})
+      }
+      $("[name='"+i+"']").val(v)
+    });
+
+    $.each(#{user_filed(@default_value.json)}, function(i,v){ //Refresh user
+      if ($(v.id).find("option[value='" + v.value + "']").length) {
+        $(v.id).val(v.value).trigger("change.select2");
+      } else {
+        var newState = new Option(v.text, v.value, true, true);
+        $(v.id).append(newState).trigger('change.select2');
+      }
+    });
+    $("#issue_project_id").select2();
+    $(".select2-origin").trigger('change.select2');
+    $("#issue_subject").trigger('input');
+
+  }, delay)
+

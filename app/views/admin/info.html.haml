@@ -1,0 +1,13 @@
+%h2= l(:label_information_plural)
+%p
+  %strong= Redmine::Info.versioned_name
+%table.list
+  - @checklist.each do |label, result|
+    %tr{:class => "#{cycle 'odd', 'even'}"}
+      %td.name= label.is_a?(Symbol) ? l(label) : label
+      %td.tick
+        %span{:class => "icon-only #{(result ? 'icon-ok' : 'icon-error')}"}
+%br/
+.box
+  %pre= Redmine::Info.environment
+- html_title(l(:label_information_plural))

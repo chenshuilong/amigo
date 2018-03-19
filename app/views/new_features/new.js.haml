@@ -1,0 +1,24 @@
+:plain
+  $("#ajax-modal").html('#{j render :partial => "new", :locals => { :new_feature => @new_feature }}')
+  new_feature_window = layer.open({
+    type: 1,
+    title: '<b>#{l(:new_feature_add)}</b>',
+    area: ['750px', '230px'],
+    zIndex: 666,
+    moveType: 1,
+    shadeClose: false,
+    content: $("#ajax-modal"),
+    btn: ['取消', '确定'],
+    yes: function(index, layero){
+      layer.close(new_feature_window)
+    },
+    btn2: function(index, layero){
+      if($("#new_feature_description").val() == ""){
+        layer.alert("#{l(:field_description)} #{l(:notice_required_field)}")
+        return false
+      }
+      else{
+        $("#new_new_feature").submit();
+      }
+    }
+  });

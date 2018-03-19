@@ -1,0 +1,18 @@
+:plain
+  $("#ajax-modal").html('#{j render :partial => "modify", :locals => { :mokuai => @mokuai }}')
+  mokuai_window = layer.open({
+    type: 1,
+    title: '<b>编辑模块</b>',
+    area: ['400px', 'auto'],
+    zIndex: 666,
+    moveType: 1,
+    shadeClose: false,
+    content: $("#ajax-modal"),
+    btn: ['取消', '确定'],
+    yes: function(index, layero){
+      layer.close(mokuai_window)
+    },
+    btn2: function(index, layero){
+      $("#mokuai_form").submit();
+    }
+  });

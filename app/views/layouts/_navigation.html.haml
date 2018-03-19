@@ -1,0 +1,96 @@
+%nav.navbar.navbar-default
+  .container
+    .navbar-header
+      %button.navbar-toggle.collapsed{"aria-expanded" => "false", "data-target" => "#navigation", "data-toggle" => "collapse", :type => "button"}
+        %span.sr-only Toggle navigation
+        %span.icon-bar
+        %span.icon-bar
+        %span.icon-bar
+      %a.navbar-brand{:href => "/"}
+        = image_tag("amigo.png")
+        = development_env_flag
+    #navigation.collapse.navbar-collapse
+      = render_menu :top_menu, nil, "nav navbar-nav"
+      %ul.nav.navbar-nav.navbar-right
+        %li.dropdown
+          - if User.current.logged?
+            %a.dropdown-toggle{ "data-toggle" => "dropdown", :href => void_js, :role => "button"}
+              = User.current.name
+              %span.caret
+            %ul.dropdown-menu
+              %li.comingsoon
+                %a{:href => "#"}
+                  %i.fa.fa-envelope
+                  消息
+              %li#help
+                %a{:href => void_js}
+                  %i.fa.fa-exclamation-circle
+                  帮助
+              %li
+                %a{:href => project_board_path(Project.first.to_param,1)}
+                  %i.fa.fa-comment
+                  反馈
+              %li
+                %a{:href => my_account_path}
+                  %i.fa.fa-cog
+                  设置
+              %li.divider{:role => "separator"}
+              %li
+                %a{:href => signout_path}
+                  %i.fa.fa-sign-out
+                  退出
+          - else
+            %a.dropdown-toggle{:href => signin_path, :role => "button"} 登录
+
+      %ul.nav.navbar-nav.navbar-right.nav-faster-new
+        %li.dropdown.nav-faster-new
+          %a.dropdown-toggle{ "data-toggle" => "dropdown", :href => void_js, :role => "button"}
+            %i.fa.fa-plus
+          %ul.dropdown-menu= faster_new_menu
+      %ul.navbar-form.navbar-right
+        .nav-downlaod= link_to (icon "download", :class => "export-badge" , "data-badge" => unexport_count), void_js
+        .nav-search
+          = form_tag({:controller => 'search', :action => 'index', :id => @project}, :method => :get ) do
+            = hidden_field_tag(controller.default_search_scope, 1, :id => nil) if controller.default_search_scope
+            = text_field_tag 'q', @question, :size => 20, :placeholder => "搜索从这里开始", :accesskey => accesskey(:quick_search)
+            = icon "search"
+        // .nav-notification
+        //   = link_to (icon "envelope", :class => "mail-badge", "data-badge" => unread_count), my_notifications_path
+      = render_notice_menu
+
+
+- if yield(:nav).present?
+  .nav-content
+    .container.tab-content
+      = render_navigation_sub_menu
+
+  - if yield(:bread).present?
+    .nav-breadcrumb
+      .container
+        %ol.breadcrumb
+          = link_to "< ", :back
+          = yield(:bread)
+
+.help_window
+  %header
+    .main
+      %p 阿米哥
+      %span Version 3.0
+  .main
+    %p 阿米哥基于Redmine开发，目前正处于开发期，欢迎大家提出宝贵意见，共同推动本项目进程。
+  .main.text-center
+    %a.btn.btn-primary{:href => "https://os.gionee.com/projects/amigo-h/boards/1"} 意见反馈
+
+
+:javascript
+  var nav = #{yield(:nav).first.to_i} || 0, subnav = #{yield(:nav).last.to_i} || 0;
+  $("#tab-"+$("#navigation li").eq(nav - 1).addClass("active").find("a").attr("class").split(' ')[0]).addClass("active").find("li").eq(subnav - 1).addClass("active");
+  $("#navigation a[href='#'], li.comingsoon").click(function(){layer.msg("本功能暂未上线，敬请期待！")});
+  $("#help").click(function(){
+    layer.open({
+      type: 1,
+      area: ['360px', 'auto'],
+      skin: 'layui-layer-rim', //加上边框
+      content: $(".help_window")
+    });
+  })

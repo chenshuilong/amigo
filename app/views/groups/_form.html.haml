@@ -1,0 +1,6 @@
+= error_messages_for @group
+.box.tabular
+  %p= f.text_field :name, :required => true, :size => 60, |
+      :disabled => !@group.safe_attribute?('name')        |
+  - @group.custom_field_values.each do |value|
+    %p= custom_field_tag_with_label :group, value

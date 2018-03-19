@@ -1,0 +1,91 @@
+%form#formCustomFeild.form-horizontal{:role => "form"}
+  .form-group
+    = label_tag :name,'字段名称', class: 'control-label col-sm-2'
+    .col-xs-6
+      = text_field_tag "custom_fields[name]", nil, { class: 'form-control', style: 'width:100%'}
+    .col-xs-2
+      = select_tag "custom_fields[field_subsection]", subsection_for_select, {class: 'value form-control', style: 'width:100%'}
+  .form-group
+    = label_tag :possible_values, "字段值", class: "control-label col-sm-2"
+    .col-xs-8
+      = text_area_tag "custom_fields[possible_values]", "", { style: 'width:100%;height:120px;'}
+  .form-group
+    = label_tag :field_format,'类型', class: 'control-label col-sm-2'
+    .col-xs-2
+      = select_tag "custom_fields[field_format]", field_format_for_select, {class: 'value form-control select-multiple', style: 'width:100%'}
+    .col-xs-2
+      = button_tag l(:definition_custom_field_create), {id: 'btn-add-feild', class: "btn btn-primary"}
+  = hidden_field_tag "custom_fields[type]", "DefinitionCustomField"
+
+
+%hr
+.row
+  .col-sm-10
+  .col-sm-2
+    = button_tag l(:edit_all), {id: 'btn-edit-all', class: "btn btn-primary"}
+  .roadmap-table
+    %table#feildTable.list.table.table-striped.table-bordered{:class => "csacsa"}
+      %thead
+        %tr
+          %th{style:'text-align: center;'}
+            = check_box_tag "check_all"
+            = l(:check_all)
+          %th= l :numerical_order_all
+          %th= l :definition_custom_field_name
+          %th= l :definition_custom_field_format
+          %th= l :definition_custom_field_value
+          %th= l :label_sort
+      %tbody
+
+
+:javascript
+
+  new SMValidator('#formCustomFeild', {
+      focus: true,
+      required: '这是必填项',
+      fields: {
+        "custom_fields[name]":         'required',
+        "custom_fields[field_format]": 'required'
+      },
+      submit: function(valid, form) {
+        if(valid) {
+          onCreateDefinitionCustomFeild(getFormParams($('#formCustomFeild').get(0)), "#{@project.id}")
+        }
+      }
+  });
+
+  $('#check_all').on('click',function() {
+    if($(this).is(':checked')){
+      $("[name = fields]:checkbox").attr("checked", true);
+    }else{
+      $("[name = fields]:checkbox").attr("checked", false);
+    }
+  })
+
+  $('#btn-edit-all').on('click',function() {
+
+    var fids = new Array();
+    $("[name = fields]:checkbox").each(function () {
+      if ($(this).is(":checked")) {
+        fids.push($(this).attr("value"));
+      }
+    });
+
+    if(fids.length == 0){
+      layer.alert("请选择要修改的字段!")
+    }else {
+      layer.confirm("确定要#{l(:edit_all)}" + fids.length.toString() + "字段吗？", {btn: ['取消', '确定']},
+        function (cancal) {
+            layer.close(cancal);
+        },
+        function () {
+            var data = $('#formCustomFeild').serializeObject();
+            data.fids = fids;
+            remote("/projects/#{@project.id}/definitions/edit_custom_field", "POST", { data: data }, function (res) {
+                layer.msg("操作成功！");
+                generateDefinitionFieldTable('feildTable', "#{@project.id}");
+            })
+        }
+      );
+    }
+  })

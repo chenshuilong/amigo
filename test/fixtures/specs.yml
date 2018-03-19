@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  app_name: MyString
+  adapter_finish_dt: 2017-01-03 13:53:25
+  locked: false
+  is_default: false
+  note: MyText
+
+two:
+  app_name: MyString
+  adapter_finish_dt: 2017-01-03 13:53:25
+  locked: false
+  is_default: false
+  note: MyText

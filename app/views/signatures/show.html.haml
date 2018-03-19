@@ -1,0 +1,42 @@
+- provide :nav, "5,6"
+- provide :css, "bootstrap"
+
+- content_for :bread do
+  %li= link_to l(:label_signatures), signatures_path
+  %li= @sign.name
+
+.clearfix
+  .issue-details
+    .attributes
+      %table.table.table-borderless
+        %tbody
+          %tr
+            %th.col-sm-2= l(:signature_name)
+            %td.col-sm-10= load_value(@sign, :name)
+          %tr
+            %th.col-sm-2= l(:signature_key_name)
+            %td.col-sm-10= load_value(@sign, :key_name)
+          %tr
+            %th.col-sm-2= l(:signature_author_id)
+            %td.col-sm-10= link_to_user @sign.author
+          %tr
+            %th.col-sm-2= l(:field_created_on)
+            %td.col-sm-10= @sign.created_at.strftime('%F %T')
+          %tr
+            %th.col-sm-2= l(:signature_due_at)
+            %td.col-sm-10= @sign.due_at.try(:strftime, '%F %T')
+          %tr
+            %th.col-sm-2= l(:signature_status)
+            %td.col-sm-10= load_value(@sign, :status)
+          %tr
+            %th.col-sm-2= l(:signature_upload_url)
+            %td.col-sm-10= @sign.upload_url.present? ? link_to(@sign.upload_url, @sign.upload_url) : ''
+          %tr
+            %th.col-sm-2= l(:signature_download_url)
+            %td.col-sm-10= @sign.download_url.present? ? link_to(@sign.download_url, @sign.download_url) : ''
+          %tr
+            %th.col-sm-2= l(:signature_infos)
+            %td.col-sm-10= @sign.infos.present? ? link_to(@sign.infos, @sign.infos, target: "_blank") : '' 
+          %tr
+            %th.col-sm-2= l(:signature_notes)
+            %td.col-sm-10= simple_format(@sign.notes)

@@ -1,0 +1,60 @@
+.tab{:role => "tabpanel"}
+  / Nav tabs
+  %ul#feildTabs.nav.nav-tabs{:role => "tablist", :style => "margin-top:5px;"}
+    - if allow_to_manage_product_definition?
+      %li#tab_product.active{:role => "presentation"}
+        %a{"aria-controls" => "product", "data-toggle" => "tab", :href => "#section_product", :role => "tab"} 产品定义字段
+    - if allow_to_manage_definition_module?
+      %li#tab_module{:role => "presentation"}
+        %a{"aria-controls" => "module", "data-toggle" => "tab", :href => "#section_module", :role => "tab"} 自定义模块
+    - if allow_to_manage_definition_custom_field?
+      %li#tab_feild{:role => "presentation"}
+        %a{"aria-controls" => "feild", "data-toggle" => "tab", :href => "#section_feild", :role => "tab"} 自定义字段
+    - if allow_to_manage_definition_module_field?
+      %li#tab_module_feild{:role => "presentation"}
+        %a{"aria-controls" => "feild", "data-toggle" => "tab", :href => "#section_module_feild", :role => "tab"} 模块配置
+    - if allow_to_manage_compare_model?
+      %li#tab_compare_model{:role => "presentation"}
+        %a{"aria-controls" => "feild", "data-toggle" => "tab", :href => "#section_compare_model", :role => "tab"} 对标机型管理
+  / Tab panes
+  .tab-content
+    #section_product.tab-pane.fade.in.active{:role => "tabpanel"}
+      %p= render :partial => "product_definition_feilds" if allow_to_manage_product_definition?
+    #section_module.tab-pane.fade{:role => "tabpanel"}
+      %p= render :partial => "definition_modules" if allow_to_manage_definition_module?
+    #section_feild.tab-pane.fade{:role => "tabpanel"}
+      %p= render :partial => "definition_custom_feilds" if allow_to_manage_definition_custom_field?
+    #section_module_feild.tab-pane.fade{:role => "tabpanel"}
+      %p= render :partial => "product_module_feilds" if allow_to_manage_definition_module_field?
+    #section_compare_model.tab-pane.fade{:role => "tabpanel"}
+      %p= render :partial => "compare_model" if allow_to_manage_compare_model?
+
+:javascript
+
+  generateProductDefinitionTable('definitionFeildTable', '#{@definition.id}', "#{@project.id}");
+
+  $('#feildTabs li').click(function() {
+    var project_id = "#{@project.id}";
+    var tabId = $(this).attr("id");
+
+    switch(tabId)
+    {
+      case "tab_product":
+        generateProductDefinitionTable('definitionFeildTable', '#{@definition.id}', project_id);
+        break;
+      case "tab_module":
+        generateDefinitionModuleTable('moduleTable', project_id);
+        break;
+      case "tab_feild":
+        generateDefinitionFieldTable('feildTable', project_id);
+        break;
+      case "tab_module_feild":
+        generateModuleFieldTable('moduleFeildTable', project_id);
+        break;
+      case "tab_compare_model":
+        generateCompareModelTable('compareModelTable', project_id);
+        break;
+      default:
+        break;
+    }
+  })

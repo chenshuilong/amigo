@@ -1,0 +1,7 @@
+- watched_issues = issueswatched_items
+%h4
+  -# = link_to l(:label_watched_issues),                                              |
+  -#   issues_path(:search => "watchers.user_id=#{User.current.id}", :sort => 'updated_on:desc') |
+  -# (#{watched_issues.limit(nil).count})
+  = "#{l(:label_watched_issues)}(#{watched_issues.limit(nil).count})"
+= render :partial => 'issues/list_simple', :locals => { :issues => watched_issues.to_a }

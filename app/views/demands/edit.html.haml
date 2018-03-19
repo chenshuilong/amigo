@@ -1,0 +1,12 @@
+- provide :nav, '6, 1'
+- provide :css, 'bootstrap'
+- content_for :bread do
+  %li= link_to l(:label_demands), demands_path
+  %li= "编辑需求"
+
+%span.h2= "编辑需求"
+
+= labelled_form_for @demand, :url => demand_path(@demand) do |f|
+  = render :partial => 'form', :locals => { :f => f }
+  .button-group.text-center
+    = submit_tag l(:button_save), class: "btn btn-primary"

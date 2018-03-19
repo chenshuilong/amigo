@@ -1,0 +1,55 @@
+- provide :css, "bootstrap"
+
+- if @project.show_by(4)
+  .alert.alert-warning= l(:label_no_data)
+- else
+  .h2 模块OWNER
+
+  - if User.current.allowed_to?(:add_mokuai_ownners, @project)
+    %h4 创建OWNER匹配
+    .row
+      .col-md-9
+        = form_tag(project_mokuai_ownners_path(@project), remote: true, class: "mokuai_ownner_form") do
+          %table.table.table-striped.table-bordered{:style => "table-layout: fixed;"}
+            %thead
+              %tr
+                %th{:width => "15%"} 归属
+                %th{:width => "15%"} 模块
+                %th{:width => "20%"} TFDE
+                %th{:width => "20%"} OWNER
+                %th{:width => "20%"} 次要OWNER(可多选)
+                %th{:width => "10%"}
+            %tbody
+              %tr
+                %th= select_tag "reason", options_for_select(@reasons.collect{ |r| [r, r] }), :class => "form-control mokuai-reason"
+                %th= select_tag "ownner[mokuai_id]", options_from_collection_for_select(@names, "id", "name"), :class => "form-control mokuai-name"
+                %th
+                  = select_tag "ownner[tfde]", [], :class => "form-control mokuai-owwner"
+                  = select2_remote("ownner_tfde", @project)
+                %th
+                  = select_tag "ownner[main_ownner]", [], :class => "form-control mokuai-owwner"
+                  = select2_remote("ownner_main_ownner", @project)
+                %th
+                  = select_tag "ownner[minor_ownner][]", [], multiple: "multiple", :class => "form-control mokuai-owwner"
+                  = select2_remote("ownner_minor_ownner_", @project)
+                %th= submit_tag "创建", :class => "btn btn-primary"
+      .col-md-3
+        = form_tag(fetch_project_mokuai_ownners_path(@project), remote: true, class: "mokuai_ownner_form") do
+          %table.table
+            %thead
+              %tr
+                %th 拉取其他项目的模块OWNER
+                %th
+            %tbody
+              %tr
+                %th
+                  = select_tag "project[id]", project_tree_options_for_select(@projects), :class => "form-control"
+                  = select2_for "project_id"
+                  = hidden_field_tag "project[to]", @project.id
+                %th= submit_tag "拉取", :class => "btn btn-primary"
+
+
+  %h4 已创建的OWNER匹配
+
+  .project-mokuai-ownners
+    = render :partial => "ownners", :locals => { :ownners => @ownners, :project => @project}

@@ -1,0 +1,56 @@
+%form#formProductDefinition.form-horizontal{:role => "form"}
+  .form-group
+    = label_tag :definition_module_id,'模块名称', class: 'control-label col-sm-2'
+    .col-xs-2
+      = select_tag "product[definition_module_id]", options_for_select(@definition_module.map{|v| [v.name,v.id]}.unshift(["",""])), { class: 'form-control', style: 'width:100%'}
+      = select2_tag("product_definition_module_id")
+    = label_tag :custom_field_id, "字段名称", class: "control-label col-sm-2"
+    .col-xs-4
+      = select_tag "product[custom_field_id]", options_for_select(@definition ? choose_custom_feilds(@definition.id) : []), :multiple => :multiple, class: 'value form-control select-multiple', style: 'width:100%'
+      = select2_tag("product_custom_field_id")
+    .col-xs-2
+      = button_tag l(:definition_custom_field_create), {id: 'btn-add-feild', class: "btn btn-primary"}
+    = hidden_field_tag "product[product_definition_id]", "#{@definition ? @definition.id : ''}"
+
+  %hr
+  .roadmap-table
+    %table#definitionFeildTable.list.table.table-striped.table-bordered{:class => "csacsa"}
+      %thead
+        %tr
+          %th= l :numerical_order_all
+          %th= l :definition_module_name
+          %th= l :definition_custom_field_name
+          %th= l :definition_custom_field_format
+          %th= l :definition_custom_field_value
+          %th= l :definition_custom_field_sort
+          %th= l :option_all
+      %tbody#custom_feilds
+
+:javascript
+
+  new SMValidator('#formProductDefinition', {
+      focus: true,
+      required: '这是必填项',
+      rules: {
+        onlyNumber:   [/^\d*$/, '只能输入数字'],
+        onlyAlphabet: [/^[a-z]*$/, '只能输入字母'],
+      },
+      fields: {
+        "product[definition_module_id]":  'required',
+        "product[custom_field_id]":       'required'
+      },
+      submit: function(valid, form) {
+        if(valid) {
+          var url = "&product[definition_module_id]=" + $('#product_definition_module_id').val()
+          url += "&product[custom_field_id]=" + $('#product_custom_field_id').val()
+          url += "&product[product_definition_id]=#{@definition.id}"
+          onCreateDefinitionCustomValue(url, #{@definition.id}, "#{@project.id}")
+          window.location.reload();
+        }
+      }
+  });
+
+  $('#product_definition_module_id').on('change',function() {
+    getModuleFields($(this).val(), "#{@project.id}");
+  })
+

@@ -1,0 +1,26 @@
+%p
+  %hr
+  %table
+    %tbody
+      %tr
+        %td.talbe-col-md-2
+          %p.label 任务发起人
+        %td.talbe-col-md-4= @task.author.try(:name)
+      %tr
+        %td.talbe-col-md-2
+          %p.label 计划开始时间
+        %td.talbe-col-md-4= @task.start_date.strftime("%F %T")
+      %tr
+        %td.talbe-col-md-2
+          %p.label 计划结束时间
+        %td.talbe-col-md-4= @task.due_date.strftime("%F %T")
+
+
+/ Public
+%hr
+%table.button.small
+  %tr
+    %td
+      %table
+        %tr
+          %td= link_to '查看详情', my_tasks_url(type: 'personal_task', person_type: 'assigned_to_id')

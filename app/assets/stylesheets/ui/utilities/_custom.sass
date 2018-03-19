@@ -1,0 +1,13 @@
+// Export format icon
+=export-format-icon($format)
+  .export-format-#{$format}:before
+    width: 35px
+    height: 40px
+    content: " "
+    background: image-url("export-format-#{$format}.png")
+    background-size: 35px 35px
+    background-repeat: no-repeat
+    background-position:center center
+    position: absolute
+    left: 30px
+    top: 16px

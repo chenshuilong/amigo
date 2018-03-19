@@ -1,0 +1,15 @@
+:plain
+  $("#ajax-modal").html('#{j render :partial => "history", :locals => { :records => @records }}')
+  mokuai_history_window = layer.open({
+    type: 1,
+    title: '<b>#{l(:label_history)} (#{@mokuai.reason}/#{@mokuai.name})</b>',
+    area: ['80%', '800px'],
+    zIndex: 1001,
+    moveType: 1,
+    shadeClose: false,
+    content: $("#ajax-modal"),
+    btn: ['关闭'],
+    yes: function(index, layero){
+      layer.close(mokuai_history_window)
+    }
+  });

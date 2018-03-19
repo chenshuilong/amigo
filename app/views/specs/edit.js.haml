@@ -1,0 +1,18 @@
+:plain
+  $("#ajax-modal").html('#{j render :partial => "modify", :locals => { :spec => @spec }}')
+  spec_window = layer.open({
+    type: 1,
+    title: '<b>编辑规格</b>',
+    area: ['600px', 'auto'],
+    zIndex: 666,
+    moveType: 1,
+    shadeClose: false,
+    content: $("#ajax-modal"),
+    btn: ['取消', '确定'],
+    yes: function(index, layero){
+      layer.close(spec_window)
+    },
+    btn2: function(index, layero){
+      $("#ajax-modal").find("form").submit();
+    }
+  });

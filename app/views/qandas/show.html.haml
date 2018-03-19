@@ -1,0 +1,39 @@
+- provide :nav, "9,1"
+- provide :css, "bootstrap"
+
+- content_for :header_tags do
+  = stylesheet_link_tag '/amg/wangEditor/dist/css/wangEditor.min.css'
+
+%div#qusDetail
+  - if User.current.admin?
+    %span.production-action-menu.pull-right
+      = link_to l(:button_edit), edit_qanda_path(@qanda)
+      = " | "
+      = link_to l(:button_delete), @qanda, method: :delete, data: { confirm: "You sure?" }
+  .h2= l(:qanda_view)
+  %section.issue-details
+    %header
+      %h2= @qanda.subject
+    %article
+      = preserve raw @qanda.content
+      = render_tag @qanda
+    %footer
+      = raw render_nabor_of @qanda
+      -# %form
+      -#   %div#score
+      -#     %span 你的评分：
+      -#     %ul
+      -#       %li
+      -#         %i.fa.fa-star
+      -#       %li
+      -#         %i.fa.fa-star
+      -#       %li
+      -#         %i.fa.fa-star
+      -#       %li
+      -#         %i.fa.fa-star
+      -#       %li
+      -#         %i.fa.fa-star
+      -#       %input{ :type => "hidden", :value => 0 }
+      -#   %textarea.form-control{:rows => "5"}
+      -#   %button.btn.btn-primary.pull-right
+      -#     %span 提交

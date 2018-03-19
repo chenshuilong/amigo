@@ -1,0 +1,10 @@
+= labelled_form_for @user do |f|
+  = render :partial => 'form', :locals => { :f => f }
+  - if @user.active? && email_delivery_enabled? && @user != User.current
+    %p
+      %label
+        = check_box_tag 'send_information', 1, true
+        = l(:label_send_information)
+  %p
+    = submit_tag l(:button_save)
+    =link_to "添加到UAAM", "http://uc.gionee.com/api/service/app/registerUser?appId=41&userId=#{@user.login}", class: "btn btn-default", target: "_blank"

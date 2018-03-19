@@ -1,0 +1,145 @@
+- provide :nav, "3,3"
+- provide :css, "bootstrap"
+- content_for :header_tags do
+  %link{:href => "/amg/easytree/skin-win8/ui.easytree.css", :rel => "stylesheet"}
+
+  %script{:src => "/amg/easytree/jquery.easytree.js", :type => "text/javascript"}
+
+  %script{:src => "/javascripts/echarts.min.js", :type => "text/javascript"}
+  %script{:src => "/javascripts/infographic.js", :type => "text/javascript"}
+  %script{:src => "/javascripts/walden.js", :type => "text/javascript"}
+
+.row.filter-main
+  .filter-left
+    .filter-side
+      .filter-list
+        .panel-group
+          .panel.panel-default
+            .panel-heading
+              %i.fa.fa-cog
+              %span 定制列表
+            .panel-collapse.active
+              .panel-body
+                #reportsListMenu
+
+  .filter-right
+    = render :partial => '/reports/personalize_tabs/' << params[:menuid] if params[:menuid]
+    - unless params[:menuid]
+      .page-header
+        %h1.text-center
+          SQA项目质量日报
+      %div{:style => "width:100%;"}
+        %ul.notification-list
+          %li.notification-list-item
+            .clearfix
+            .notification-acton.select2-rectify
+              %form#formSQA.form-horizontal{:role => "form"}
+                .form-group
+                  %label.col-sm-1.control-label 项目
+                  .col-sm-4
+                    %select#project_sqa.form-control{:name => "project_sqa",:style => "width:90%;"}
+                      = project_tree_options_for_select(Project.all)
+                  %label.col-sm-1.control-label 时间
+                  .col-sm-2
+                    %input#start_dt_sqa.form-control{:name => "start_dt",:value => "2016-09-01"}
+                  %label.col-sm-1.control-label.text-center 到
+                  .col-sm-2
+                    %input#end_dt_sqa.form-control{:name => "end_dt",:value => "#{Time.now.strftime('%Y-%m-%d')}"}
+                  .col-sm-1.text-center
+                    %input{:type => "button",:onclick => "querySQA()",:class => "btn btn-primary",:value => "预览"}
+
+      #accordion.panel-group
+        .panel.panel-success
+          .panel-heading
+            %h4.panel-title
+              %a{"data-parent" => "#accordion", "data-toggle" => "collapse", :href => "#colLeaveAmountAndSolvedRate"}
+                遗留BUG数及解决率
+          #colLeaveAmountAndSolvedRate.panel-collapse.collapse
+            .panel-body
+              %select#rate_standard.form-control{:name => "rate_standard"}
+                %option{:value => "0"} 验收一
+                %option{:value => "1"} 封板
+              .autoscroll
+                %table#table_leave_amount_and_solved_rate.table.table-striped.table-bordered.table-hover
+              -#= render :partial => '/reports/personalize_tabs/leave_amount_and_solved_rate'
+        .panel.panel-info
+          .panel-heading
+            %h4.panel-title
+              %a{"data-parent" => "#accordion", "data-toggle" => "collapse", :href => "#colLeaveAmountRankByDept"}
+                遗留BUG TOP10部门分布
+          #colLeaveAmountRankByDept.panel-collapse.collapse
+            .panel-body
+              #chartLeaveAmountRankByDept{:style => "height:600px"}
+              -#= render :partial => '/reports/personalize_tabs/leave_amount_rank_by_dept'
+        .panel.panel-warning
+          .panel-heading
+            %h4.panel-title
+              %a{"data-parent" => "#accordion", "data-toggle" => "collapse", :href => "#colLeaveAmountRankByMokuai"}
+                遗留BUG TOP10模块分布
+          #colLeaveAmountRankByMokuai.panel-collapse.collapse
+            .panel-body
+              #chartLeaveAmountRankByMokuai{:style => "height:600px"}
+              -#= render :partial => '/reports/personalize_tabs/leave_amount_rank_by_mokuai'
+        .panel.panel-danger
+          .panel-heading
+            %h4.panel-title
+              %a{"data-parent" => "#accordion", "data-toggle" => "collapse", :href => "#colLeaveAmountRankByIssueCategory"}
+                遗留BUG TOP10问题分类分布
+          #colLeaveAmountRankByIssueCategory.panel-collapse.collapse
+            .panel-body
+              #chartLeaveAmountRankByIssueCategory{:style => "height:600px"}
+              -#= render :partial => '/reports/personalize_tabs/leave_amount_rank_by_issue_category'
+        .panel.panel-success
+          .panel-heading
+            %h4.panel-title
+              %a{"data-parent" => "#accordion", "data-toggle" => "collapse", :href => "#colTimeoutAndUnhandleBugCoverage"}
+                超时未处理BUG状况
+          #colTimeoutAndUnhandleBugCoverage.panel-collapse.collapse
+            .panel-body
+              #chartTimeoutAndUnhandleBugCoverage{:style => "height:600px"}
+              -#= render :partial => '/reports/personalize_tabs/timeout_and_unhandle_bug_coverage'
+        .panel.panel-info
+          .panel-heading
+            %h4.panel-title
+              %a{"data-parent" => "#accordion", "data-toggle" => "collapse", :href => "#colLeaveAmountGroupByOwnerAndRom"}
+                各属性中遗留BUG各责任人分布（ROM）
+          #colLeaveAmountGroupByOwnerAndRom.panel-collapse.collapse
+            .panel-body
+              #chartLeaveAmountGroupByOwnerAndRom{:style => "height:600px"}
+        .panel.panel-warning
+          .panel-heading
+            %h4.panel-title
+              %a{"data-parent" => "#accordion", "data-toggle" => "collapse", :href => "#colLeaveAmountGroupByOwnerAndDrive"}
+                各属性中遗留BUG各责任人分布（驱动、相机、软件）
+          #colLeaveAmountGroupByOwnerAndDrive.panel-collapse.collapse
+            .panel-body
+              #chartLeaveAmountGroupByOwnerAndDrive{:style => "height:600px"}
+              -##chartLeaveAmountGroupByOwnerAndSofeware{:style => "height:600px"}
+              -##chartLeaveAmountGroupByOwnerAndFilm{:style => "height:600px"}
+
+      %input{:type => "button",:onclick => "sendSQA()",:class => "btn btn-primary btn-lg",:value => "发送"}
+
+.filter-slide-button{:href => "javascript:;"}
+  %i.fa.fa-chevron-left
+
+:javascript
+  var treeData = #{raw_json personalize_menu_list}
+  initEasyTree('reportsListMenu',{ enableDnd: true, data: treeData, showMore: false });
+  initSelect("project_sqa");
+  initDateTimePicker("start_dt_sqa","Y-m-d",false);
+  initDateTimePicker("end_dt_sqa","Y-m-d",false);
+
+  // Fix Filter left panel
+  $(".filter-left").fixedBlock();
+
+  $(function () { $('#colLeaveAmountAndSolvedRate').collapse('show')});
+  $(function () { $('#colLeaveAmountRankByDept').collapse('toggle')});
+  $(function () { $('#colLeaveAmountRankByMokuai').collapse('toggle')});
+  $(function () { $('#colLeaveAmountRankByIssueCategory').collapse('toggle')});
+  $(function () { $('#colTimeoutAndUnhandleBugCoverage').collapse('toggle')});
+  $(function () { $('#colLeaveAmountGroupByOwnerAndRom').collapse('toggle')});
+  $(function () { $('#colLeaveAmountGroupByOwnerAndDrive').collapse('toggle')});
+
+  setTimeout(function () {
+        $('.notification-acton').css("display","block");
+    }, 500);

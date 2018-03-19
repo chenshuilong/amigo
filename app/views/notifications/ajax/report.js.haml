@@ -1,0 +1,6 @@
+:plain
+  $("#notifications-#{@notification.id}").find(".notification-acton").html("#{render_handle_result(@notification)}");
+  $("#notifications-#{@notification.id}").find(".notification-flag").removeClass("unread");
+  $("#notification-#{@notification.category}").find(".badge").text("#{unread_count(@notification.category)}");
+  $("#nav-notification").find(".fa").attr("data-badge", "#{unread_count}");
+  if(!"#{unread_count}"){$(".nav-notification").find(".fa").removeClass("mail-badge");}

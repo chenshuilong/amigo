@@ -1,0 +1,116 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+- unless @project.active?
+  %p.warning
+    %span.icon.icon-lock= l(:text_project_closed)
+
+.row
+  .col-sm-6
+    .h2
+  .col-sm-6.text-right
+    .top-action-menu
+      - if User.current.allowed_to?(:add_subprojects, @project)
+        - if @project.show_by(4)
+          = link_to l(:label_subproject_new), new_productions_path << "?type=#{@project.production_type}&parent_id=#{@project}"
+        - else
+          = link_to l(:label_subproject_new), new_project_path(:parent_id => @project), :class => 'icon icon-add'
+      - if User.current.allowed_to?(:close_project, @project)
+        - if @project.active?
+          = link_to l(:button_close), close_project_path(@project), :data => {:confirm => l(:text_are_you_sure)}, :method => :post, :class => 'icon icon-lock'
+        - else
+          = link_to l(:button_reopen), reopen_project_path(@project), :data => {:confirm => l(:text_are_you_sure)}, :method => :post, :class => 'icon icon-unlock'
+
+.issue-details
+  .h2= l(:label_overview)
+  .splitcontentleft
+    .description
+      - if @project.description.present?
+        .wiki
+          = textilizable @project.description
+    - if @project.homepage.present? || @subprojects.any? || @project.visible_custom_field_values.any?(&:present?)
+      %ul
+        - unless @project.homepage.blank?
+          %li
+            %span.label
+              = l(:field_homepage)
+              \:
+            = link_to_if uri_with_safe_scheme?(@project.homepage), @project.homepage, @project.homepage
+        - if @subprojects.any?
+          %li
+            %span.label
+              = l(:label_subproject_plural)
+              \:
+            = @subprojects.collect{|p| link_to p, project_path(p)}.join(", ").html_safe
+        - render_custom_field_values(@project) do |custom_field, formatted|
+          %li
+            %span.label
+              = custom_field.name
+              \:
+            = formatted
+    - if User.current.allowed_to?(:view_issues, @project)
+      .issues.box
+        .h2= l(:label_issue_tracking)
+        - if @trackers.present?
+          %table.list.issue-report.table.table-striped.table-bordered
+            %thead
+              %tr
+                %th
+                %th= l(:label_open_issues_plural)
+                %th= l(:label_closed_issues_plural)
+                %th= l(:label_total)
+            %tbody
+              - @trackers.each do |tracker|
+                %tr{:class => "#{cycle("odd", "even")}"}
+                  %td.name
+                    = link_to tracker.name, project_issues_path(@project, :search => "issues.project_id=#{@project.id} AND issues.tracker_id=#{tracker.id}")
+                  %td
+                    = link_to @open_issues_by_tracker[tracker.id].to_i, project_issues_path(@project, :search => "issues.project_id=#{@project.id} AND issues.tracker_id=#{tracker.id} AND issues.closed_on IS NULL")
+                  %td
+                    = link_to (@total_issues_by_tracker[tracker.id].to_i - @open_issues_by_tracker[tracker.id].to_i), project_issues_path(@project, :search => "issues.project_id=#{@project.id} AND issues.tracker_id=#{tracker.id} AND issues.closed_on IS NOT NULL")
+                  %td
+                    = link_to @total_issues_by_tracker[tracker.id].to_i, project_issues_path(@project, :search => "issues.project_id=#{@project.id} AND issues.tracker_id=#{tracker.id}")
+        %p
+          = link_to l(:label_issue_view_all), project_issues_path(@project, :set_filter => 1)
+          = link_to l(:label_calendar), project_calendar_path(@project) if User.current.allowed_to?(:view_calendar, @project, :global => true)
+          = link_to l(:label_gantt), project_gantt_path(@project) if User.current.allowed_to?(:view_gantt, @project, :global => true)
+    = call_hook(:view_projects_show_left, :project => @project)
+
+  - if @approveds.present?
+    %hr
+    .version-issues
+      .h2= l(:label_project_google_approved_versions)
+      %table#issueTable{:class => "list issues table table-striped table-bordered"}
+        %thead
+          %tr
+            %th= '#'
+            %th= l(:version_name)
+            %th= 'FingerPrint'
+            %th= l(:version_sendtest_at)
+        %tbody
+          - @approveds.each_with_index do |a, i|
+            %tr
+              %td= i+1
+              %td= link_to_version a
+              %td= a.finger_print
+              %td= format_time(a.sendtest_at)
+    %hr
+
+  .splitcontentright
+    = render :partial => 'members_box'
+    - if @news.any? && authorize_for('news', 'index')
+      .news.box
+        %h3= l(:label_news_latest)
+        = render :partial => 'news/news', :collection => @news
+        %p= link_to l(:label_news_view_all), project_news_index_path(@project)
+    = call_hook(:view_projects_show_right, :project => @project)
+
+-# - content_for :sidebar do
+-#   = render :partial => 'projects/sidebar'
+- content_for :header_tags do
+  = auto_discovery_link_tag(:atom, {:controller => 'activities', :action => 'index', :id => @project, :format => 'atom', :key => User.current.rss_key})
+- html_title(l(:label_overview))
+
+:javascript
+
+  $('.row').pin({padding: {top: 70, bottom: 10}})

@@ -1,0 +1,56 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+.top-action-menu.pull-right
+  = link_to l(:label_issue_to_special_test_create), new_project_issue_to_special_test_path(:project_id => @project), :class => 'btn btn-sm btn-primary'
+
+.h2= l(:label_issue_to_special_test)
+
+.filter-right
+  .panel.panel-default{:style => "margin-top:20px;"}
+    .panel-body
+      .issues-body
+        - if @specials.blank?
+          %p.nodata= l(:label_no_data)
+        - else
+          %table#specTable.table.table-striped.table-bordered.table-hover
+            %thead
+              %tr
+                %th #
+                %th= l(:issue_to_special_test_category)
+                %th= l(:issue_to_special_test_subject)
+                %th= l(:issue_to_special_test_test_times)
+                %th= l(:issue_to_special_test_log_from_com)
+                %th= l(:issue_to_special_test_machine_num)
+                %th= l(:issue_to_special_test_test_version)
+                %th= l(:issue_to_special_test_author_id)
+                %th= l(:repo_request_created_at)
+                %th= l(:issue_to_special_test_priority)
+                %th= l(:issue_to_special_test_status)
+                %th= l(:option_all)
+            %tbody
+              - @specials.each do |special|
+                %tr
+                  %td= special_link(special)
+                  %td= load_value(special, :category)
+                  %td
+                    = popover(:trigger => "click", :content => simple_format(special.subject),:title => "详细信息", :placement => 'bottom') do
+                      = special.subject.to_s[0,10]
+                  %td
+                    = popover(:trigger => "click", :content => simple_format(special.test_times),:title => "详细信息", :placement => 'bottom') do
+                      = special.test_times.to_s[0,5]
+                  %td= load_value(special, :log_from_com)
+                  %td
+                    = popover(:trigger => "click", :content => simple_format(special.machine_num),:title => "详细信息", :placement => 'bottom') do
+                      = special.machine_num.to_s[0,5]
+                  %td
+                    = popover(:trigger => "click", :content => simple_format(special.test_version),:title => "详细信息", :placement => 'bottom') do
+                      = special.test_version.to_s[0,5]
+                  %td= link_to_user special.author
+                  %td= special.created_at.strftime("%F %T")
+                  %td= load_value(special, :priority)
+                  %td= load_value(special, :status)
+                  %td
+                    = link_to l(:label_new_task), new_project_issue_to_special_test_result_path(project_id: special.project, special_test_id: special.id), class: "btn btn-xs btn-primary" if special.status == "agreed" && special.judge?
+                    = link_to l(:button_edit), edit_project_issue_to_special_test_path(project_id: special.project, id: special), class: "btn btn-xs btn-primary" if special.status == "submitted" && special.judge?
+          %span.pagination= pagination_links_full @pages, @count

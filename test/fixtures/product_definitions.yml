@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  projects_id: 
+  mobile_public_cta: MyString
+  propaganda_version: MyString
+
+two:
+  projects_id: 
+  mobile_public_cta: MyString
+  propaganda_version: MyString

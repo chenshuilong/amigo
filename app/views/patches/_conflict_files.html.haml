@@ -1,0 +1,18 @@
+- if files.present?
+  .version-issues
+    .wiki
+      - if files.size > 15
+        = data_table_for 'patchLibraryFiles',
+          dom: '<"data-table-top"f>rt<"data-table-bottom"pil><"clear">',
+          lengthMenu: [[-1, 10, 25, 50, 100], ["#{l(:label_all)}", 10, 25, 50, 100]]
+      = fields_table :class => 'list data-table', :id => 'patchLibraryFiles' do |t|
+        - t.title l(:library_file_name)
+        - t.title l(:library_file_conflict_type)
+        - t.title l(:library_file_status)
+        - t.title l(:library_file_user_id)
+        - files.each_with_index do |file|
+          - t.row do
+            - t.data file.name
+            - t.data file.conflict_type
+            - t.data l("patch_label_#{file.status}")
+            - t.data file.user.firstname

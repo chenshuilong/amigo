@@ -1,0 +1,50 @@
+= labelled_fields_for :version_name_rule, @rule do |f|
+  %p
+    = f.select :android_platform, Project::PROJECT_ANDROID_PLATFORM, {:required => true}, :disabled => @rule.android_platform_frozen?
+    - unless @rule.android_platform_frozen?
+      %small.form-text.text-muted 一旦保存，平台无法修改。
+  %p= f.text_field :name, :required => true, label: :field_name
+  %p#description_and_toolbar
+    = f.text_area :description, :rows => 5, :class => 'wiki-edit'
+    = wikitoolbar_for 'version_name_rule_description'
+  %p
+    = f.label l(:periodic_version_rule_range)
+    = f.radio_button :id, '0', :checked => (@rule.range.blank?? true : false)
+    = l(:periodic_version_rule_range_timestamp)
+    = f.radio_button :id, '1', :checked => (@rule.range.blank?? false : true)
+    = l(:periodic_version_rule_range_txxxx)
+
+  %p{:class => "#{'collapse' if @rule.range.blank?}", :id => 'setRange'}
+    = f.text_field :range, label: :periodic_version_rule_set_range
+    %small.form-text.text-muted= l(:periodic_version_rule_set_range_example)
+
+:javascript
+  $('input[type=radio][name="version_name_rule[id]"]').on('change', function() {
+    $("#setRange input").val('');
+    if(~~this.value > 0){
+      $("#setRange").show();
+    } else {
+      $("#setRange").hide();
+    }
+  });
+
+  new SMValidator('form', {
+    rules: {
+      set_range: function(val){
+        if(~~$('input[name="version_name_rule[id]"]:checked').val() > 0){
+          return /^T\d+\-T\d+$/.test(val) || "输入不符合规范"
+        }
+      }
+    },
+    fields: {
+      'version_name_rule[name]': 'required',
+      'version_name_rule[range]': 'set_range'
+    },
+    submit: function(valid, form) {
+      if(valid) form.submit();
+    }
+  });
+
+
+
+

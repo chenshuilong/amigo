@@ -1,0 +1,24 @@
+.issue-subject
+  %p= link_to("#{issue.tracker.name} ##{issue.id}: #{issue.subject}", issue_url)
+
+.issue-attributes
+  %table
+    %tbody
+      %tr
+        %td.talbe-col-md-2
+          %p.label 描述
+        %td{:colspan => 3}= textilizable(issue, :description, :only_path => false)
+      - email_issue_attributes(issue, users.first).each_slice(2).each do |attrs|
+        %tr
+          - attrs.each do |attr|
+            %td.talbe-col-md-2
+              %p.label= attr.split(':')[0]
+            %td.talbe-col-md-4= attr.split(':')[1]
+
+- if issue.attachments.any?
+  %fieldset.attachments
+    %legend= l(:label_attachment_plural)
+    - issue.attachments.each do |attachment|
+      = link_to_attachment attachment, :download => true, :only_path => false
+      (#{number_to_human_size(attachment.filesize)})
+      %br/

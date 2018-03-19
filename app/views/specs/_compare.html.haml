@@ -1,0 +1,4 @@
+.form-group#update_compare_specs.col-sm-4
+  = label_tag 'specs', l(:spec_name)
+  = select_tag 'specs', grouped_options_for_select(@select_specs.collect{|p| [p.project_name, Hash[p.specs_list.split(",").map!.with_index{|n, i| i.even?? "&nbsp;&nbsp;".html_safe+n : n }.each_slice(2).to_a].to_a]}, @specs), {:multiple => true, class: "form-control", :disabled => project.blank?, style: "min-width: 200px; width:80%;min-height: 30px; max-height:30px; overflow-y: auto"}
+  = select2_for "specs", '', placeholder:"请选择", maximumSelectionLength: 30

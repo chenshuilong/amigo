@@ -1,0 +1,63 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}
+    = stylesheet_link_tag 'mail'
+  %body
+    %table.body{"data-author" => "chengxi<http://jjlam.cn>"}
+      %tbody
+        %tr
+          %td.float-center{:align => "center", :valign => "top"}
+            %center{"data-parsed" => ""}
+              %table.spacer.float-center
+                %tbody
+                  %tr
+                    %td{:height => "16px", :style => "font-size:16px;line-height:16px;"}
+              / Header  
+              %table.container.header.float-center{:align => "center"}
+                %tbody
+                  %tr
+                    %td
+                      %table.row.collapse
+                        %tbody
+                          %tr
+                            %th.small-12.large-12.columns.first.last
+                              %table
+                                %tbody
+                                  %tr
+                                    %th
+                                      .logo-wrapper
+                                        %img{:alt => "logo", :src => "http://os.gionee.com/images/amigo-logo.png"}
+                                    %th.expander
+              / Body
+              %table.container.body-drip.float-center{:align => "center"}
+                %tbody
+                  %tr
+                    %td.small-12.large-12.columns.first.last
+                      %table.spacer
+                        %tbody
+                          %tr
+                            %td{:height => "16px", :style => "font-size:16px;line-height:16px;"}
+                      %table
+                        %tbody
+                          %tr
+                            %th
+                              = yield
+
+              / Footer
+              %table.footer.container.float-center
+                %tbody
+                  %tr
+                    %th.small-12.large-12.columns.first.last
+                      %table
+                        %tbody
+                          %tr
+                            %th
+                              %table.spacer
+                                %tbody
+                                  %tr
+                                    %td{:height => "16px", :style => "font-size:16px;line-height:16px;"}
+                              - if Setting.emails_footer.present?
+                                .auto-send= Redmine::WikiFormatting.to_html(Setting.text_formatting, Setting.emails_footer).html_safe
+                              %p.actions= footer_actions
+                            %th.expander

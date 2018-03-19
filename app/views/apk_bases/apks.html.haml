@@ -1,0 +1,71 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+- content_for :header_tags do
+  %link{:href => "/amg/dataTable/datatable.css", :rel => "stylesheet"}
+  %link{:href => "/amg/dataTable/fixedColumns.bootstrap.min.css", :rel => "stylesheet"}
+
+  %script{:src => "/amg/dataTable/dataTables.fixedColumns.min.js", :type => "text/javascript"}
+  %script{:src => "/amg/dataTable/dataTables.bootstrap.min.js", :type => "text/javascript"}
+
+.top-action-menu.pull-right
+  - if User.current.allowed_to?(:edit_apk_bases, @project, nil)
+    = link_to(l(:label_apk_base_new), new_project_apk_basis_path(@project), :class => 'btn btn-primary btn-sm')
+.h2= l(:label_apk_base)
+
+.filter-right
+  .panel.panel-default{:style => "margin-top:20px;"}
+    .panel-body
+      .issues-head
+        .issues-body
+          - if @apks.blank?
+            %p.nodata= l(:label_no_data)
+          - else
+            %table#projectApksTable.table.table-bordered.table-hover
+              %thead
+                %tr
+                  %th{width: '80'} 序号
+                  %th{width: '150'}= l(:apk_base_name)
+                  %th{width: '150'}= l(:apk_base_cn_name)
+                  %th{width: '150'}= l(:apk_base_cn_description)
+                  %th{width: '150'}= l(:apk_base_developer)
+                  %th{width: '150'}= l(:apk_base_desktop_name)
+                  %th{width: '120'}= l(:apk_base_package_name)
+                  %th{width: '150'}= l(:apk_base_category_id)
+                  %th{width: '150'}= l(:apk_base_android_platform)
+                  %th{width: '60'}= l(:apk_base_integrated)
+                  %th{width: '50'}= l(:field_status)
+                  %th{width: '50'}= l(:option_all)
+              %tbody
+                - @apks.each_with_index do |apk,idx|
+                  %tr
+                    %td= idx+1
+                    %td= load_value(apk, :name)
+                    %td= load_value(apk, :cn_name)
+                    %td
+                      = popover(:trigger => "click", :content => simple_format(apk.cn_description),:title => "详细信息") do
+                        = apk.cn_description.to_s[0,10]
+                    %td= load_value(apk, :developer)
+                    %td= load_value(apk, :desktop_name)
+                    %td= load_value(apk, :package_name)
+                    %td= apk.try(:apk_base_category).try(:name)
+                    %td= load_value(apk, :android_platform)
+                    %td= load_value(apk, :integrated)
+                    %td= apk.project_apk.deleted ? '已删除' : '未删除'
+                    %td
+                      - if apk.tasks.where(status: 24).count == 0
+                        - if !apk.project_apk.deleted && User.current.allowed_to?(:edit_apk_bases, @project, nil)
+                          %a{:href => "#{edit_project_apk_basis_path(project_id: apk.project_apk.project.name, id: apk.id)}"}
+                            %i.spec-edit.fa.fa-edit
+                          = "|"
+                          %a{:href => "javascript:deleteApkBase(#{apk.project_apk.project_id}, #{apk.id});"}
+                            %i.spec-delete.fa.fa-close
+                      - else
+                        %span.text-danger 评审中
+          %span.pagination= pagination_links_full @pages, @count
+
+
+:javascript
+  var projectApksTable = initDataTable('projectApksTable',{
+    paging: false, ordering: true, info: false, searching: false, select: true, scrollX: true, fixedColumns: {leftColumns: 2,rightColumns: 2}
+  });

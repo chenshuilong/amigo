@@ -1,0 +1,68 @@
+- provide :nav, "5,1"
+- provide :css, "bootstrap"
+
+.filter-right
+  - if User.current.admin?
+    .panel.panel-default{:style => "margin-top:20px;"}
+      .panel-heading
+        .row
+          .col-sm-6
+            %h4= "权限管理设置"
+          .col-sm-6.text-right
+            = link_to("新增权限管理人员", new_custom_permission_path(type: 'manage'), remote: true, :class => 'btn btn-primary btn-sm') 
+      .panel-body
+        .issues-body
+          - if @manages.blank?
+            %p.nodata= l(:label_no_data)
+          - else
+            %table.table.table-striped.table-bordered.table-hover
+              %thead
+                %tr
+                  %th #
+                  %th 人员 
+                  %th 权限类型
+                  %th 创建日期
+                  %th 备注
+                  %th 操作
+              %tbody
+                - @manages.each_with_index do |m, i|
+                  %tr
+                    %td= i+1
+                    %td= link_to_user m.user                 
+                    %td= scope_text(m.permission_type)
+                    %td= m.created_at.strftime("%F %T")                  
+                    %td= m.notes
+                    %td= custom_permission_links(m)
+
+  .panel.panel-default{:style => "margin-top:20px;"}
+    .panel-heading
+      .row
+        .col-sm-6
+          %h4= "权限申请设置"
+        .col-sm-6.text-right
+          = link_to("新增权限申请人员", new_custom_permission_path(type: 'common'), remote: true, :class => 'btn btn-primary btn-sm')
+    .panel-body
+      .issues-body
+        - if @commons.blank?
+          %p.nodata= l(:label_no_data)
+        - else
+          %table.table.table-striped.table-bordered.table-hover
+            %thead
+              %tr
+                %th #
+                %th 人员 
+                %th 权限类型
+                %th 创建日期
+                %th 备注
+                %th 操作
+            %tbody
+              - @commons.each_with_index do |c, i|
+                %tr
+                  %td= i+1
+                  %td= link_to_user c.user                 
+                  %td= scope_text(c.permission_type)
+                  %td= c.created_at.strftime("%F %T")                  
+                  %td= c.notes
+                  %td= custom_permission_links(c)
+
+          %span.pagination= pagination_links_full @pages, @count

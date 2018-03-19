@@ -1,0 +1,31 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  category: 1
+  status: 1
+  android_repo: MyString
+  package_repo: MyString
+  server_ip: MyString
+  project_id: 1
+  branch: MyString
+  version_id: 1
+  write_users: MyText
+  read_users: MyText
+  submit_users: MyText
+  notes: MyText
+  author_id: 1
+
+two:
+  category: 1
+  status: 1
+  android_repo: MyString
+  package_repo: MyString
+  server_ip: MyString
+  project_id: 1
+  branch: MyString
+  version_id: 1
+  write_users: MyText
+  read_users: MyText
+  submit_users: MyText
+  notes: MyText
+  author_id: 1

@@ -1,0 +1,38 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+.h2 项目风险
+
+- if User.current.allowed_to?(:add_risks, @project)
+  .top-action-menu.pull-right
+    = link_to "新建项目风险",:controller => :risks, :action => :new
+%br
+%br
+- if @risks.present?
+  %table.table.table-bordered
+    %thead
+      %tr
+        %th 序号
+        %th 部门
+        %th 分类
+        %th 风险说明
+        %th 风险措施
+        %th 预计完成时间
+        %th 责任人
+    %tbody
+      - @risks.each_with_index do |r, i|
+        %tr
+          %td{:rowspan => r.risk_measures.count}= i + 1
+          %td{:rowspan => r.risk_measures.count}= r.department
+          %td{:rowspan => r.risk_measures.count}= r.category
+          %td{:rowspan => r.risk_measures.count}= r.description
+          %td= r.risk_measures.first.content
+          %td= format_date(r.risk_measures.first.finish_at)
+          %td{:rowspan => r.risk_measures.count}= link_to_user(r.user)
+        - if r.risk_measures.count > 1
+          - r.risk_measures[1..-1].each do |m|
+            %tr
+              %td= m.content
+              %td.date= format_date(m.finish_at)
+- else
+  %div.alert.alert-warning 暂无项目风险数据。

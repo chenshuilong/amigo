@@ -1,0 +1,6 @@
+= error_messages_for 'template'
+.box.tabular
+  %p= f.select :role_id, options_for_select(@roles), :required => true, label: :template_role_id
+  - if @temp.role_type.to_i == 3
+    %p= f.select :object_id, options_for_select(@groups), :required => true, label: :template_group_id
+    %p= f.hidden_field :object_type, value: 2

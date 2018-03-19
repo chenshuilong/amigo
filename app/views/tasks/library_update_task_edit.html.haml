@@ -1,0 +1,100 @@
+- provide :css, "bootstrap"
+
+.clearfix{style: "margin-top:30px"}
+  .issue-details
+    .attributes
+      %table.table.table-borderless
+        %tbody
+          %tr
+            %th.col-sm-2= l(:patch_patch_no)
+            %td.col-sm-10= load_value(@patch, :patch_no)
+          %tr 
+            %th.col-sm-2= l(:library_name)
+            %td.col-sm-10= load_value(@library, :name)
+          %tr 
+            %th.col-sm-2= l(:library_path)
+            %td.col-sm-10= load_value(@library, :path)
+          %tr
+            %th.col-sm-2= l(:patch_due_at)
+            %td.col-sm-10= format_date @patch.due_at
+          %tr
+            %th.col-sm-2= l(:task_assigned_to_id)
+            %td.col-sm-10= @task.assigned_to.firstname
+          %tr
+            %th.col-sm-2= l(:library_status)
+            %td.col-sm-10= Task::TASK_STATUS[@task.status.to_sym][1]           
+          - if @task.container_type == "LibraryFile"
+            %tr
+              %th.col-sm-2= l(:library_file_name)
+              %td.col-sm-10= @file.name
+            %tr
+              %th.col-sm-2= l(:library_file_conflict_type)
+              %td.col-sm-10= @file.conflict_type
+            %tr
+              %th.col-sm-2= l(:library_file_status)
+              %td.col-sm-10= @file.status
+
+    - if @records.present?
+      .attributes     
+        .allchange
+          %ul.nav.nav-tabs
+            %li{:class => "active" }
+              %a{"data-toggle" => "tab", :href => "#history"}= l(:label_history)
+          .tab-content
+            #history.tab-pane{:class => "in active" }
+              .history-details
+                .journal
+                  - @records.each_with_index do |r, idx|
+                    #note
+                      .note-title
+                        = task_authoring_at r.created_at, r.user, {:label => :label_updated_time_at, target: "_blank"}
+                      %ul.details
+                        - personal_task_details(r.details).each do |string|
+                          %li= string
+
+
+  - if (@task.status == "update_failed" && @task.container_type == "Library") || (@task.container_type == "LibraryFile" && @file.status == "failed")
+    = error_messages_for @task
+    = labelled_form_for @task, :url => library_update_task_update_task_path(@task), :html => {:multipart => true, id: "libraryUpdateTaskForm"} do |f|
+      .issue-details#update
+        #all_attributes
+          %p
+            %label= l("#{@task.container_type == 'LibraryFile' ? 'library_file_status' : 'library_status'}")
+            = select_tag "#{@task.container_type == 'Library' ? 'task' : 'container'}[status]", options_for_select(task_status_options(@task))
+          %p= f.text_area :notes, required: false, label: :spec_note, :style => "width: 80%; height: 100px"  
+
+      .button-group.text-center
+        %a.btn.btn-primary.btn-bg{id:"libraryUpdateTask", remote: true}= l(:button_save)
+
+:javascript
+  $("#libraryUpdateTask").on("click", function(){
+    window.onbeforeunload = null;
+
+    var data = $("form#libraryUpdateTaskForm").serialize();
+    var taskId = "#{@task.id}";
+    $.ajax({
+      url: '/tasks/'+taskId+'/library_update_task_update.json?key=#{User.current.api_key}',
+      type: "post",
+      data: data,
+      dataType: "json"
+    }).done( function(result){
+      success = result.success;
+      messages = result.message;
+      if(success == 1){
+        var url = '#{my_tasks_path(type: "library_update_task")}';
+        window.parent.location.href = url;
+      }else if(success == 0){
+        var html = '';
+        html = html + "<div id='errorExplanation'><ul>";
+              
+        $.each(messages, function(i, value) {
+          html = html + "<li>" + value + "</li>";
+        });    
+
+        html = html + "</ul></div>";    
+
+        $("#errorExplanation").remove();
+        $("form#libraryTaskForm").prepend(html);
+      }
+    });   
+  })

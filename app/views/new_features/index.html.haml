@@ -1,0 +1,27 @@
+- provide :nav, "9,2"
+- provide :css, "bootstrap"
+
+%div#new_function
+  .h2 新功能
+  - if User.current.admin?
+    = link_to new_new_feature_path, :class => 'pull-right btn btn-primary btn-sm', :remote => true do
+      = icon "plus"
+      = l(:new_feature_add)
+  %section.section-wrapper
+    %div
+      %header
+        %i.fa.fa-volume-up
+        %span 有新功能上线啦！！
+      %section.row
+        - @grouped_new_features.each do |g|
+          %aside.col-xs-2
+            %span= g.first.day
+            %b /
+            %sub #{g.first.month}月
+          %article.col-xs-10
+            - g.last.each do |new_feature|
+              .paper
+                %span.tag{:class => tag_class_of(new_feature)}= new_feature.category_name
+                %span= new_feature.description
+                - if User.current.admin?
+                  = link_to icon("close"), new_feature, method: :delete, data: { confirm: "You sure?" }, class: "pull-right"

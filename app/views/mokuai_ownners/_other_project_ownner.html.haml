@@ -1,0 +1,21 @@
+.window-wrapper
+  .alert.alert-warning 请选择要添加的Owner，重复内容将会被覆盖。
+  = form_tag(copy_project_mokuai_ownners_path(to), remote: true, class: "copy_ownner_form", id: "ownnerForm") do
+    %table.table
+      %thead
+        %tr
+          %th= check_box_tag "check_all", nil, false, :onclick => '$(".check_id").prop("checked", this.checked)'
+          %th 归属
+          %th 模块
+          %th TFDE
+          %th OWNER
+          %th 次要OWNER
+        %tbody
+          - ownners.each do |mokuai_ownner|
+            %tr
+              %th= check_box_tag "ids[]", mokuai_ownner.id, false, :class => "check_id"
+              %th= mokuai_ownner.mokuai.reason
+              %th= mokuai_ownner.mokuai.name
+              %th= mokuai_ownner.tfder.try(:name)
+              %th= mokuai_ownner.main_ownner
+              %th= mokuai_ownner.omit_ownner

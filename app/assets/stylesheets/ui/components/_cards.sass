@@ -1,0 +1,12 @@
+=cards($selector: '.cards', $child-selector: '.card')
+  +clearfix
+  +media($desktop)
+    #{$child-selector}
+      +span-columns(3 of 12)
+      +omega(4n)
+    @for $i from 1 through 6
+      &#{$selector}-#{$i}
+        #{$child-selector}
+          +span-columns((12/$i) of 12)
+          +omega(#{$i}n)
+

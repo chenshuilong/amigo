@@ -1,0 +1,17 @@
+= form_tag("/projects/#{definition.project}/definitions/copy",method: "post",remote:true,:class => "form-horizontal") do
+  .form-group
+    = label_tag :spec_project, "项目", class: "control-label col-sm-3"
+    .col-xs-8
+      = select_tag "definitions[copy_project_id]", options_for_select(Project.default.map{|v| [v.name,v.id]}.unshift(['--- 请选择 ---', ''])), { class: 'form-control', style: 'width:100%'}
+      = select2_tag("definitions_copy_project_id")
+
+  .form-group
+    = label_tag :name, "复制方式", class: "control-label col-sm-3"
+    .col-xs-8
+      %label.radio-inline
+        %input#copy_type_one{:name => "definitions[copy_type]", :type => "radio", :value => "1", :checked => "checked"} 完全复制
+      %label.radio-inline
+        %input#copy_type_two{:name => "definitions[copy_type]", :type => "radio", :value => "2"} 仅复制字段
+      %label.radio-inline
+        = popover(:trigger => "click", :content => copy_type_description, :title => l(:field_description)) do
+          = icon 'question-circle'

@@ -1,0 +1,57 @@
+- provide :nav, "4,3"
+- provide :css, "bootstrap"
+
+= title [l(:label_apk_base), apk_bases_path], l(:native_applist_history)
+
+#roadmap
+  - if @records.empty? && params[:utf8].blank?
+    %p.nodata= l(:label_no_data)
+  - else
+    .roadmap-table
+      %table#versionTable.list.table.table-striped.table-bordered{:class => "csacsa"}
+        %thead
+          %tr
+            %th= "序号"
+            %th{width: "100"}= "变更时间"
+            %th{width: "100"}= "变更人"
+            %th{width: "80"}= "变更类型"
+            %th{width: "120"}= "变更字段"
+            %th= "APK名称"
+            %th= "变更前"
+            %th= "变更后"
+        %tbody
+          - @records.each_with_index do |r, index|
+            %tr{class: r.property == "delete" ? 'danger' : ''}
+              %td= index+1
+              %td= format_time r.created_at
+              %td= link_to_user(r.alter_record.user)
+              %td= record_type(r.property)
+              %td= l("apk_base_#{r.prop_key}".to_sym)
+              %td= r.property == "update" ? r.alter_record.alter_for.name : ""
+              %td
+                - if %w(cn_description).include?(r.prop_key)
+                  = popover(:trigger => "click", :content => simple_format(r.old_value),:title => "详细信息") do
+                    = r.old_value.to_s[0,10]
+                - elsif %w(removable desktop_icon integrated).include?(r.prop_key)
+                  = r.old_value.to_i == 0 ? l(:general_text_no) : l(:general_text_yes)
+                - elsif r.prop_key == 'category_id'
+                  = ApkBaseCategory.find_by(id: r.old_value.to_i).try(:name)
+                - elsif r.prop_key == 'android_platform'
+                  - key = ApkBase::APK_BASE_ANDROID_PLATFORM.key(r.old_value.to_i)
+                  = key.present? ? l("apk_base_android_platform_#{key.to_s}") : ''
+                - else
+                  = r.old_value
+              %td
+                - if %w(cn_description).include?(r.prop_key)
+                  = popover(:trigger => "click", :content => simple_format(r.value),:title => "详细信息") do
+                    = r.value.to_s[0,10]
+                - elsif %w(removable desktop_icon integrated).include?(r.prop_key)
+                  = r.value.to_i == 0 ? l(:general_text_no) : l(:general_text_yes)
+                - elsif r.prop_key == 'category_id'
+                  = ApkBaseCategory.find_by(id: r.value.to_i).try(:name)
+                - elsif r.prop_key == 'android_platform'
+                  - key = ApkBase::APK_BASE_ANDROID_PLATFORM.key(r.value.to_i)
+                  = key.present? ? l("apk_base_android_platform_#{key.to_s}") : ''
+                - else
+                  = r.value
+    %span.pagination= pagination_links_full @pages, @count

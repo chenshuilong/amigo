@@ -1,0 +1,63 @@
+- provide :css, "bootstrap"
+
+.clearfix{style: "margin-top:30px"}
+  .issue-details
+    .attributes
+      %table.table.table-borderless
+        %tbody
+          - @apk_base_info.each do |k, v|
+            %tr
+              %th.col-sm-2= k
+              %td.col-sm-10= v
+          - if @task.status != 'approving'
+            %tr
+              %th.col-sm-2= '评审结果'
+              %td.col-sm-10= Task::TASK_STATUS[@task.status.to_sym][1]
+            %tr
+              %th.col-sm-2= l(:label_remark)
+              %td.col-sm-10= @task.notes           
+
+  
+
+  - if %w(approving).include?(@task.status)
+    = error_messages_for @task
+    = labelled_form_for @task, :url => apk_base_task_update_task_path(@task), :html => {:multipart => true, id: "apkBaseTaskForm"} do |f|
+      .issue-details#update
+        #all_attributes
+          %p= f.select :status, task_status_options(@task),required: true, label: "评审结果"
+          %p= f.text_area :notes, required: false, label: :spec_note, :style => "width: 80%; height: 100px"  
+
+      .button-group.text-center
+        %a.btn.btn-primary.btn-bg{id:"updateApkBaseTask", remote: true}= l(:button_save)
+
+:javascript
+  $("#updateApkBaseTask").on("click", function(){
+    window.onbeforeunload = null;
+    var data = $("form#apkBaseTaskForm").serialize();
+    var taskId = "#{@task.id}";
+    $.ajax({
+      url: '/tasks/'+taskId+'/apk_base_task_update.json?key=#{User.current.api_key}',
+      type: "post",
+      data: data,
+      dataType: "json"
+    }).done( function(result){
+      success = result.success;
+      messages = result.message;
+      if(success == 1){
+        var url = '#{my_tasks_path(type: "apk_base_task")}';
+        window.parent.location.href = url;
+      }else if(success == 0){
+        var html = '';
+        html = html + "<div id='errorExplanation'><ul>";
+              
+        $.each(messages, function(i, value) {
+          html = html + "<li>" + value + "</li>";
+        });    
+
+        html = html + "</ul></div>";    
+
+        $("#errorExplanation").remove();
+        $("form#apkBaseTaskForm").prepend(html);
+      }
+    });   
+  })

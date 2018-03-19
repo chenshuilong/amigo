@@ -1,0 +1,47 @@
+%ul.list-inline
+  %li= link_to l(:label_user_new), new_group_users_path(@group), :remote => true, :class => "icon icon-add"
+  %li= link_to l(:label_user_import), "javascript:;", :class => "icon icon-add icon-import"
+- if @group.users.any?
+  %table.list.users
+    %thead
+      %tr
+        %th= l(:label_user)
+        %th{:style => "width:15%"}
+    %tbody
+      - @group.users.sort.each do |user|
+        %tr{:class => "#{cycle 'odd', 'even'}", :id => "user-#{user.id}"}
+          %td.name= link_to_user user
+          %td.buttons
+            = delete_link group_user_path(@group, :user_id => user), :remote => true
+  %p= l(:label_total_time) + @group.users.count.to_s.center(4)
+
+- else
+  %p.nodata= l(:label_no_data)
+
+
+-# Import User
+
+.group-user-import{:style => "display: none"}
+  .window-wrapper
+    = form_tag import_group_path(@group), multipart: true, class: "form-inline group-import-form" do
+      .form-group
+        = file_field_tag :file
+:javascript
+  $(".icon-import").click(function(){
+    group_window = layer.open({
+      type: 1,
+      title: '<b>导入用户到组</b>',
+      area: ['400px', 'auto'],
+      zIndex: 666,
+      moveType: 1,
+      shadeClose: false,
+      content: $('.group-user-import'),
+      btn: ['取消', '确定'],
+      yes: function(index, layero){
+        layer.close(group_window)
+      },
+      btn2: function(index, layero){
+        $(".group-import-form").submit()
+      }
+    });
+  })

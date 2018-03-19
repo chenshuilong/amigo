@@ -1,0 +1,219 @@
+- provide :nav, "3,1"
+- provide :css, "bootstrap"
+- content_for :bread do
+  %li= link_to "问题", _project_issues_path(@project)
+  %li 查看问题
+
+.row
+  .col-sm-6
+    #copyIssueID.h2{"data-clipboard-text" => @issue.id, :style => "cursor:pointer", :title => "点击复制ID"}= issue_heading(@issue)
+    = clipboard_for("copyIssueID", "ID")
+  .col-sm-6.text-right
+    = render :partial => 'action_menu'
+
+%div{:class => "#{@issue.css_classes} issue-details"}
+  .row
+    .col-md-3.col-md-push-9
+      - if @prev_issue_id || @next_issue_id
+        .next-prev-links.contextual.pull-right
+          = link_to_if @prev_issue_id,                           |
+            (icon 'caret-square-o-left'),                        |
+            (@prev_issue_id ? issue_path(@prev_issue_id) : nil), |
+            :title => "##{@prev_issue_id}",                      |
+            :accesskey => accesskey(:previous)
+          - if @issue_position && @issue_count
+            %span.position= "第" + l(:label_item_position, :position => @issue_position, :count => @issue_count) + "页"
+          = link_to_if @next_issue_id,                           |
+            (icon 'caret-square-o-right'),                       |
+            (@next_issue_id ? issue_path(@next_issue_id) : nil), |
+            :title => "##{@next_issue_id}",                      |
+            :accesskey => accesskey(:next)
+    .col-md-9.col-md-pull-3
+      #issueSubject.subject.issue-subject{"data-clipboard-text" => @issue.subject, :style => "cursor:pointer", :title => "点击复制#{l(:field_subject)}"}
+        = render_issue_subject_with_tree(@issue)
+        = clipboard_for("issueSubject", l(:field_subject))
+      .author
+        = authoring @issue.created_on, @issue.author
+        - if @issue.created_on != @issue.updated_on
+          %span ，
+          = l(:label_updated_time, time_tag(@issue.updated_on)).html_safe
+      .status-history 查看状态历史
+      .status-show-history
+        .status-history-wraper
+          = raw show_issue_status_history(@issue)
+  %hr
+  .description
+    .label= l(:field_description)
+    - if @issue.description?
+      = link_to l(:button_quote), quoted_issue_path(@issue), :remote => true, :method => 'post', :class => 'icon icon-comment pull-right' if @issue.notes_addable?
+      .wiki
+        = textilizable @issue, :description, :attachments => @issue.attachments
+
+    - else
+      .wiki= l(:label_no_description)
+  = call_hook(:view_issues_show_description_bottom, :issue => @issue)
+
+  %hr
+  .attributes
+    = issue_fields_rows do |rows|
+      - rows.left l(:field_rom_version), @issue.rom_version, :class => 'rom_version' unless @issue.disabled_core_fields.include?('rom_version')
+      - rows.left l(:field_project), link_to_project(@issue.project), :class => 'project'
+      - rows.right l(:field_author), link_to_user(@issue.author), :class => 'author'
+      - rows.left l(:field_status), @issue.status.name, :class => 'status'
+      - rows.right l(:field_created_on), format_date(@issue.created_on), :class => 'created_on'
+      - rows.left l(:field_mokuai_reason), @issue.mokuai_reason, :class => 'reason' unless @issue.disabled_core_fields.include?('mokuai_reason')
+      - rows.right l(:field_mokuai_name), (@issue.mokuai.present?? @issue.mokuai.name : nil), :class => 'mokuai' unless @issue.disabled_core_fields.include?('mokuai_name')
+
+      - unless @issue.disabled_core_fields.include?('assigned_to_id')
+        - rows.left l(:field_assigned_to), (@issue.assigned_to ? link_to_user(@issue.assigned_to) : "-"), :class => 'assigned-to'
+      - unless @issue.disabled_core_fields.include?('priority_id')
+        - rows.right l(:field_priority), @issue.priority.name, :class => 'priority'
+      - unless @issue.disabled_core_fields.include?('tfde_id')
+        - rows.right l(:field_tfde), avatar(@issue.tfde, :size => "14").to_s.html_safe + (@issue.tfde ? link_to_user(@issue.tfde) : "-"), :class => 'tfde'
+
+      - unless @issue.disabled_core_fields.include?('app_version_id')
+        - rows.left l(:field_app_version), (@issue.app_version ? link_to_version(@issue.app_version) : "-") , :class => 'app_version'
+      - unless @issue.disabled_core_fields.include?('integration_version_id')
+        - rows.right l(:field_integration_version), (@issue.integration_version ? link_to_version(@issue.integration_version) : "-") , :class => 'integration_version'
+
+      - unless @issue.disabled_core_fields.include?('category_id') || (@issue.category.nil? && @issue.project.issue_categories.none?)
+        - rows.left l(:field_category), (@issue.category ? @issue.category.name : "-"), :class => 'category'
+
+      - unless @issue.disabled_core_fields.include?('fixed_version_id') || (@issue.fixed_version.nil? && @issue.assignable_versions.none?)
+        - rows.left l(:field_fixed_version), (@issue.fixed_version ? link_to_version(@issue.fixed_version) : "-"), :class => 'fixed-version'
+
+      - unless @issue.disabled_core_fields.include?('start_date')
+        - rows.right l(:field_start_date), format_date(@issue.start_date), :class => 'start-date'
+
+      - unless @issue.disabled_core_fields.include?('due_date')
+        - rows.right l(:field_due_date), format_date(@issue.due_date), :class => 'due-date'
+
+      - unless @issue.disabled_core_fields.include?('done_ratio')
+        - rows.right l(:field_done_ratio), progress_bar(@issue.done_ratio, :legend => "#{@issue.done_ratio}%"), :class => 'progress'
+
+      - unless @issue.disabled_core_fields.include?('estimated_hours')
+        - if @issue.estimated_hours.present? || @issue.total_estimated_hours.to_f > 0
+          - rows.right l(:field_estimated_hours), issue_estimated_hours_details(@issue), :class => 'estimated-hours'
+
+      - if User.current.allowed_to_view_all_time_entries?(@project)
+        - if @issue.total_spent_hours > 0
+          - rows.right l(:label_spent_time), issue_spent_hours_details(@issue), :class => 'spent-time'
+
+      - if @issue.disabled_core_fields.include?('solve_version')
+        - rows.left l(:field_solve_version), @issue.solve_version, :class => 'due-date'
+
+      - if @issue.disabled_core_fields.include?('discovery_version')
+        - rows.left l(:field_discovery_version), @issue.discovery_version, :class => 'due-date'
+
+      - if @issue.disabled_core_fields.include?('phenomena_category')
+        - rows.left l(:field_phenomena_category), @issue.phenomena_category, :class => 'due-date'
+
+      - if @issue.disabled_core_fields.include?('releate_case')
+        - rows.left l(:field_releate_case), @issue.releate_case, :class => 'due-date'
+
+      - if @issue.disabled_core_fields.include?('test_emphasis')
+        - rows.left l(:field_test_emphasis), @issue.test_emphasis, :class => 'due-date'
+
+      - if @issue.disabled_core_fields.include?('verificate_version')
+        - rows.right l(:field_verificate_version), @issue.verificate_version, :class => 'due-date'
+
+      - if @issue.disabled_core_fields.include?('releate_quality_case')
+        - rows.right l(:field_releate_quality_case), @issue.releate_quality_case, :class => 'due-date'
+
+      - if @issue.disabled_core_fields.include?('quality_category')
+        - rows.right l(:field_quality_category), @issue.quality_category, :class => 'due-date'
+
+      - if @issue.disabled_core_fields.include?('blueprint_issue')
+        - rows.right l(:field_blueprint_issue), @issue.blueprint_issue, :class => 'due-date'
+
+      - if @issue.disabled_core_fields.include?('back_log')
+        - rows.right l(:field_back_log), @issue.back_log, :class => 'due-date'
+
+      - if @issue.disabled_core_fields.include?('releate_mokuai')
+        - rows.right l(:field_releate_mokuai), @issue.releate_mokuai, :class => 'due-date'
+
+    .clearfix
+    = render_custom_fields_rows(@issue)
+    = call_hook(:view_issues_show_details_bottom, :issue => @issue)
+    -# = issue_fields_rows do |rows|
+    -#   - rows.left l(:field_integration_version), (@issue.integration_version ? link_to_version(@issue.integration_version) : "-"), :class => 'integration-version'
+    -#   - rows.right l(:field_app_version), (@issue.app_version ? link_to_version(@issue.app_version) : "-"), :class => 'app-version'
+    .clearfix
+  - if @issue.attachments.any?
+    %hr
+    .attachments
+      .label= l(:label_attachments)
+      = link_to_attachments @issue, :thumbnails => true
+
+  -# - if !@issue.leaf? || User.current.allowed_to?(:manage_subtasks, @project)
+  -#   %hr/
+  -#   #issue_tree
+  -#     .contextual
+  -#       = link_to_new_subtask(@issue) if User.current.allowed_to?(:manage_subtasks, @project)
+  -#     %p
+  -#       %strong= l(:label_subtask_plural)
+  -#     = render_descendants_tree(@issue) unless @issue.leaf?
+
+  - if @relations.present? || User.current.allowed_to?(:manage_issue_relations, @project)
+    %hr
+    #relations
+      = render :partial => 'relations'
+
+  -# - if @changesets.present?
+  -#   #issue-changesets
+  -#     %h3= l(:label_associated_revisions)
+  -#     = render :partial => 'changesets', :locals => { :changesets => @changesets}
+
+  -# - if @journals.present?
+  -#   #history
+  -#     %label= l(:label_history)
+  -#     .history-hr
+  -#     .history-details
+  -#       = render :partial => 'history', :locals => { :issue => @issue, :journals => @journals }
+
+  .allchange
+    %ul.nav.nav-tabs
+      - if @issue.journals.notes.present?
+        %li.active
+          %a{"data-toggle" => "tab", :href => "#notes"}= l(:field_notes)
+      %li{:class => ("active" unless @issue.journals.notes.present?) }
+        %a{"data-toggle" => "tab", :href => "#history"}= l(:label_history)
+      - if @issue.gerrits.present?
+        %li
+          %a{"data-toggle" => "tab", :href => "#gitChangeset"} Git/Svn Changeset
+    .tab-content
+      - if @issue.journals.notes.present?
+        #notes.tab-pane.fade.in.active
+          = render :partial => 'notes', :locals => { :issue => @issue, :journals => @journals }
+      #history.tab-pane.fade{:class => ("in active" unless @issue.journals.notes.present?) }
+        - if @journals.present?
+          .history-details
+            = render :partial => 'history', :locals => { :issue => @issue, :journals => @journals }
+        - else
+          %p 暂无任何记录。
+      - if @issue.gerrits.present?
+        #gitChangeset.tab-pane.fade
+          .gerrit-details
+            = render :partial => 'changesets', :locals => { :gerrits => @issue.gerrits }
+            = clipboard_for(".svn-link-copy")
+
+.clearfix
+
+- if @issue.editable?
+  #update.collapse
+    %span.h2= l(:button_edit)
+    = render :partial => 'edit'
+
+- other_formats_links do |f|
+  -# = f.link_to 'Atom', :url => {:key => User.current.rss_key}
+  = f.link_to 'PDF'
+
+-# - content_for :sidebar do
+-#   = render :partial => 'issues/sidebar'
+-#   - if User.current.allowed_to?(:add_issue_watchers, @project) ||
+-#   - (@issue.watchers.present? && User.current.allowed_to?(:view_issue_watchers, @project))
+-#     #watchers
+-#       = render :partial => 'watchers/watchers', :locals => {:watched => @issue}
+- content_for :header_tags do
+  = auto_discovery_link_tag(:atom, {:format => 'atom', :key => User.current.rss_key}, :title => "#{@issue.project} - #{@issue.tracker} ##{@issue.id}: #{@issue.subject}")
+= context_menu issues_context_menu_path

@@ -1,0 +1,296 @@
+- provide :nav, "3,2"
+- provide :css, "bootstrap"
+- content_for :header_tags do
+  %link{:href => "/amg/easytree/skin-win8/ui.easytree.css", :rel => "stylesheet"}
+  %link{:href => "/amg/rangeslider/rangeslider.css", :rel => "stylesheet"}
+  -#%link{:href => "/scripts/miniui/themes/default/miniui.css", :rel => "stylesheet"}
+
+  %script{:src => "/amg/easytree/jquery.easytree.js", :type => "text/javascript"}
+  %script{:src => "/amg/rangeslider/rangeslider.js", :type => "text/javascript"}
+  -#%script{:src => "/scripts/boot.js", :type => "text/javascript"}
+
+  %script{:src => "/javascripts/echarts.min.js", :type => "text/javascript"}
+  %script{:src => "/javascripts/infographic.js", :type => "text/javascript"}
+  %script{:src => "/javascripts/linq.min.js", :type => "text/javascript"}
+
+.row.filter-main
+  .filter-left
+    = render :partial => 'left'
+
+  .filter-right
+    %form{:id => "redirecttoissue",:action => "/issues", :target => "_blank", :method => "get"}
+      %input{:id => "condition_id",:name => "condition_id",:value => "", :type => "hidden"}
+    %div{:style => "width:100%;"}
+      %ol#breadcrumb-report.breadcrumb
+        %li
+          %a{:href => report_index_url} 报表首页
+        %li
+          %a#nav_report_name.active{:href => "javascript:;"}= @condition.name.gsub('/','')
+
+      %ul.notification-list
+        %li.notification-list-item
+          .notification-menu
+            %i.fa.fa-chevron-down
+          .notification-content
+            %p
+              %strong= "条件筛选器"
+          .clearfix
+          .notification-acton.select2-rectify
+            %form#filterform.form-horizontal{:role => "form"}
+              .form-group
+                %label.col-sm-2.control-label 名称
+                .col-sm-2
+                  %input#reportname.form-control{:name => "reportname"}
+                .col-sm-4
+                  %select#reporttype.form-control{:name => "reporttype"}
+                    %optgroup{:label => "数量"}
+                      %option{:value => "bug数量"} bug数量
+                      %option{:value => "有效数量"} 有效数量
+                      %option{:value => "发现bug数量"} 发现bug数量
+                      %option{:value => "重打开数量"} 重打开次数
+                      %option{:value => "遗留数量"} 遗留数量
+                      %option{:value => "已解决数量"} 已解决数量
+                      %option{:value => "已解的重分配数量"} 已解的重分配数量
+                      %option{:value => "冗余数量"} 冗余数量
+                      %option{:value => "平均已解的重分配数量"} 平均已解的重分配数量
+                    %optgroup{:label => "时长"}
+                      %option{:value => "平均未分配时长"} 平均未分配时长
+                      %option{:value => "平均未解决时长"} 平均未解决时长
+                      %option{:value => "平均未处理时长"} 平均未处理时长
+                      -#%option{:value => "平均未走读时长"} 平均未走读时长
+                      %option{:value => "平均未验证时长"} 平均未验证时长
+                      %option{:value => "平均关闭时长"} 平均关闭时长
+                      %option{:value => "平均分配时长"} 平均分配时长
+                      %option{:value => "平均解决时长"} 平均解决时长
+                      -#%option{:value => "平均走读时长"} 平均走读时长
+                      %option{:value => "平均验证时长"} 平均验证时长
+                    -#%option{:value => "bug分析时长"} bug分析时长
+                    %optgroup{:label => "比率"}
+                      %option{:value => "解决率"} 解决率
+                      %option{:value => "重打开率"} 重打开率
+                      %option{:value => "重分配率"} 已解BUG的重分配率
+                      %option{:value => "分配准确率"} 分配准确率
+                .col-sm-2
+                  %span#calculation
+                    = icon "info-circle"
+                    = link_to "计算方法", "javascript:onShowCalculation('reporttype');"
+
+              .form-group
+                %label.col-sm-2.control-label 角色
+                .col-sm-2
+                  %select#role.form-control{:name => "role"}
+                    %option{:value => "assigned_to_id"} 个人
+                    %option{:value => "depts.id"} 部门
+                .col-sm-6
+                  = select_tag "role_value", [], :multiple => :multiple, class: 'value form-control select-multiple', :name => "role_value"
+                  -#= select2_remote("role_value")
+              .form-group
+                %label.col-sm-2.control-label 项目
+                .col-sm-2
+                  %select#project.form-control{:name => "project"}
+                    %option{:value => "project_id"} 项目名称
+                    %option{:value => "category"} 项目类别
+                -#%option{:value => "project_hard_category"} 按项目难度分类
+                -#%option{:value => "project_flow"} 按流
+                .col-sm-6
+                  = select_tag "project_value", options_for_select(Project.sorted.collect {|p| [p.name,p.id]}), :multiple => :multiple, class: 'value form-control select-multiple'
+
+              .form-group
+                %label.col-sm-2.control-label{:for => "probability"} 概率
+                .col-sm-2
+                  = select_tag "probability", options_for_select(CustomField.visible.find_by_name("概率").possible_values), :multiple => :multiple, class: 'value form-control select-multiple'
+                %label.col-sm-2.control-label{:for => "priority"} 严重等级
+                .col-sm-4
+                  = select_tag "priority_id", options_for_select(IssuePriority.active.collect{|pty| [pty.name,pty.id]}), :multiple => :multiple, class: 'value form-control select-multiple'
+
+              .form-group
+                %label.col-sm-2.control-label{:for => "groupby"} 显示
+                .col-sm-2
+                  %select#groupby.form-control{:name => "groupby"}
+                    %option{:value => "issues.assigned_to_id"} 按个人
+                    %option{:value => "users.orgNm"} 按部门
+                    %option{:value => "issues.project_id"} 按项目
+                    %option{:value => "issues.mokuai_name"} 按模块
+                    %option{:value => "issues.mokuai_reason"} 按归属
+                    -#%option{:value => "projects.category"} 按项目类别
+                %label.col-sm-2.control-label 图表类型
+                .col-sm-4
+                  %select#charttype.form-control{:name => "charttype"}
+                    %option{:value => "bar"} 柱状图
+                    %option{:value => "line"} 折线图
+                -#%option{:value => "pie"} 饼块图
+
+              .form-group
+                .col-sm-2
+                  .btn-group-report.text-right
+                    %input{:id => "dwm_yn",:type => "checkbox"}
+                .col-sm-2
+                  %select#day_week_month.form-control{:name => "dwm"}
+                    %option{:value => "day"} 日
+                    %option{:value => "week"} 周
+                    %option{:value => "month"} 月
+                .col-sm-2
+                  %input#start_dt.form-control{:name => "start_dt",:value => "2016-09-01"}
+                %label.col-sm-1.control-label.text-center 至
+                .col-sm-3
+                  %input#end_dt.form-control{:name => "end_dt",:value => "#{Time.now.strftime('%Y-%m-%d')}"}
+
+              .form-group
+                %hr
+                .button-group-report.text-center
+                  %span.text-right{:style => "float:right"}
+                    %input{:id => "auto",:type => "checkbox",:checked => "checked"}= "自动预览"
+                  %input{:type => "button",:onclick => "preview()",:class => "btn btn-primary",:value => "预览"}
+                  %input{:type => "button",:onclick => "save()",:class => "btn btn-primary",:value => "保存"}
+
+      #gioneeChart{:style => "height:600px;margin-bottom: 20px;"}
+
+      .panel.panel-default
+        .panel-heading#table_report_name= @condition.name.gsub('/','')
+        .panel-body
+          .button-group-report.text-right
+            %input{:type => "button",:onclick => "export_data()",:class => "btn btn-primary",:value => "导出Excel"}
+          .autoscroll
+            %table#reportDataList.table.table-striped.table-bordered.table-hover
+
+.filter-slide-button{:href => "javascript:;"}
+  %i.fa.fa-chevron-left
+
+:javascript
+  // Filter pane collapse
+  var availableFilters = #{raw_json @query.available_filters_as_json};
+  // Filter pane collapse
+  var filterCollapseID = localStorage.getItem("filterCollapseID") || "filterStar";
+  $("#"+filterCollapseID).addClass("in");
+  $('#filterStar, #filterClock, #filterCog').on('show.bs.collapse', function () {
+    localStorage.setItem("filterCollapseID", this.id);
+  })
+  // Filter Slide
+  if(localStorage.getItem("filterSlideStatus") == "true"){
+    $(".filter-slide-button i").addClass("fa-chevron-right");
+    $(".filter-main").addClass("filter-slide");
+  }
+
+  // Fix Filter left panel
+  $(".filter-left").fixedBlock();
+
+  var conditions = #{@condition.json};
+  var dwm_yn = #{@condition.report_condition ? JSON.parse(@condition.report_condition.json)["dwm_yn"] : 0};
+  var auto = #{@condition.report_condition ? JSON.parse(@condition.report_condition.json)["auto"] : 0};
+  $("#reportname").val('#{@condition.name.to_s.split('/')[0]}');
+  $("#reporttype").val('#{@condition.name.to_s.split('/')[1]}');
+  $('#groupby').val('#{@condition.report_condition ? JSON.parse(@condition.report_condition.json)["groupby"] : "issues.assigned_to_id"}');
+  $('#charttype').val('#{@condition.report_condition ? JSON.parse(@condition.report_condition.json)["charttype"] : "bar"}');
+  dwm_yn == 1 ? $('#dwm_yn').attr("checked", true) : $('#dwm_yn').attr("checked", false);
+  auto == 1 ? $('#auto').attr("checked", true) : $('#auto').attr("checked", false);
+  $('#day_week_month').val('#{@condition.report_condition ? JSON.parse(@condition.report_condition.json)["dwm"] : "day"}');
+  $('#start_dt').val('#{@condition.report_condition ? JSON.parse(@condition.report_condition.json)["start_dt"] : "2016-09-01"}');
+  $('#end_dt').val('#{@condition.report_condition ? JSON.parse(@condition.report_condition.json)["end_dt"] : Time.now.strftime('%Y-%m-%d')}');
+
+  $('#role_value').val('').trigger("change");
+  $('#project_value').val('').trigger("change");
+  $('#priority_id').val('').trigger("change");
+  $('#probability').val('').trigger("change");
+  $.each(conditions[" AND 0"],function(index,item) {
+    switch (item[0].toString()) {
+      case "depts.id":
+        $("#role").val("depts.id");
+        var opts = #{@depts};
+        $('#role_value').empty().append(opts);
+        $('#role_value').select2();
+        $("#role_value").val(item[2]).trigger("change");
+        break;
+      case "assigned_to_id":
+        $("#role").val("assigned_to_id");
+        $('#role_value').empty().append('#{user_options(@condition)}');
+        $("#role_value").select2_remote();
+        $("#role_value").val(item[2]).trigger("change");
+        break;
+      case "project_id":
+        $("#project").val(item[0]);
+        var opts = #{@projects};
+        $('#project_value').empty().append(opts);
+        $("#project_value").val(item[2]).trigger("change");
+        break;
+      case "category":
+        $("#project").val(item[0]);
+        var opts = #{@project_categories};
+        $('#project_value').empty().append(opts);
+        $("#project_value").val(item[2]).trigger("change");
+        break;
+      case "project_hard_category","project_flow":
+        $("#project").val(item[0]);
+        $("#project_value").val(item[2]).trigger("change");
+        break;
+      case "priority_id":
+        $("#priority_id").val(item[2]).trigger("change");
+        break;
+      case "cf2":
+        $("#probability").val(item[2]).trigger("change");
+        break;
+    }
+  });
+
+  initDateTimePicker("start_dt","Y-m-d",false);
+  initDateTimePicker("end_dt","Y-m-d",false);
+
+  initSelect("reporttype");
+  initSelect("priority_id");
+  initSelect("probability");
+  initSelect("project_value");
+
+  if($('#role').val() == "assigned_to_id")
+    $("#role_value").select2_remote();
+
+  $('#role').on("change", function (e) {
+    var opts = "";
+    $('#role_value').siblings(".select2-container").remove();
+    $('#role_value').val('').trigger("change");
+    if($('#role').val()=="assigned_to_id"){
+      $('#role_value').select2_remote();
+    }else{
+      opts = #{@depts};
+      $('#role_value').empty().append(opts);
+      $('#role_value').select2();
+    }
+  });
+
+  $('#project').on("change", function (e) {
+    var opts = "";
+    $('#project_value').val('').trigger("change");
+    switch ($('#project').val())
+    {
+      case "project_id":
+        opts = #{@projects};
+        break;
+      case "category":
+        opts = #{@project_categories};
+        break;
+      case "project_hard_category":
+        opts = #{Project::PROJECT_HARD_CATEGORY.map{|p| "<option value=\"#{p}\">#{p}</option>"}};
+        break;
+      case "project_flow":
+        opts = "";
+        break;
+    }
+    $('#project_value').empty().append(opts);
+  });
+
+  $('#reporttype').on("change", function (e) {
+    changeControlStatus();
+  });
+
+  $('#charttype,#reporttype,#priority_id,#probability,#project_value,#role_value,#groupby,#dwm_yn,#day_week_month,#start_dt,#end_dt').on("change", function (e) {
+    if(checkboxStatus('auto'))
+      preview();
+  });
+
+  setTimeout(function () {
+      changeControlStatus();
+        $('.notification-acton').css("display","block");
+        $('.notification-menu').children().eq(0).removeClass("fa fa-chevron-down").addClass("fa fa-chevron-up");
+        preview();
+    }, 500);
+
+:css
+  .select2-drop-active {border-top: 1px solid #5897fb !important;}

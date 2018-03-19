@@ -1,0 +1,20 @@
+= error_messages_for @special_test
+.issue-details#update
+  #all_attributes
+    %p= f.select :category, list_for_select(:issue_to_special_test, :category),:required => true
+    %p= f.text_field :subject,:required => true, label: :issue_to_special_test_subject, :style => "width: 80%"
+    %p= f.text_field :related_issues,:required => true, label: :issue_to_special_test_related_issues
+    %p= f.text_area :precondition, :required => true, label: :issue_to_special_test_precondition, :style => "width: 80%; height: 100px"
+    %p= f.text_field :test_times,:required => true, label: :issue_to_special_test_test_times
+    %p= f.select :log_from_com, options_for_select([["否", "false"], ["是", "true"]], @special_test.log_from_com), :required => true, label: :issue_to_special_test_log_from_com
+    %p= f.text_field :machine_num, :required => true, label: :issue_to_special_test_machine_num
+    %p= f.text_area :test_method, :required => true, label: :issue_to_special_test_test_method, :style => "width: 80%; height: 100px"
+    %p= f.text_area :attentions, :required => true, label: :issue_to_special_test_attentions, :style => "width: 80%; height: 100px"
+    %p= f.text_field :test_version, :required => true, label: :issue_to_special_test_test_version, :style => "width: 80%"
+    - if @special_test.judge?
+      %hr
+      %p= f.select :priority, list_for_select(:issue_to_special_test, :priority), :required => true, label: :issue_to_special_test_priority
+      %p= f.text_area :approval_result, :required => true, label: :issue_to_special_test_approval_result, :style => "width: 80%; height: 100px"
+      %p= f.select :status, list_for_select(:issue_to_special_test, :status)[1..2], :required => true
+.button-group.text-center
+  = submit_tag l(:button_save), class: "btn btn-primary"

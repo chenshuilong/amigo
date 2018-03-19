@@ -1,0 +1,11 @@
+- provide :nav, "3,1"
+- provide :css, "bootstrap"
+- content_for :bread do
+  %li= link_to "问题", _project_issues_path(@project)
+  %li 修改问题
+
+= title issue_heading(@issue)
+#update
+  = render :partial => 'edit'
+- content_for :header_tags do
+  = robot_exclusion_tag

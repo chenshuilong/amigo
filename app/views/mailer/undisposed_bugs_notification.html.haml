@@ -1,0 +1,214 @@
+- tb_style = 'color: #333333;border-width: 1px;border-color: #d0c9c9;border-collapse: collapse'
+- th_style = 'border-width: 1px;padding: 8px;border-style: solid;border-color: #d0c9c9;background-color: #dedede'
+- td_style = 'border-width: 1px;padding: 8px;border-style: solid;border-color: #d0c9c9;background-color: #ffffff'
+- priorityAndprob = { 's1bx' => "S1必现解决率", 's1sj' => "S1随机解决率", 's2bx' => "S2必现解决率",
+                      's2sj' => "S2随机解决率", 's3bx' => "S3必现解决率", 's3sj' => "S3随机解决率", }
+
+- case @type
+- when 'tester'
+
+  %p= "截至#{format_date(Time.now)}，您尚有以下BUG未处理："
+  %table{:style => tb_style}
+    %thead
+      %tr
+        %th{:style => th_style} 序号
+        %th{:style => th_style} 项目
+        - @days.each_with_index do |day, di|
+          - nextday = @days[di + 1]
+          %th{:style => th_style}= nextday.present?? "#{day}-#{nextday-1}天" : "#{day}天及以上"
+    %tbody
+      - @data['chaoShiWeiJie'].keys.each_with_index do |project_name, index|
+        %tr
+          %td{:style => td_style}= index + 1
+          %td{:style => td_style}= project_name
+          - @days.length.times do |i|
+            - real_issue = @data['chaoShiWeiJie'][project_name][i]
+            - if real_issue.present?
+              %td{:style => td_style}= link_to real_issue.split(',').length, issues_url(:search => "issues.id in (#{real_issue})")
+            - else
+              %td{:style => td_style} -
+
+- when 'developer'
+  - if @data['chaoShiWeiJie'].present? || @data['caiJueShenQing'].present?
+    %p= "截至#{format_date(Time.now)}，您尚有以下BUG未处理："
+    %table{:style => tb_style}
+      %thead
+        %tr
+          %th{:style => th_style} 序号
+          %th{:style => th_style} 项目
+          - @days.each_with_index do |day, di|
+            - nextday = @days[di + 1]
+            %th{:style => th_style}= nextday.present?? "#{day}-#{nextday-1}天" : "#{day}天及以上"
+          %th{:style => th_style} 裁决申请
+      %tbody
+        - keys = @data['chaoShiWeiJie'].keys | @data['caiJueShenQing'].keys
+        - keys.each_with_index do |project_name, index|
+          %tr
+            %td{:style => td_style}= index + 1
+            %td{:style => td_style}= project_name
+            - @days.length.times do |i|
+              - real_issue = @data['chaoShiWeiJie'].fetch(project_name){{}}[i]
+              - if real_issue.present?
+                %td{:style => td_style}= link_to real_issue.split(',').length, issues_url(:search => "issues.id in (#{real_issue})")
+              - else
+                %td{:style => td_style} -
+            %td{:style => td_style}
+              - caijue_value = @data['caiJueShenQing'][project_name]
+              - if caijue_value.present?
+                = link_to caijue_value.split(',').length, issues_url(:search => "issues.id in (#{caijue_value})")
+              - else
+                \-
+      %br
+
+  - if @data['jieJueLv'].present?
+    %p= "截至#{format_date(Time.now)}，#{@user.dept.orgNm} BUG解决率如下："
+    %table{:style => tb_style}
+      %thead
+        %tr
+          %th{:style => th_style} 序号
+          %th{:style => th_style} 项目
+          - priorityAndprob.values.each do |papv|
+            %th{:style => th_style}= papv
+          %th{:style => th_style} 裁决申请
+      %tbody
+        - @data['jieJueLv'].keys.each_with_index do |project_name, index|
+          %tr
+            %td{:style => td_style}= index + 1
+            %td{:style => td_style}= project_name
+            - priorityAndprob.keys.each do |pap|
+              - p = @data['jieJueLv'][project_name][pap]
+              - if p.present?
+                %td{:style => td_style}
+                  = p[0]
+                  = " ("
+                  = p[1].present?? (link_to p[1].split(',').length, issues_url(:search => "issues.id in (#{p[1]})")) : "0"
+                  = "/"
+                  = link_to p[2].split(',').length, issues_url(:search => "issues.id in (#{p[2]})")
+                  = ")"
+              - else
+                %td{:style => td_style} -
+
+- when 'manager'
+  - datas = @data.values
+  - if datas.any?{|dat| dat["chaoShiWeiJie"].present? || dat["caiJueShenQing"].present?}
+    %p= "截至#{format_date(Time.now)}，#{@user.dept.orgNm} BUG未处理情况如下："
+    %table{:style => tb_style}
+      %thead
+        %tr
+          %th{:style => th_style} 序号
+          %th{:style => th_style} 姓名
+          - @days.each_with_index do |day, di|
+            - nextday = @days[di + 1]
+            %th{:style => th_style}= nextday.present?? "#{day}-#{nextday-1}天" : "#{day}天及以上"
+          %th{:style => th_style} 裁决申请
+      %tbody
+        - datas.each_with_index do |dat, index|
+          - next if dat["chaoShiWeiJie"].blank? && dat["caiJueShenQing"].blank?
+          %tr
+            %td{:style => td_style}= index + 1
+            %td{:style => td_style}= dat['name']
+            - @days.length.times do |i|
+              - real_issue = dat['chaoShiWeiJie'].map{|key, val| val[i]}.reject(&:blank?).join(",")
+              - if real_issue.present?
+                %td{:style => td_style}= link_to real_issue.split(',').length, issues_url(:search => "issues.id in (#{real_issue})")
+              - else
+                %td{:style => td_style} -
+            %td{:style => td_style}
+              - caijue_value = dat['caiJueShenQing'].values.reject(&:blank?).join(",")
+              - if caijue_value.present?
+                = link_to caijue_value.split(',').length, issues_url(:search => "issues.id in (#{caijue_value})")
+              - else
+                \-
+    %br
+
+  - if datas.any?{|dat| dat['jieJueLv'].present?}
+    %p= "截至#{format_date(Time.now)}，#{@user.dept.orgNm} BUG解决率如下："
+    %table{:style => tb_style}
+      %thead
+        %tr
+          %th{:style => th_style} 序号
+          %th{:style => th_style} 项目
+          - priorityAndprob.values.each do |papv|
+            %th{:style => th_style}= papv
+      %tbody
+        - keys = datas.map{|dat| dat['jieJueLv'].keys}.flatten.uniq
+        - keys.each_with_index do |project_name, index|
+          %tr
+            %td{:style => td_style}= index + 1
+            %td{:style => td_style}= project_name
+            - priorityAndprob.keys.each do |pap|
+              - p1 = []
+              - p2 = []
+              - datas.each do |dat|
+                - values = dat['jieJueLv'].fetch(project_name){{}}[pap] || []
+                - next if values.blank?
+                - p1 << values[1]
+                - p2 << values[2]
+              - p1 = p1.reject(&:blank?).join(",").split(",")
+              - p2 = p2.reject(&:blank?).join(",").split(",")
+              - p0 = p2.present?? '%.1f%' % (p1.size/p2.size.to_f*100) : ''
+              %td{:style => td_style}= p0.present?? "#{p0} (#{p1.present?? p1.size : 0}/#{p2.size})" : '-'
+
+
+- when 'majordomo'
+  - data = @data
+  - if data.values.map(&:values).flatten.any?{|dat| dat["chaoShiWeiJie"].present? || dat["caiJueShenQing"].present?}
+    %p= "截至#{format_date(Time.now)}，#{@user.dept.orgNm} BUG未处理情况如下："
+    %table{:style => tb_style}
+      %thead
+        %tr
+          %th{:style => th_style} 序号
+          %th{:style => th_style} 部门
+          - @days.each_with_index do |day, di|
+            - nextday = @days[di + 1]
+            %th{:style => th_style}= nextday.present?? "#{day}-#{nextday-1}天" : "#{day}天及以上"
+          %th{:style => th_style} 裁决申请
+      %tbody
+        - data.keys.each_with_index do |dept, index|
+          %tr
+            %td{:style => td_style}= index + 1
+            %td{:style => td_style}= dept.orgNm
+            - datas = data[dept].values
+            - @days.each_with_index do |d, i|
+              - real_issue = datas.map{|dat| dat["chaoShiWeiJie"]}.map{|m| m.values.map{|mm| mm[i]}}.flatten.reject(&:blank?).join(",").split(",")
+              - if real_issue.present?
+                %td{:style => td_style}= real_issue.size
+              - else
+                %td{:style => td_style} -
+            %td{:style => td_style}
+              - caijue_value = datas.map{|dat| dat["caiJueShenQing"].values}.flatten.reject(&:blank?).join(",").split(",")
+              - if caijue_value.present?
+                = caijue_value.size
+              - else
+                \-
+    %br
+
+  - if data.values.map(&:values).flatten.any?{|dat| dat["jieJueLv"].present?}
+    %p= "截至#{format_date(Time.now)}，#{@user.dept.orgNm} BUG解决率如下："
+    %table{:style => tb_style}
+      %thead
+        %tr
+          %th{:style => th_style} 序号
+          %th{:style => th_style} 项目
+          - priorityAndprob.values.each do |papv|
+            %th{:style => th_style}= papv
+      %tbody
+        - keys = data.values.map(&:values).flatten.map{|dat| dat['jieJueLv'].keys}.flatten.uniq
+        - keys.each_with_index do |project_name, index|
+          %tr
+            %td{:style => td_style}= index + 1
+            %td{:style => td_style}= project_name
+            - priorityAndprob.keys.each do |pap|
+              - p1 = []
+              - p2 = []
+              - data.values.map(&:values).flatten.each do |dat|
+                - values = dat['jieJueLv'].fetch(project_name){{}}[pap] || []
+                - next if values.blank?
+                - p1 << values[1]
+                - p2 << values[2]
+              - p1 = p1.reject(&:blank?).join(",").split(",")
+              - p2 = p2.reject(&:blank?).join(",").split(",")
+              - p0 = p2.present?? '%.1f%' % (p1.size/p2.size.to_f*100) : ''
+              %td{:style => td_style}= p0.present?? "#{p0} (#{p1.present?? p1.size : 0}/#{p2.size})" : '-'
+
+

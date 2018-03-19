@@ -1,0 +1,27 @@
+= form_tag({:action => 'edit', :tab => 'authentication'}) do
+  .box.tabular.settings
+    %p= setting_check_box :login_required
+    %p= setting_select :autologin, [[l(:label_disabled), 0]] + [1, 7, 30, 365].collect{|days| [l('datetime.distance_in_words.x_days', :count => days), days.to_s]}
+    %p= setting_select :self_registration, [[l(:label_disabled), "0"], |
+        [l(:label_registration_activation_by_email), "1"],             |
+        [l(:label_registration_manual_activation), "2"],               |
+        [l(:label_registration_automatic_activation), "3"]]            |
+    %p= setting_check_box :unsubscribe
+    %p= setting_text_field :password_min_length, :size => 6
+    %p
+      = setting_select :password_max_age, [[l(:label_disabled), 0]] + [7, 30, 60, 90, 180, 365].collect{|days| [l('datetime.distance_in_words.x_days', :count => days), days.to_s]}
+    %p= setting_check_box :lost_password
+    %p= setting_text_field :max_additional_emails, :size => 6
+    %p= setting_check_box :openid, :disabled => !Object.const_defined?(:OpenID)
+  %fieldset.box
+    %legend= l(:label_session_expiration)
+    .tabular.settings
+      %p= setting_select :session_lifetime, session_lifetime_options
+      %p= setting_select :session_timeout, session_timeout_options
+    %p
+      %em.info= l(:text_session_expiration_settings)
+  %fieldset.box
+    %legend= l(:label_default_values_for_new_users)
+    .tabular.settings
+      %p= setting_check_box :default_users_hide_mail, :label => :field_hide_mail
+  = submit_tag l(:button_save)

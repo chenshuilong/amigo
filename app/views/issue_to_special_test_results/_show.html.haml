@@ -1,0 +1,108 @@
+.attributes
+  %table.table.table-borderless
+    %tbody
+      %tr
+        %th.col-sm-2= l(:issue_to_special_test_category)
+        %td.col-sm-10= load_value(@special_test, :category)
+      %tr
+        %th.col-sm-2= l(:issue_to_special_test_author_id)
+        %td.col-sm-10= action_name == "show" ? link_to_user(@special_test.author) : @special_test.author.firstname
+      %tr
+        %th.col-sm-2= l(:issue_to_special_test_subject)
+        %td.col-sm-10= load_value(@special_test, :subject)
+      %tr
+        %th.col-sm-2= l(:issue_to_special_test_related_issues)
+        %td.col-sm-10= related_issues(@special_test.related_issues)
+      %tr
+        %th.col-sm-2= l(:issue_to_special_test_precondition)
+        %td.col-sm-10= simple_format(@special_test.precondition)  
+      %tr
+        %th.col-sm-2= l(:issue_to_special_test_test_times)
+        %td.col-sm-10= load_value(@special_test, :test_times)
+      %tr
+        %th.col-sm-2= l(:issue_to_special_test_log_from_com)
+        %td.col-sm-10= load_value(@special_test, :log_from_com)       
+      %tr
+        %th.col-sm-2= l(:issue_to_special_test_machine_num)
+        %td.col-sm-10= load_value(@special_test, :machine_num) 
+      %tr
+        %th.col-sm-2= l(:issue_to_special_test_test_method)
+        %td.col-sm-10= simple_format(@special_test.test_method)  
+      %tr
+        %th.col-sm-2= l(:issue_to_special_test_attentions)
+        %td.col-sm-10= simple_format(@special_test.attentions)    
+      %tr
+        %th.col-sm-2= l(:issue_to_special_test_test_version)
+        %td.col-sm-10= load_value(@special_test, :test_version) 
+      %tr
+        %th.col-sm-2= l(:repo_request_status)
+        %td.col-sm-10= load_value(@special_test, :status)
+      - if @special_test.agreed?
+        %tr
+          %th.col-sm-2= l(:issue_to_special_test_priority)
+          %td.col-sm-10= load_value(@special_test, :priority) 
+        %tr
+          %th.col-sm-2= l(:issue_to_special_test_approval_result)
+          %td.col-sm-10= simple_format(@special_test.approval_result) 
+      - if @task.present?
+        %tr
+          %th.col-sm-2= l(:issue_to_special_test_result_designer_id)
+          %td.col-sm-10= action_name == "show" ? link_to_user(@result.designer) : @result.designer.firstname
+        %tr
+          %th.col-sm-2= l(:issue_to_special_test_result_assigned_to_id)
+          %td.col-sm-10= action_name == "show" ? link_to_user(@result.assigner) : @result.assigner.firstname 
+        - if %w(finished designed).include?(@task.status)
+          %tr 
+            %th.col-sm-2= l(:issue_to_special_test_result_steps)
+            %td.col-sm-10= simple_format(@result.steps)
+        - if @task.status == "finished"
+          %tr
+            %th.col-sm-2= l(:issue_to_special_test_result_start_date)
+            %td.col-sm-10= @result.start_date.try(:strftime, "%F %T")
+          %tr
+            %th.col-sm-2= l(:issue_to_special_test_result_due_date)
+            %td.col-sm-10= @result.due_date.try(:strftime, "%F %T")
+          %tr
+            %th.col-sm-2= l(:issue_to_special_test_result_sample_num)
+            %td.col-sm-10= load_value(@result, :sample_num)
+          %tr
+            %th.col-sm-2= l(:issue_to_special_test_result_catch_log_way)
+            %td.col-sm-10= load_value(@result, :catch_log_way)
+          %tr
+            %th.col-sm-2= l(:issue_to_special_test_result_result)
+            %td.col-sm-10= load_value(@result, :result)
+          %tr
+            %th.col-sm-2= "备注(专项发现的其他问题)"
+            %td.col-sm-10= simple_format(@result.notes)
+
+      - if @result.attachments.any? && (@task.finished? || (@task.designed? && action_name != "show" && User.current.id == @task.assigned_to_id))
+        %tr 
+          %th.col-sm-2= l(:label_attachments)
+          %td.col-sm-10
+            .attachments
+              .attachments.attachments-list
+                - @result.attachments.preload(:author).each do |a|
+                  %p 
+                    = link_to a.filename, named_attachment_path(id: a.id, filename: a.filename), target: "_blank", class: "icon icon-attachment"
+                    %span.size= number_to_human_size a.filesize
+                    = link_to l(:button_delete), attachment_path(id: a.id), method: "delete", class: "delete icon-only icon-del" if @task.designed? && @task.assigned_to_id == @result.assigned_to_id
+                    = action_name == "show" ? link_to_user(a.author) : a.author.firstname
+
+- if @records.present?
+  .attributes     
+    .allchange
+      %ul.nav.nav-tabs
+        - if @records.present?
+          %li.active
+            %a{"data-toggle" => "tab", :href => "#supplements"}= l(:label_supplement)
+      .tab-content
+        #notes.tab-pane.in.active
+          .history-details
+            .journal
+              - @records.each_with_index do |r, idx|
+                #note
+                  .note-title
+                    = task_authoring_at r.created_at, r.user, {:label => :label_updated_time_at, target: "_blank"}
+                  %ul.details
+                    - personal_task_details(r.details).each do |string|
+                      = string

@@ -1,0 +1,90 @@
+= labelled_fields_for :issue, @issue do |f|
+  .splitcontent.row
+    .col-md-6
+      - if @issue.safe_attribute?('status_id') && @allowed_statuses.present?
+        %p= f.select :status_id, (@allowed_statuses.collect {|p| [p.name, p.id]}), {:required => true},            |
+            :onchange => "updateIssueFrom('#{escape_javascript update_issue_form_path(@project, @issue)}', this)", |
+            :data => {:status_id => @issue.status_was.try(:id), :issue_id => @issue.try(:id)},                     |
+            :disabled => (@issue.status_id.to_i == 23 && @issue.umpirage_approver_id.exclude?(User.current.id) && @issue.status_id == @issue.status_id_was && !User.current.admin?)
+        = hidden_field_tag 'was_default_status', @issue.status_id, :id => nil if @issue.status == @issue.default_status
+      - else
+        %p
+          %label= l(:field_status)
+          %span.vcenter= @issue.status
+    .col-md-6
+      - if @issue.safe_attribute? 'priority_id'
+        %p
+          = f.select :priority_id, (@priorities.collect {|p| [p.name, p.id]}), {:required => true}
+          %small.form-text.text-muted 严重等级可能会随品质分类的操作而改变
+  .splitcontent.row
+    .col-md-6
+      - if @issue.safe_attribute? 'mokuai_reason'
+        %p= f.select :mokuai_reason, mokuai_reasons_options_for_select(@issue), {:required => true}, { :class => 'mokuai-reason' }
+      - if @issue.safe_attribute? 'mokuai_name'
+        %p= f.select :mokuai_name, mokuai_names_options_for_select(@issue), {:required => true}, { :class => 'mokuai-name' }
+    .col-md-6
+
+  .splitcontent.row
+    .col-md-6
+      - if @issue.safe_attribute? 'assigned_to_id'
+        %p
+          = f.select :assigned_to_id, only_selected_options_for_select(@issue.assignable_users, @issue.assigned_to), |
+            {:include_blank => true, :required => @issue.required_attribute?('assigned_to_id')}
+          - if @issue.persisted?
+            = link_to "逆推模块", void_js, :id => "reverseMokuai"
+            = popover :span, :content => "此功能会自动选择当前指派对象所在的归属及模块，并暂时禁用模块的Owner自动分配功能。", :title => "逆推模块" do
+              = icon "question-circle"
+          = select2_remote("issue_assigned_to_id", @issue)
+
+      - if @issue.safe_attribute?('category_id') && @issue.project.issue_categories.any?
+        %p
+          = f.select :category_id, (@issue.project.issue_categories.collect {|c| [c.name, c.id]}), :include_blank => true, :required => @issue.required_attribute?('category_id')
+          = link_to(l(:label_issue_category_new),                             |
+             new_project_issue_category_path(@issue.project),                 |
+             :remote => true,                                                 |
+             :method => 'get',                                                |
+             :title => l(:label_issue_category_new),                          |
+             :tabindex => 200,                                                |
+             :class => 'icon-only icon-add'                                   |
+            ) if User.current.allowed_to?(:manage_categories, @issue.project) |
+      - if @issue.safe_attribute?('fixed_version_id') && @issue.assignable_versions.any?
+        %p
+          = f.select :fixed_version_id, version_options_for_select(@issue.assignable_versions, @issue.fixed_version), :include_blank => true, :required => @issue.required_attribute?('fixed_version_id')
+          = link_to(l(:label_version_new),                                  |
+             new_project_version_path(@issue.project),                      |
+             :remote => true,                                               |
+             :method => 'get',                                              |
+             :title => l(:label_version_new),                               |
+             :tabindex => 200,                                              |
+             :class => 'icon-only icon-add'                                 |
+            ) if User.current.allowed_to?(:manage_versions, @issue.project) |
+      - if @issue.safe_attribute? 'parent_issue_id'
+        %p#parent_issue= f.text_field :parent_issue_id, :size => 10, :required => @issue.required_attribute?('parent_issue_id')
+        = javascript_tag "observeAutocompleteField('issue_parent_issue_id', '#{escape_javascript auto_complete_issues_path(:project_id => @issue.project, :scope => Setting.cross_project_subtasks)}')"
+    .col-md-6
+      - if @issue.safe_attribute? 'tfde_id'
+        %p
+          = f.select :tfde_id, only_selected_options_for_select(@issue.assignable_users, @issue.tfde), |
+            {:include_blank => true, :required => @issue.required_attribute?('tfde_id')}
+          = select2_remote("issue_tfde_id", @issue)
+      - if @issue.safe_attribute? 'start_date'
+        %p#start_date_area
+          = f.date_field(:start_date, :size => 10, :required => @issue.required_attribute?('start_date'))
+          = calendar_for('issue_start_date')
+      - if @issue.safe_attribute? 'due_date'
+        %p#due_date_area
+          = f.date_field(:due_date, :size => 10, :required => @issue.required_attribute?('due_date'))
+          = calendar_for('issue_due_date')
+      - if @issue.safe_attribute? 'estimated_hours'
+        %p
+          = f.text_field :estimated_hours, :size => 3, :required => @issue.required_attribute?('estimated_hours')
+          = l(:field_hours)
+      - if @issue.safe_attribute?('done_ratio') && Issue.use_field_for_done_ratio?
+        %p= f.select :done_ratio, ((0..10).to_a.collect {|r| ["#{r*10} %", r*10] }), :required => @issue.required_attribute?('done_ratio')
+
+    .clearfix
+  - if @issue.safe_attribute? 'custom_field_values'
+    = render :partial => 'issues/form_custom_fields'
+- include_calendar_headers_tags
+:css
+  .splitcontent, .tabular p {overflow:visible!important;}

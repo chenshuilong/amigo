@@ -1,0 +1,44 @@
+= labelled_form_for @task, :url => @task.container_type == "Library" ? library_task_update_task_path(@task) : update_special_test_task_task_path(@task), :html => {:multipart => true, id: "updateAssignedToForm"} do |f|
+  .issue-details#update
+    #all_attributes
+      %p
+        %label
+          = @task.container_type == "Library" ? l(:task_assigned_to_id) : l(:issue_to_special_test_result_assigned_to_id)
+          %span.required *
+        = select_tag "result[assigned_to_id]", []
+        = select2_remote("result_assigned_to_id", nil, nil, {withme: false})
+      = hidden_field_tag "change_assigned_to", true
+      = hidden_field_tag "result_container_type", @task.container_type
+
+:javascript
+  $(".layui-layer-btn1").on("click", function(){
+    var form = $("form#updateAssignedToForm")
+    var data = form.serialize();
+    var taskId = "#{@task.id}";
+    var userId = "#{@task.assigned_to_id}";
+    var assignedTo = $("#result_assigned_to_id").val();
+    var containerType = $("#result_container_type").val();
+
+    if(assignedTo != null && userId != assignedTo){
+      if(containerType == "Library"){
+        var url = '/tasks/'+ taskId +'/library_task_update.json?key=#{User.current.api_key}'
+      }else{
+        var url = '/tasks/'+ taskId +'/update_special_test_task.json?key=#{User.current.api_key}'
+      }
+      $.ajax({
+        url: url,
+        type: "post",
+        data: data,
+        success: function (data) { 
+          if(data){
+            window.onbeforeunload = null;
+            window.parent.location.href = "/my/tasks?type=#{@task.container_type == 'Library' ? 'library_task' : 'issue_to_special_test_task' }"
+          }else{
+            layer.msg("操作失败!");
+          }
+        }
+      });
+    }else{
+      layer.msg("新指定的#{@task.container_type == "Library" ? l(:task_assigned_to_id) : l(:issue_to_special_test_result_assigned_to_id)}不能为空且不能与当前相同！");
+    }
+  })

@@ -1,0 +1,17 @@
+= form_tag(collct_project_specs_path,method: "post",remote:true,:class => "form-horizontal") do
+  .form-group
+    = label_tag :project_id,'项目', class: 'control-label col-sm-2'
+    .col-xs-10
+      = select_tag "specs[project_id]",project_tree_options_for_select(Project.all), class: 'form-control', style: 'width:100%'
+  .form-group
+    = label_tag :jh_collect_finish_dt, "计划收集完成时间", class: "control-label col-sm-2"
+    .col-xs-10
+      = text_field_tag "specs[jh_collect_finish_dt]","#{Time.now.strftime('%Y-%m-%d')}",class: 'form-control'
+  .form-group
+    = label_tag :note, "备注", class: "control-label col-sm-2"
+    .col-xs-10
+      = text_area_tag "specs[note]", nil, class: 'form-control'
+
+:javascript
+  initSelect("specs_project_id");
+  initDateTimePicker("specs_jh_collect_finish_dt","Y-m-d",false);

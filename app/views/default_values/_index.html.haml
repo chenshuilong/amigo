@@ -1,0 +1,11 @@
+- if defaults.present?
+  .btn-group.pull-right
+    %button.btn.btn-default.dropdown-toggle{"data-toggle" => "dropdown", :type => "button"}
+      %sapn 选择模板
+      %span.caret
+    %ul.dropdown-menu{:role => "menu", :id => "default-value-dropdown"}
+      - defaults.each do |d|
+        %li.load-default-value
+          %span= link_to (icon "close"), default_value_path(d.id), method: :delete, data: { confirm: "确定删除本模板吗？" }, remote: true, class: "icon-right"
+          = link_to d.name, load_default_value_path(d.id), :remote => true
+

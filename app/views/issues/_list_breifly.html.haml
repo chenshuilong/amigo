@@ -1,0 +1,80 @@
+%tr#issue-preview
+  %td{:colspan => "100", :align => "left"}
+    .issue-preview-box
+      %ul.list-inline.links-no-stytle.issue-preview-tab
+        %li.active= link_to l(:field_description), "#issue-preview-desc", "data-toggle" => "tab", :class => "btn btn-default btn-sm"
+        - if @issue.journals.notes.present?
+          %li=link_to l(:field_notes), "#issue-preview-notes", "data-toggle" => "tab", :class => "btn btn-default btn-sm"
+        - if @issue.editable?
+          %li= link_to "快速编辑", "#all_attributes", "data-toggle" => "tab", :class => "btn btn-default btn-sm"
+      .tab-content
+        #issue-preview-desc.tab-pane.fade.in.active
+          - if @issue.description?
+            .wiki
+              = textilizable @issue, :description, :attachments => @issue.attachments
+          - else
+            .wiki= l(:label_no_description)
+
+        - if @issue.journals.notes.present?
+          #issue-preview-notes.tab-pane.fade
+            - for journal in @journals
+              - unless journal.notes.blank?
+                .note-title
+                  = authoring_at journal.created_on, journal.user, :label => :label_updated_time_at
+                .note-content
+                  = textilizable journal, :notes
+        - if @issue.editable?
+          #all_attributes.tab-pane.fade
+            = labelled_form_for @issue, :html => {:onsubmit => '$.post(this.action,$(this).serialize());return false', :class =>"edit_issue form-wrapper"} do |f|
+              .row
+                .col-sm-6
+                  - if @issue.attributes_editable?
+                    - if @issue.safe_attribute?('status_id') && @allowed_statuses.present?
+                      %p.issue-preview-edit-line= f.select :status_id, (@allowed_statuses.collect {|p| [p.name, p.id]}), {:required => true}, |
+                        :data => {:status_id => @issue.status_was.id, :issue_id => @issue.try(:id)}                                          |
+                    - else
+                      %p.issue-preview-edit-line
+                        %label= l(:field_status)
+                        = @issue.status
+                    - if @issue.safe_attribute? 'mokuai_reason'
+                      %p.issue-preview-edit-line= f.select :mokuai_reason, mokuai_reasons_options_for_select(@issue), {:required => true}, { :class => 'mokuai-reason' }
+                    - if @issue.safe_attribute? 'mokuai_name'
+                      %p.issue-preview-edit-line= f.select :mokuai_name, mokuai_names_options_for_select(@issue), {:required => true}, { :class => 'mokuai-name' }
+                    - if @issue.safe_attribute? 'assigned_to_id'
+                      %p.issue-preview-edit-line
+                        = f.select :assigned_to_id, only_selected_options_for_select(@issue.assignable_users, @issue.assigned_to), |
+                          {:include_blank => true, :required => @issue.required_attribute?('assigned_to_id')}, {:class => "select2test"}
+                        = link_to "逆推模块", void_js, :id => "reverseMokuai"
+                        = popover :span, :content => "此功能会自动选择当前指派对象所在的归属及模块，并暂时禁用模块的Owner自动分配功能。", :title => "逆推模块" do
+                          = icon "question-circle"
+                        = select2_remote("issue_assigned_to_id", @issue)
+                    - if @issue.safe_attribute? 'tfde_id'
+                      %p.issue-preview-edit-line
+                        = f.select :tfde_id, only_selected_options_for_select(@issue.assignable_users, @issue.tfde), |
+                          {:include_blank => true, :required => @issue.required_attribute?('tfde_id')}
+                        = select2_remote("issue_tfde_id", @issue)
+                  - if @issue.notes_addable?
+                    %p.issue-preview-edit-line= f.text_area :notes, :style => "height: 100px", :class => 'wiki-edit'
+                .col-sm-6
+                  - if @issue.attributes_editable?
+                    - if @issue.safe_attribute? 'priority_id'
+                      %p.issue-preview-edit-line= f.select :priority_id, (IssuePriority.active.collect {|p| [p.name, p.id]}), {:required => true}
+                    - @issue.editable_custom_field_values.select{|cfv| %w(优先级 修改阶段 解决版本 验证版本 研发分析结论 现象类型 品质评分 品质分类 问题导入范围 品质意见 评审意见).include? cfv.custom_field.name }.each do |cfv|
+                      %p.issue-preview-edit-line= custom_field_tag_with_label :issue, cfv, :required => @issue.required_attribute?(cfv.custom_field_id)
+              %p.issue-preview-edit-line= f.submit l(:button_submit), class: "btn btn-primary btn-sm"
+
+    :javascript
+      $(".issue-preview-box").width($(".issues-head-function").width() - 50);
+      $(".edit_issue").on("change", "select.mokuai-reason", function(){
+        $.get("/projects/#{@issue.project.identifier}/mokuai_ownners/new",{ get: "reason", val: $(this).val()});
+      }).on("change", "select.mokuai-name", function(){
+        $.get("/projects/#{@issue.project.identifier}/mokuai_ownners/new",{ get: "name", val: $(this).val()});
+      }).on('change', '#issue_custom_field_values_5', function(){
+        $.get('/api/xianxiang', { xx_name: $(this).val() }, function(result){
+          $("#issue_custom_field_values_17").select2({data: result.names}).trigger('change');
+        });
+      });
+      $("#reverseMokuai").on("click", function(){
+        $.get("/projects/#{@issue.project.identifier}/mokuai_ownners/reverse",{ ownner: $("#issue_assigned_to_id").val()});
+      });
+

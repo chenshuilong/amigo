@@ -1,0 +1,2 @@
+class CommonTool < Tool
+end

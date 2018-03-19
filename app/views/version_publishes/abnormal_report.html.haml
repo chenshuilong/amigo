@@ -1,0 +1,8 @@
+- provide :nav, "2,4"
+- provide :css, "bootstrap"
+
+- content_for :bread do
+  %li= link_to l(:label_version_publish), version_publishes_path
+  %li= [@version_publish.spec.fullname, @version_publish.version.name].join("_") + ' 异常报告'
+
+= render :partial => 'abnormal_report', :locals => { :notes => @notes }

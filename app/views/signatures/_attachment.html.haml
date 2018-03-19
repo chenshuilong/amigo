@@ -1,0 +1,21 @@
+%span#uploader.attachment-form{:data => {:max_concurrent_uploads => 1,
+  :upload_path => uploads_path(:format => 'js'),
+  :description_placeholder => l(:label_optional_description),
+  :upload_remove_confirm => l(:notice_remove_upload_confirm) }}
+  %span#uploaderList.attachment-list
+    - if defined?(container) && container && container.saved_attachments
+      - container.saved_attachments.each_with_index do |attachment, i|
+        %span{:id => "WU_FILE_p#{i}"}
+          = text_field_tag("attachments[p#{i}][filename]", attachment.filename, :class => 'filename readonly')
+          = text_field_tag("attachments[p#{i}][description]", attachment.description, :maxlength => 255, :placeholder => l(:label_optional_description), :class => 'description')
+          = link_to((icon "trash"), void_js, :class => 'remove-upload')
+          = hidden_field_tag "attachments[p#{i}][token]", "#{attachment.token}"
+  %span.attachment_area
+    %span.attachment_area_content
+      -# %span#uploaderPicker= l(:notice_click_to_upload_file)
+      = link_to void_js, class: "attachment-upload-file", id: "uploaderPicker" do
+        = icon "plus"
+        = l(:notice_click_to_upload_app_signature)
+
+- content_for :header_tags do
+  = javascript_include_tag 'attachments'

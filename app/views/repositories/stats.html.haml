@@ -1,0 +1,15 @@
+%h2= l(:label_statistics)
+%p
+  = tag("embed",                                                             |
+    :type => "image/svg+xml", :src => url_for(:controller => 'repositories', |
+    :action => 'graph', :id => @project,                                     |
+    :repository_id => @repository.identifier_param,                          |
+    :graph => "commits_per_month"))                                          |
+%p
+  = tag("embed",                                                             |
+    :type => "image/svg+xml", :src => url_for(:controller => 'repositories', |
+    :action => 'graph', :id => @project,                                     |
+    :repository_id => @repository.identifier_param,                          |
+    :graph => "commits_per_author"))                                         |
+%p= link_to l(:button_back), :action => 'show', :id => @project
+- html_title(l(:label_repository), l(:label_statistics))

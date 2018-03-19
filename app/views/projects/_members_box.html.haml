@@ -1,0 +1,13 @@
+- if @users_by_role.any?
+  .members.box
+    .h2= l(:label_member_plural)
+    %table.table
+      - @users_by_role.keys.each do |role|
+        %tr
+          %td.font-bold{width: 200}= role
+          %td{:id => "role-#{role.id}"}
+            - if @users_by_role[role].present?
+              = @users_by_role[role].take(20).select{|m| m.user ? m.user.active? : m}.uniq.collect{|m| link_to_member(m, role)}.join(", ").html_safe
+              - if @users_by_role[role].size > 20
+                .tag.project-show-all-users= link_to l(:button_view_all),                  |
+                  users_project_memberships_path(@project, role_id: role.id), remote: true |

@@ -1,0 +1,22 @@
+%p
+  %hr
+  %table
+    %thead
+      %tr
+        %td.talbe-col-md-2= '#'
+        %td.talbe-col-md-4= 'APK'
+    %tbody
+      - @invalid_apks.each_with_index do |apk, i|
+        %tr
+          %td.talbe-col-md-2= i+1
+          %td.talbe-col-md-4= apk
+
+
+/ Public
+%hr
+%table.button.small
+  %tr
+    %td
+      %table
+        %tr
+          %td= link_to '查看详情', version_url(@version.id)

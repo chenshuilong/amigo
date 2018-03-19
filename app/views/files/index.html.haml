@@ -1,0 +1,35 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+.top-action-menu.pull-right
+  = link_to(l(:label_attachment_new), new_project_file_path(@project), :class => 'icon icon-add') if User.current.allowed_to?(:manage_files, @project)
+.h2= l(:label_attachment_plural)
+- delete_allowed = User.current.allowed_to?(:manage_files, @project)
+%table.list.files.table.table-striped.table-bordered
+  %thead
+    %tr
+      = sort_header_tag('filename', :caption => l(:field_filename))
+      = sort_header_tag('created_on', :caption => l(:label_date), :default_order => 'desc')
+      = sort_header_tag('size', :caption => l(:field_filesize), :default_order => 'desc')
+      = sort_header_tag('downloads', :caption => l(:label_downloads_abbr), :default_order => 'desc')
+      %th MD5
+      %th
+  %tbody
+    - @containers.each do |container|
+      - next if container.attachments.empty?
+      - if container.is_a?(Version)
+        %tr
+          %th{:colspan => "6"}
+            = link_to(container, {:controller => 'versions', :action => 'show', :id => container}, :class => "icon icon-package")
+      - container.attachments.each do |file|
+        %tr{:class => "file #{cycle("odd", "even")}"}
+          %td.filename= link_to_attachment file, :download => true, :title => file.description
+          %td.created_on= format_time(file.created_on)
+          %td.filesize= number_to_human_size(file.filesize)
+          %td.downloads= file.downloads
+          %td.digest= file.digest
+          %td.buttons
+            = link_to(image_tag('delete.png'), attachment_path(file),
+              :data => {:confirm => l(:text_are_you_sure)}, :method => :delete) if delete_allowed
+      - reset_cycle
+- html_title(l(:label_attachment_plural))

@@ -1,0 +1,12 @@
+- if files.present?
+  .version-issues
+    .wiki
+      - if files.size > 15
+        = data_table_for 'patchLibraryFiles',
+          dom: '<"data-table-top"f>rt<"data-table-bottom"pil><"clear">',
+          lengthMenu: [[-1, 10, 25, 50, 100], ["#{l(:label_all)}", 10, 25, 50, 100]]
+      = fields_table :class => 'list data-table', :id => 'patchLibraryFiles' do |t|
+        - t.title "文件清单"
+        - files.each_with_index do |file|
+          - t.row do
+            - t.data "#{file['type']}  #{file['name']}"

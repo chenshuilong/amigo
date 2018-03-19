@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  risk_id: 
+  content: MyString
+  finish_at: 2016-07-05 14:55:40
+
+two:
+  risk_id: 
+  content: MyString
+  finish_at: 2016-07-05 14:55:40

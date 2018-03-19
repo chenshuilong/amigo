@@ -1,0 +1,34 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+.contextual
+  - if User.current.allowed_to?(:edit_documents, @project)
+    = link_to l(:button_edit), edit_document_path(@document), :class => 'icon icon-edit', :accesskey => accesskey(:edit)
+  - if User.current.allowed_to?(:delete_documents, @project)
+    = delete_link document_path(@document)
+%h2= @document.title
+%p
+  %em
+    = @document.category.name
+    %br/
+    = format_date @document.created_on
+- if @document.custom_field_values.any?
+  %ul
+    - render_custom_field_values(@document) do |custom_field, formatted|
+      %li
+        %span.label
+          = custom_field.name
+          \:
+        = formatted
+.wiki
+  = textilizable @document, :description, :attachments => @document.attachments
+%h3= l(:label_attachment_plural)
+= link_to_attachments @document
+- if authorize_for('documents', 'add_attachment')
+  %p= link_to l(:label_attachment_new), {}, :onclick => "$('#add_attachment_form').show(); return false;", |
+      :id => 'attach_files_link'                                                                           |
+  = form_tag({ :controller => 'documents', :action => 'add_attachment', :id => @document }, :multipart => true, :id => "add_attachment_form", :style => "display:none;") do
+    .box
+      %p= render :partial => 'attachments/form'
+    = submit_tag l(:button_add)
+- html_title @document.title

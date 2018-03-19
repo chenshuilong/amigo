@@ -1,0 +1,2 @@
+module ViewRecordsHelper
+end

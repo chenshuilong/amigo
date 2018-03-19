@@ -1,0 +1,73 @@
+- provide :nav, "2,4"
+- provide :css, "bootstrap"
+
+- content_for :bread do
+  %li= link_to l(:label_version_publish), version_publishes_path
+  %li= l(:label_native_applist)
+
+- content_for :header_tags do
+  %link{:href => "/amg/dataTable/datatable.css", :rel => "stylesheet"}
+  %link{:href => "/amg/dataTable/fixedColumns.bootstrap.min.css", :rel => "stylesheet"}
+
+  %script{:src => "/amg/dataTable/dataTables.fixedColumns.min.js", :type => "text/javascript"}
+  %script{:src => "/amg/dataTable/dataTables.bootstrap.min.js", :type => "text/javascript"}
+
+.top-action-menu.pull-right
+  = link_to(l(:native_applist_history), history_native_applists_path, :class => 'btn btn-primary btn-sm')
+  - if policy(:native_applist).edit?
+    = link_to(l(:button_add), new_native_applist_path, :class => 'btn btn-primary btn-sm')
+
+.h2= l(:label_native_applist)
+
+.filter-right
+  .panel.panel-default{:style => "margin-top:20px;"}
+    .panel-body
+      .issues-head
+        .issues-body
+          - if @apps.empty?
+            %p.nodata= l(:label_no_data)
+          - else
+            %table#nativeApplistTable.table.table-bordered.table-hover
+              %thead
+                %tr
+                  %th{width: '60'} #
+                  %th{width: '150'}= l(:apk_base_name)
+                  %th{width: '120'}= l(:apk_base_cn_name)
+                  %th{width: '120'}= l(:apk_base_desktop_name)
+                  %th{width: '200'}= l(:apk_base_cn_description)
+                  %th{width: '100'}= l(:apk_base_developer) 
+                  %th{width: '100'}= l(:apk_base_package_name)
+                  %th{width: '150'}= l(:apk_base_category_id)
+                  %th{width: '100'}= l(:apk_base_removable)
+                  %th{width: '100'}= l(:apk_base_app_category)
+                  %th{width: '100'}= l(:apk_base_android_platform)
+                  %th{width: '30'}= l(:option_all)
+              %tbody
+                - @apps.each do |app|
+                  %tr
+                    %td= link_to app.id, native_applist_path(app)
+                    %td= load_value(app, :name)
+                    %td= load_value(app, :cn_name)
+                    %td= load_value(app, :desktop_name)
+                    %td
+                      = popover(:trigger => "click", :content => simple_format(app.cn_description),:title => "详细信息") do
+                        = app.cn_description.to_s[0,15]
+                    %td= load_value(app, :developer)
+                    %td= load_value(app, :package_name)
+                    %td= load_value(app.apk_base_category, :name)
+                    %td= load_value(app, :removable)
+                    %td= load_value(app, :app_category)
+                    %td= load_value(app, :android_platform)
+                    %td
+                      - if app.tasks.where(status: 24).count == 0
+                        - if policy(:native_applist).edit?
+                          %a{:href => "#{edit_native_applist_path(app.id)}"}
+                            %i.spec-edit.fa.fa-edit
+                      - else
+                        %span.text-danger 评审中
+
+
+:javascript
+  var nativeApplistTable = initDataTable('nativeApplistTable',{
+    paging: true, ordering: false, info: false, searching: false, select: true, scrollX: true, fixedColumns: {leftColumns: 2, rightColumns: 1}
+  });

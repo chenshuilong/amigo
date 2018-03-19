@@ -1,0 +1,21 @@
+%p
+  = @message
+  %br/
+  - if @url && @title
+    = link_to @title, @url
+  - elsif @url
+    = link_to @url
+  - elsif @title
+    = content_tag :h1, @title
+%p
+  = l(:field_user)
+  \:
+  %strong= User.current.firstname
+  %br/
+  = l(:field_remote_ip)
+  \:
+  %strong= User.current.remote_ip
+  %br/
+  = l(:label_date)
+  \:
+  %strong= format_time Time.now, true, @user

@@ -1,0 +1,62 @@
+-# %span#attachments_fields
+-#   - if defined?(container) && container && container.saved_attachments
+-#     - container.saved_attachments.each_with_index do |attachment, i|
+-#       %span{:id => "attachments_p#{i}"}
+-#         = text_field_tag("attachments[p#{i}][filename]", attachment.filename, :class => 'filename')
+-#         = text_field_tag("attachments[p#{i}][description]", attachment.description, :maxlength => 255, :placeholder => l(:label_optional_description), :class => 'description')
+-#         = link_to((icon "trash"), attachment_path(attachment, :attachment_id => "p#{i}", :format => 'js'), :method => 'delete', :remote => true, :class => 'remove-upload')
+-#         = hidden_field_tag "attachments[p#{i}][token]", "#{attachment.token}"
+
+-# %span.attachment_area
+-#   %span.attachment_area_content
+-#     = link_to void_js, class: "attachment-upload-file" do
+-#       = icon "plus"
+-#       = l(:notice_click_to_upload_file)
+-#     = l(:default_operator_or)
+-#     = link_to void_js, class: "attachment-paste-screenshot", "data-paste-notice": l(:notice_ctrl_v_to_paste_screenshot) do
+-#       = icon "clipboard"
+-#       = l(:notice_click_to_paste_screenshot)
+-#     (#{l(:label_max_size)}#{number_to_human_size(Setting.attachment_max_size.to_i.kilobytes)})
+-# %span.add_attachment.hidden
+-#   = file_field_tag 'attachments[dummy][file]',                                                                                               |
+-#     :id => nil,                                                                                                                              |
+-#     :class => 'file_selector',                                                                                                               |
+-#     :multiple => true,                                                                                                                       |
+-#     :onchange => 'addInputFiles(this);',                                                                                                     |
+-#     :data => {                                                                                                                               |
+-#       :max_file_size => Setting.attachment_max_size.to_i.kilobytes,                                                                          |
+-#       :max_file_size_message => l(:error_attachment_too_big, :max_size => number_to_human_size(Setting.attachment_max_size.to_i.kilobytes)), |
+-#       :max_concurrent_uploads => Redmine::Configuration['max_concurrent_ajax_uploads'].to_i,                                                 |
+-#       :upload_path => uploads_path(:format => 'js'),                                                                                         |
+-#       :description_placeholder => l(:label_optional_description)                                                                             |
+-#     }                                                                                                                                        |
+
+%span#uploader.attachment-form{:data => {:max_file_size => (controller_name != "issues" ? Setting.attachment_max_size.to_i.kilobytes : 0),
+  :max_file_size_message => l(:error_attachment_too_big, :max_size => number_to_human_size(Setting.attachment_max_size.to_i.kilobytes)),
+  :max_concurrent_uploads => Redmine::Configuration['max_concurrent_ajax_uploads'].to_i,
+  :upload_path => uploads_path(:format => 'js'),
+  :description_placeholder => l(:label_optional_description),
+  :upload_remove_confirm => l(:notice_remove_upload_confirm) }}
+  %span#uploaderList.attachment-list
+    - if defined?(container) && container && container.saved_attachments
+      - container.saved_attachments.each_with_index do |attachment, i|
+        %span{:id => "WU_FILE_p#{i}"}
+          = text_field_tag("attachments[p#{i}][filename]", attachment.filename, :class => 'filename readonly')
+          = text_field_tag("attachments[p#{i}][description]", attachment.description, :maxlength => 255, :placeholder => l(:label_optional_description), :class => 'description')
+          = link_to((icon "trash"), void_js, :class => 'remove-upload')
+          = hidden_field_tag "attachments[p#{i}][token]", "#{attachment.token}"
+  %span.attachment_area
+    %span.attachment_area_content
+      -# %span#uploaderPicker= l(:notice_click_to_upload_file)
+      = link_to void_js, class: "attachment-upload-file", id: "uploaderPicker" do
+        = icon "plus"
+        = l(:notice_click_to_upload_file)
+      = l(:default_operator_or)
+      = link_to void_js, class: "attachment-paste-screenshot", "data-paste-notice": l(:notice_ctrl_v_to_paste_screenshot) do
+        = icon "clipboard"
+        = l(:notice_click_to_paste_screenshot)
+      -# (#{l(:label_max_size)}#{number_to_human_size(Setting.attachment_max_size.to_i.kilobytes)})
+
+- content_for :header_tags do
+  = javascript_include_tag 'attachments'
+

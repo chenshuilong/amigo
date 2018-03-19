@@ -1,0 +1,5 @@
+%h4= link_to document.title, document_path(document)
+%p
+  %em= format_time(document.updated_on)
+.wiki
+  = textilizable(truncate_lines(document.description), :object => document)

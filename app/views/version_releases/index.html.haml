@@ -1,0 +1,140 @@
+- provide :nav, "4,2"
+- provide :css, "bootstrap"
+- content_for :header_tags do
+  %link{:href => "/amg/dataTable/datatable.css", :rel => "stylesheet"}
+  %link{:href => "/amg/dataTable/fixedColumns.bootstrap.min.css", :rel => "stylesheet"}
+
+  %script{:src => "/amg/dataTable/dataTables.fixedColumns.min.js", :type => "text/javascript"}
+  %script{:src => "/amg/dataTable/dataTables.bootstrap.min.js", :type => "text/javascript"}
+
+.top-action-menu.pull-right
+  - if User.current.allowed_to?(:release_versions, nil, :global => true)
+    = link_to(l(:version_release_new), new_version_release_path, :class => 'btn btn-primary btn-sm')
+.h2= l(:version_release_all)
+
+.clearfix
+.issue-details
+  .roadmap-query{:style => "width:100%;"}
+    %ul.notification-list
+      %li.notification-list-item
+        .notification-menu
+          %i.fa.fa-chevron-up
+        .notification-content
+          %p
+            %strong= "查询条件"
+        .clearfix
+        .notification-acton.select2-rectify{:style => "display:block;"}
+          = form_tag({}, {method: :get, class: 'form-horizontal'}) do |f|
+            .form-group
+              = label_tag 'category', l(:version_release_category), class: "col-sm-2 control-label"
+              .col-sm-2
+                = select_tag 'category', options_for_select(list_for_select(:version_release, :category), @category),
+                  class: "form-control", multiple: true
+                = select2_for 'category', l(:label_all), closeOnSelect: false
+              = label_tag 'project_id', l(:version_release_production), class: "col-sm-2 control-label"
+              .col-sm-2
+                = select_tag 'project_id', options_for_select(                                                                |
+                  Production.where(:production_type => [1,2,3]).pluck(:name, :id).unshift([l(:label_all), '']), @project_id), |
+                  class: "form-control", :onchange => "this.form.submit(); return false;"
+                = select2_for "project_id"
+              = label_tag 'status', l(:field_status), class: "col-sm-2 control-label"
+              .col-sm-2
+                = select_tag 'status', options_for_select(                                           |
+                  list_for_select(:version_release, :status).unshift([l(:label_all), '']), @status), |
+                  class: "form-control", :multiple => true, :onchange => "this.form.submit(); return false;"
+                = select2_for 'status'
+            .form-group
+              = label_tag 'failed_count', l(:version_release_failed_count), class: "col-sm-2 control-label"
+              .col-sm-2
+                = select_tag 'failed_count', options_for_failed_count_select, class: "form-control", |
+                  :onchange => "this.form.submit(); return false;"
+              = label_tag 'tested_mobile', l(:version_release_tested_mobile), class: "col-sm-2 control-label"
+              .col-sm-2
+                = select_tag 'tested_mobile', options_for_select(Project.active.where(:category => [1, 2, 3]).pluck(:name, :id), @tested_mobile), {include_blank: true, :multiple => true}
+                = select2_for 'tested_mobile'
+              = label_tag 'just_adpted', l(:version_release_adpted_and_not_completed), class: "col-sm-2 control-label"
+              .col-sm-2
+                = select_tag 'just_adpted', options_for_select(bool_for_select.unshift([l(:label_all), '']), @just_adpted), |
+                  class: "form-control", :onchange => "this.form.submit(); return false;"
+            .form-group
+              = label_tag 'author', l(:field_author), class: "col-sm-2 control-label"
+              .col-sm-2
+                = select_tag 'author', options_for_select([[User.find_by(:id => @author), @author]], @author) ,  |
+                  class: "form-control", :id => 'version_release_author', :style => "width: 150px;"
+                = select2_remote 'version_release_author'
+              = label_tag 'created_at', l(:field_created_on), class: "col-sm-2 control-label"
+              .col-sm-2
+                = text_field_tag 'created_at_start', @created_at_start, class: "form-control", :id => 'version_release_created_at_start'
+                = hidden_field_tag 'created_at_end', @created_at_end, class: "form-control", :id => 'version_release_created_at_end'
+                = calendar_range_for 'version_release_created_at_start', 'version_release_created_at_end'
+              = label_tag 'has_problem', l(:version_release_has_problem), class: "col-sm-2 control-label"
+              .col-sm-2
+                = select_tag 'has_problem', options_for_select([[l(:label_all), ''], [l(:general_text_yes), 1], [l(:general_text_no), 0]], @has_problem), class: "form-control", |
+                  :onchange => "this.form.submit(); return false;"
+            .form-group
+              .col-sm-2.col-sm-offset-2
+                = submit_tag l(:button_query), :name => nil, class: "btn btn-primary btn-sm"
+  %hr
+  .roadmap-table
+    .panel.panel-default
+      .panel-body
+        - if @releases.present?
+          %table#releaseTable.list.issues-relations-table.table.table-bordered.table-hover
+            %thead
+              %tr
+                = sort_header_tag('id', :caption => "#")
+                = sort_header_tag('category', :caption => l(:version_release_category))
+                %th= l(:version_release_production)
+                = sort_header_tag('version_id', :caption => l(:version_release_version_id))
+                = sort_header_tag('status', :caption => l(:field_status))
+                = sort_header_tag('failed_count', :caption => l(:version_release_failed_count))
+                = sort_header_tag('tested_mobile', :caption => l(:version_release_tested_mobile))
+                %th= l(:version_release_adpted_and_not_completed)
+                = sort_header_tag('version_applicable_to', :caption => l(:version_release_version_applicable_to))
+                = sort_header_tag('test_finished_on', :caption => l(:version_release_test_finished_on))
+                = sort_header_tag('created_at', :caption => l(:field_created_on))
+                = sort_header_tag('author_id', :caption => l(:field_author))
+            %tbody
+              - @releases.each do |release|
+                %tr
+                  %td= link_to release.id, release
+                  %td= load_value(release, :category)
+                  %td= release.version.project.name
+                  %td= link_to_version release.version
+                  %td= load_value(release, :status)
+                  %td= render_failed_count release
+                  %td= render_tested_mobile release
+                  %td= render_just_adapted release
+                  %td= release.version_applicable_to
+                  %td= format_date release.test_finished_on
+                  %td= format_time release.created_at
+                  %td= link_to_user release.author
+          %span.pagination= pagination_links_full @release_pages, @release_count
+        - else
+          %p.nodata= l(:label_no_data)
+
+- html_title(l(:version_release_all))
+
+:javascript
+
+  var appTable = initDataTable('releaseTable',{
+    paging: false, ordering: false, info: false, searching: false, select: true, scrollX: true, fixedColumns: {leftColumns: 3,rightColumns: 2}
+  });
+
+  // Pin issue-head
+  $('.roadmap-query').pin({padding: {top: 70, bottom: 10}});
+
+  $(window).on('scroll', function(event) {
+      var htop = $(event.target).scrollTop();
+      if (htop > 300) {
+          $('.notification-acton').css("display","none");
+          $('.notification-menu').children().eq(0).removeClass("fa fa-chevron-up").addClass("fa fa-chevron-down");
+      } else {
+          $('.notification-acton').css("display","block");
+          $('.notification-menu').children().eq(0).removeClass("fa fa-chevron-down").addClass("fa fa-chevron-up");
+      }
+  }.bind(this))
+
+:css
+
+  .roadmap-query{z-index: 999}

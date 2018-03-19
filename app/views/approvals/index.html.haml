@@ -1,0 +1,28 @@
+%h2= l(:field_approvals)
+
+.h2 已配置的审批
+.contextual
+  = link_to l(:approval_new), new_approval_path, :class => 'icon icon-add'
+
+
+
+%table.table.table-striped.table-bordered
+  %thead
+    %tr
+      %th ID
+      %th 类型
+      %th 对象类型
+      %th 对象
+      %th 审批人
+      %th 操作
+  %tbody
+    - @approvals.each_with_index do |approval, index|
+      %tr{:data => {:id => approval.id}}
+        %td= index + 1
+        %td= l(:"approval_type_#{approval.type.to_s}")
+        %td= l(:"approval_object_type_#{approval.object_type.to_s}")
+        %td= approval.object.try(:name)
+        %td= approval.user.name
+        %th
+          = link_to l(:button_edit), edit_approval_path(approval.id)
+          = link_to l(:button_delete), approval_path(approval.id), "data-confirm" => "确定删除吗？", method: :delete

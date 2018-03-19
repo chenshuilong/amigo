@@ -1,0 +1,19 @@
+:plain
+  var flag = #{@spec_id};
+
+  if(flag == 0){
+    window.location.href = '/projects/#{@project_id}/specs?id=#{@spec.id}';
+    layer.msg('新建成功！');
+  }else{
+    var locked = #{@spec.locked}
+    if(locked){
+      layer.alert('规格已被锁定，无法修改！');
+    }else{
+      spec_tr = $('[data-id="spec-#{@spec.id}"]');
+      spec_tr.children().eq(1).html("<a href=\"/projects/#{@project.identifier}/specs?id=#{@spec.id}\">#{@spec.name}</a>")
+                .end().eq(3).text("#{format_date @spec.sj_collect_finish_dt}")
+                .end().eq(4).text("#{@spec.note.to_s[0,10]}");
+
+      layer.msg('修改成功！');
+    }
+  }

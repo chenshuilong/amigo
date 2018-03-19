@@ -1,0 +1,6 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+
+%h2= l(:label_board)
+= labelled_form_for @board, :url => project_board_path(@project, @board) do |f|
+  = render :partial => 'form', :locals => {:f => f}
+  = submit_tag l(:button_save)

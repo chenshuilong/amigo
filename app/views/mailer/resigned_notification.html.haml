@@ -1,0 +1,8 @@
+%p= "您的同事 #{@resigner.dept_name} #{@resigner.name} 已经离职，但其仍有未处理完的BUG，请尽快安排其他同事跟进处理这些BUG。"
+%p= "BUG ID(s): #{@bugs}"
+%table.button.small
+  %tr
+    %td
+      %table
+        %tr
+          %td= link_to '查看其未处理完的BUG', issues_url(:search => "issues.id in (#{@bugs})")

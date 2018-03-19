@@ -1,0 +1,3 @@
+- @users.each do |user|
+  $("#issue_watcher_user_ids_#{user.id}").remove();
+$('#watchers_inputs').append('#{escape_javascript(watchers_checkboxes(nil, @users, true))}');

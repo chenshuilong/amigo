@@ -1,0 +1,28 @@
+= form_for([@project, ownner], :html => {:id => "mokuai_ownner_form", :class => "form-horizontal"}, remote: true) do |f|
+  .form-group
+    = f.label :id, "序号", class: "control-label col-sm-2"
+    .col-xs-10
+      = f.text_field nil, :value => @project.mokuai_ownners.index(ownner) + 1, class: 'form-control', :readonly => true
+  .form-group
+    = f.label :reason, "归属", class: "control-label col-sm-2"
+    .col-xs-10
+      = f.text_field nil, :value => ownner.mokuai.reason, class: 'form-control', :readonly => true
+  .form-group
+    = f.label :name, "模块", class: "control-label col-sm-2"
+    .col-xs-10
+      = f.text_field nil, :value => ownner.mokuai.name, class: 'form-control', :readonly => true
+  .form-group
+    = f.label :tfde, "TFDE", class: "control-label col-sm-2"
+    .col-xs-10
+      = select_tag "ownner[tfde]", omit_options_for_mokuai_owner(ownner, :tfde, ownner.tfde), {:class => "form-control", :id => "mokuai_tfde"}
+      = select2_remote "mokuai_tfde", @project
+  .form-group
+    = f.label :description, "Ownner", class: "control-label col-sm-2"
+    .col-xs-10
+      = select_tag "ownner[main_ownner]", omit_options_for_mokuai_owner(ownner, :main_ownner, ownner.ownner.first), {:class => "form-control", :id => "mokuai_main_ownner"}
+      = select2_remote "mokuai_main_ownner", @project
+  .form-group
+    = f.label :description, "次要Ownner", class: "control-label col-sm-2"
+    .col-xs-10
+      = select_tag "ownner[minor_ownner][]", omit_options_for_mokuai_owner(ownner, :minor_ownner, ownner.ownner.from(1)), multiple: "multiple", :class => "form-control", :id => "mokuai_minor_ownner"
+      = select2_remote "mokuai_minor_ownner", @project

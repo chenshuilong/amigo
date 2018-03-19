@@ -1,0 +1,66 @@
+- provide :nav, "5,5"
+- provide :css, "bootstrap"
+
+- content_for :bread do
+  %li= link_to l(:label_patch), patches_path
+  %li= @patch.patch_no
+
+.clearfix
+  .issue-details
+    .attributes
+      %table.table.table-borderless
+        %tbody
+          %tr
+            %th.col-sm-2= l(:patch_patch_type)
+            %td.col-sm-10= load_value(@patch, :patch_type)
+          %tr
+            %th.col-sm-2= l(:patch_patch_no)
+            %td.col-sm-10= load_value(@patch, :patch_no)
+          %tr
+            %th.col-sm-2= l(:patch_status)
+            %td.col-sm-10= l("patch_status_#{@patch.status}")
+          %tr
+            %th.col-sm-2= l(:patch_notes)
+            %td.col-sm-10= simple_format(@patch.notes)
+          - if @patch.init_command.present?
+            %tr
+              %th.col-sm-2= "manifest_url"
+              %td.col-sm-10= @patch.init_command[:manifest_url]
+            %tr
+              %th.col-sm-2= "manifest_branch"
+              %td.col-sm-10= @patch.init_command[:manifest_branch]
+            %tr
+              %th.col-sm-2= "manifest_xml"
+              %td.col-sm-10= @patch.init_command[:manifest_xml]
+            %tr
+              %th.col-sm-2= "repo_url"
+              %td.col-sm-10= @patch.init_command[:repo_url]
+          - if @patch.patch_type.to_i == 2
+            %tr
+              %th.col-sm-2= l(:patch_proprietary_tag)
+              %td.col-sm-10= @patch.proprietary_tag
+          %tr
+            %th.col-sm-2= l(:patch_object_ids)
+            %td.col-sm-10= @patch.object_names.map{|k,v| v}.join(",")
+          %tr
+            %th.col-sm-2= l(:field_created_on)
+            %td.col-sm-10= format_time @patch.created_at
+          %tr
+            %th.col-sm-2= l(:patch_due_at)
+            %td.col-sm-10= @patch.due_at.try(:strftime, '%F')
+          %tr
+            %th.col-sm-2= l(:patch_actual_due_at)
+            %td.col-sm-10= @patch.actual_due_at.try(:strftime, '%F')
+          %tr
+            %th.col-sm-2= l(:patch_author_id)
+            %td.col-sm-10= link_to_user @patch.author
+          - if @patch.jenkins_url.present?
+            - %w(task1 taskprecompile task2 taskpostcompile task3).each do |key|
+              - if @patch.jenkins_url[key].present?
+                - url = @patch.jenkins_url[key][-1][:url]
+                %tr
+                  %th.col-sm-2= "#{l('patch_jenkins_'+key.to_s)} Jenkins #{l(:field_path)}"
+                  %td.col-sm-10
+                    %a{href: "#{url}", target: "blank"}= url
+
+    = render :partial => 'show', :locals => { :tab => @tab }

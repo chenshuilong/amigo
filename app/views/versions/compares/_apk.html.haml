@@ -1,0 +1,21 @@
+- if @apklists.present? && @category == "terminal" && @type == 'apk'
+  .version-issues
+    .label APK版本比较
+    .wiki
+      - if @apklists.size > 15
+        = data_table_for 'compareApklists',
+          dom: '<"data-table-top"f>rt<"data-table-bottom"pil><"clear">',
+          lengthMenu: [[-1, 10, 25, 50, 100], ["#{l(:label_all)}", 10, 25, 50, 100]]
+      = fields_table :class => 'list data-table', :id => 'compareApklists' do |t|
+        - t.title '#'
+        - t.title 'APK'
+        - t.title link_to @va.fullname, version_path(@va.id)
+        - t.title link_to @vb.fullname, version_path(@vb.id)
+        - @apklists.each_with_index do |apk, i|
+          - t.row do
+            - t.data i+1
+            - t.data apk[:apk_name]
+            - t.data apk[:list][@va.id.to_s].present? ? apk[:list][@va.id.to_s][:apk_interior_version] : '-'
+            - t.data apk[:list][@vb.id.to_s].present? ? apk[:list][@vb.id.to_s][:apk_interior_version] : '-'
+- else
+  %p.nodata= l(:label_no_data)

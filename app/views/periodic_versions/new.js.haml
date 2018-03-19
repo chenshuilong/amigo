@@ -1,0 +1,9 @@
+:plain
+  var replacement = $('#{j render :partial => 'version_form'}');
+  $('#versionForm input, #versionForm textarea, #versionForm select').each(function(){
+    var object_id = $(this).attr('id');
+    if (object_id && $(this).data('valuebeforeupdate')!=$(this).val()) {
+      replacement.find('#'+object_id).val($(this).val());
+    }
+  });
+  $('#versionForm').empty().prepend(replacement);

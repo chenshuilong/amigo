@@ -1,0 +1,54 @@
+- provide :nav, "5,1"
+- provide :css, "bootstrap"
+
+%span.h2= l("label_repo_request_#{RepoRequest::REPO_REQUEST_CATEGORY.index(@repo_request.category).to_s}".to_sym)
+
+.clearfix
+  - if !@repo_request.new_record? && @repo_request.category == 1
+    .issue-details#update
+      .attributes
+        %table.table.table-borderless
+          %tbody
+            %tr
+              %th.col-sm-2.text-right= l(:repo_request_server_ip)
+              %td.col-sm-10= load_value(@repo_request, :server_ip)
+            %tr
+              %th.col-sm-2.text-right= @repo_request.category == 1 ? l(:field_project) : l(:version_release_production)
+              %td.col-sm-10= @repo_request.project.name
+            %tr
+              %th.col-sm-2.text-right= l(:repo_request_version_id)
+              %td.col-sm-10= @repo_request.try(:version).try(:name)
+            %tr
+              %th.col-sm-2.text-right= l(:repo_request_version_id)+l(:version_repo_one_of_project)
+              %td.col-sm-10= @repo_request.try(:version).try(:repo_one)
+            %tr
+              %th.col-sm-2.text-right= l(:repo_request_android_repo)
+              %td.col-sm-10= load_value(@repo_request, :android_repo)
+            %tr
+              %th.col-sm-2.text-right= l(:repo_request_package_repo)
+              %td.col-sm-10= load_value(@repo_request, :package_repo)
+            %tr
+              %th.col-sm-2.text-right= l(:repo_request_use)
+              %td.col-sm-10= load_value(@repo_request, :use)
+        - if @notes.present?
+          .allchange
+            %ul.nav.nav-tabs
+              - if @notes.present?
+                %li.active
+                  %a{"data-toggle" => "tab", :href => "#notes"}= l(:field_notes)
+            .tab-content
+              #notes.tab-pane.in.active
+                .history-details
+                  .journal
+                    - @notes.each_with_index do |r, idx|
+                      #note
+                        .note-title
+                          = authoring_at r.created_at, r.user, {:label => :label_updated_time_at}
+                        %ul.details
+                          - repo_request_details(r.details.where(prop_key: "notes")).each do |string|
+                            = string
+
+= labelled_form_for :repo_request, @repo_request do |f|
+  = render :partial => 'repo_requests/form', :locals => { :f => f }
+  .text-center
+    = submit_tag l(:button_save), class: "btn btn-primary"

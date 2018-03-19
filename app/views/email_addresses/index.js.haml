@@ -1,0 +1,15 @@
+:plain
+  $('#ajax-modal').html('#{escape_javascript(render :partial => 'email_addresses/index')}');
+  if(!~~$(".layui-layer-wrap").length){
+    layer.open({
+      type: 1,
+      title: '#{escape_javascript l(:label_email_address_plural)}',
+      area: ['600px', '400px'],
+      zIndex: 666,
+      moveType: 1,
+      shadeClose: false,
+      content: $('#ajax-modal'),
+      end: function(){ $('#ajax-modal').removeClass("layui-layer-wrap") }
+    })
+  }
+  $('#email_address_address').focus();

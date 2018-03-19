@@ -1,0 +1,35 @@
+- provide :nav, (@page.project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+= wiki_page_breadcrumb(@page)
+= title [@page.pretty_title, project_wiki_page_path(@page.project, @page.title, :version => nil)], l(:label_history)
+= form_tag({:controller => 'wiki', :action => 'diff', |
+  :project_id => @page.project, :id => @page.title},  |
+  :method => :get) do                                 |
+  %table.list.wiki-page-versions
+    %thead
+      %tr
+        %th #
+        %th
+        %th
+        %th= l(:field_updated_on)
+        %th= l(:field_author)
+        %th= l(:field_comments)
+        %th
+    %tbody
+      - show_diff = @versions.size > 1
+      - line_num = 1
+      - @versions.each do |ver|
+        %tr{:class => "wiki-page-version #{cycle("odd", "even")}"}
+          %td.id= link_to ver.version, :action => 'show', :id => @page.title, :project_id => @page.project, :version => ver.version
+          %td.checkbox= radio_button_tag('version', ver.version, (line_num==1), :id => "cb-#{line_num}", :onclick => "$('#cbto-#{line_num+1}').prop('checked', true);") if show_diff && (line_num < @versions.size)
+          %td.checkbox= radio_button_tag('version_from', ver.version, (line_num==2), :id => "cbto-#{line_num}") if show_diff && (line_num > 1)
+          %td.updated_on= format_time(ver.updated_on)
+          %td.author= link_to_user ver.author
+          %td.comments= ver.comments
+          %td.buttons
+            = link_to l(:button_annotate), :action => 'annotate', :id => @page.title, :version => ver.version
+            = delete_link wiki_page_path(@page, :version => ver.version) if User.current.allowed_to?(:delete_wiki_pages, @page.project) && @version_count > 1
+        - line_num += 1
+  = submit_tag l(:label_view_diff), :class => 'small' if show_diff
+  %span.pagination= pagination_links_full @version_pages, @version_count

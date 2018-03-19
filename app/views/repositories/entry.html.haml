@@ -1,0 +1,13 @@
+= call_hook(:view_repositories_show_contextual, { :repository => @repository, :project => @project })
+.contextual
+  = render :partial => 'navigation'
+%h2= render :partial => 'breadcrumbs', :locals => { :path => @path, :kind => 'file', :revision => @rev }
+= render :partial => 'link_to_functions'
+- if Redmine::MimeType.is_type?('image', @path)
+  = render :partial => 'common/image', :locals => {:path => url_for(params.merge(:action => 'raw')), :alt => @path}
+- elsif @content
+  = render :partial => 'common/file', :locals => {:filename => @path, :content => @content}
+- else
+  = render :partial => 'common/other'
+- content_for :header_tags do
+  = stylesheet_link_tag "scm"

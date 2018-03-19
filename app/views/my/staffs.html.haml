@@ -1,0 +1,217 @@
+- provide :nav, "1, 5"
+- provide :css, "bootstrap"
+
+- content_for :header_tags do
+  %link{:href => "/amg/jqwidgets/styles/jqx.base.css", :rel => "stylesheet"}
+  %link{:href => "/amg/easytree/skin-win8/ui.easytree.css", :rel => "stylesheet"}
+  %script{:src => "/amg/easytree/jquery.easytree.js", :type => "text/javascript"}
+  %script{:src => "/amg/jqwidgets/jqxcore.js", :type => "text/javascript"}
+  %script{:src => "/amg/jqwidgets/jqxdata.js", :type => "text/javascript"}
+  %script{:src => "/amg/jqwidgets/jqxbuttons.js", :type => "text/javascript"}
+  %script{:src => "/amg/jqwidgets/jqxscrollbar.js", :type => "text/javascript"}
+  %script{:src => "/amg/jqwidgets/jqxpanel.js", :type => "text/javascript"}
+  %script{:src => "/amg/jqwidgets/jqxtree.js", :type => "text/javascript"}
+  %script{:src => "/amg/jqwidgets/jqxexpander.js", :type => "text/javascript"}
+  %script{:src => "/amg/jqwidgets/jqxcheckbox.js", :type => "text/javascript"}
+
+.row.seamless
+  #companies.col-md-3
+    .gionee-logo
+      %img{":src" => "logo_url"}
+    %select{"v-model" => "all_companies.selected", "@change" => 'initTree', :class => 'form-control'}
+      %option{":value" => "option.value", "v-for" => "option in all_companies.options"} {{ option.text }}
+    #companiesTree
+
+  #staffs.col-md-9
+    .row
+      .col-md-2
+        .h2= l(:text_find_collegue)
+      .col-md-10.text-right
+        - if policy(:my).export?
+          %a#exportExcel.btn.btn-primary.btn-sm{:href => "#{void_js}"}
+            %i.fa.fa-file-excel-o
+              = l(:permission_export_my_staffs)
+    .name_search
+      %form{"@submit.prevent" => "changeName"}
+        .input-group.input-group-sm
+          %input.form-control{:placeholder => "支持汉字和拼音搜索", ":value" => "params.name"}
+          %span.input-group-btn
+            %button.btn.btn-default
+              %i.fa.fa-search
+    .row{"v-if" => "!!selected"}
+      .col-md-4
+        #staffLists{"@scroll" => "handleScroll"}
+          %ul
+            %li{"v-for" => "(user, index) in users", "v-if" => "users.length>0", "@click" => 'changeSelected(index)', ":class" => "{'active' : (user == selected)}"}
+              .user-picture.pull-left
+                %img{":src" => "user.picture"}
+              .user-brief
+                %span.user-name {{user.name}}
+                %span.user-job_name {{user.job_name}}
+              .clear-fix
+      .col-md-8
+        #staffInfo
+          .user-avatar
+            %img{":src" => "selected.avatar"}
+          .user-details
+            %ul.fa-ul
+              - {name: '', dept: 'fa-bookmark-o', job_name: 'fa-user-circle-o', number: 'fa-id-badge', mail: 'fa-envelope-o', mobile: 'fa-mobile', phone: 'fa-phone'}.each do |info, klass|
+                %li{"v-if" => "selected.#{info}"}
+                  %i.fa.fa-li{:class => klass}
+                  %span {{selected.#{info}}}
+    .row{"v-else" => ""}
+      #staffNoContents
+        .no-data= l(:label_no_data)
+
+    #exportTree{:style => "display: none;visibility: hidden; margin: 20px;"}
+
+
+:javascript
+  var companies = new Vue({
+    el: '#companies',
+    data: {
+      all_companies: {
+        selected: '10100000',
+        options: [
+          {text: '深圳市金立通信设备有限公司', value: '10100000'},
+          {text: '金立总部', value: '10100001' },
+          {text: '金铭电子', value: '20100000' },
+          {text: '金尚包装', value: '20100111' },
+          {text: '金卓通信', value: '30100000' },
+          {text: '海外事业', value: '88100000' }
+        ]
+      },
+      logo_url: "#{image_path('gionee_logo.png')}",
+      tree_data: null
+    },
+    mounted: function(){
+      this.initTree();
+    },
+    methods: {
+      initTree: function() {
+        var _this = this;
+        $.getJSON("/api/depts_tree?id=" + this.all_companies.selected).done(function(data) {
+          _this.tree_data = data
+        })
+      }
+    },
+    watch: {
+      'all_companies.selected': function(new_seleted) {
+        staffs.$data.params.dept_id = new_seleted;
+      },
+      tree_data: function (new_tree_data) {
+        var _this = this;
+        $('#companiesTree').easytree({
+          data: new_tree_data,
+          showMore: false,
+          disableIcons: true,
+          stateChanged: function(nodes, nodesJson){
+            var actived_dept = _this.$el.querySelector('.easytree-active');
+            if(!!actived_dept){ staffs.$data.params.dept_id = actived_dept.id; }
+          },
+          openLazyNode: function(event, nodes, node, hasChildren) {
+            if(hasChildren) { return false; }
+            node.lazyUrl = '/api/depts_tree?id=' + node.id;
+          }
+        });
+      }
+    }
+  })
+
+  var staffs = new Vue({
+    el: '#staffs',
+    data: {
+      users: [],
+      selected: null,
+      ajaxing: false,
+      params: {
+        page: 1,
+        dept_id: null,
+        name: null
+      }
+    },
+    methods: {
+      changeSelected: function(index){
+        this.selected = this.users[index];
+      },
+      changeName: function(e){
+        this.params.name = $(e.target).find('input').val()
+      },
+      loadUsers: function(is_add){
+        var _this = this, data = {}
+        if(!!this.params.page) {data.page = this.params.page}
+        if(!!this.params.name) {data.name = this.params.name}
+        if(!!this.params.dept_id) {data.dept_id = this.params.dept_id}
+
+        _this.ajaxing = true;
+        $.getJSON("/api/dept_users?" + $.param(data)).done(function(result){
+          _this.ajaxing = false;
+          if(is_add){
+            _this.users = _this.users.concat(result)
+          } else {
+            _this.users = result;
+            _this.selected = result[0];
+          }
+        })
+      },
+      handleScroll: function(e){
+        if(this.ajaxing) {return;}
+        var ele = e.target;
+        if (ele.scrollTop + $(ele).height() + 10 > ele.scrollHeight - 10) {
+          this.params.page += 1;
+        }
+      }
+    },
+    watch: {
+      'params.page':    function(){ this.loadUsers(true)  },
+      'params.name':    function(){ this.loadUsers(false) },
+      'params.dept_id': function(){
+        var $container = this.$el.querySelector('#staffLists')
+        if($container){ $container.scrollTop = 0; }
+        this.ajaxing = false;
+        this.params.page = 1;
+        this.params.name = null;
+        this.loadUsers(false)
+      }
+    }
+  })
+
+  var source = {
+                    datatype: "json",
+                    datafields: [
+                        { name: 'id' },
+                        { name: 'orgNo' },
+                        { name: 'orgNm' },
+                        { name: 'parentNo' }
+                    ],
+                    id: 'id',
+                    localdata: #{raw_json(@depts)}
+                };
+  var dataAdapter = new $.jqx.dataAdapter(source);
+  dataAdapter.dataBind();
+  var records = dataAdapter.getRecordsHierarchy('orgNo', 'parentNo', 'items', [{ name: 'orgNm', map: 'label'}]);
+  $('#exportTree').jqxTree({ source: records, width: '450px', height: '600px', checkboxes: true, hasThreeStates: true, toggleMode: 'click' });
+  $('#exportExcel').on('click', function() {
+    $('#exportTree').css('visibility', 'visible');
+    // $('#exportTree').jqxTree('expandAll');
+
+    openLayer("请选择部门", 680, $('#exportTree'), function() {
+      var items = $('#exportTree').jqxTree('getCheckedItems');
+      var ids = []
+      $.each(items, function(idx, item) {
+        ids.push(item.id)
+      })
+      if (ids.length > 0) {
+        remote("/my/export_staffs", "POST", {ids: ids}, function(res){
+          $("body").animate({"scrollTop": "0px"}, 500, function(){
+            var $export_icon = $('.nav-downlaod i.fa')
+            $export_icon.attr('data-badge', ~~$export_icon.attr('data-badge') + 1)
+            layer.tips('导出任务已添加！', $export_icon, {tips: [4, '#3F3F3F']});
+          });
+        })
+      } else {
+        layer.alter("请勾选需要导出的部门");
+      }
+    })
+  })
+

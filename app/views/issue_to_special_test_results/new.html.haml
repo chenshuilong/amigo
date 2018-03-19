@@ -1,0 +1,10 @@
+- provide :nav, "2,1"
+- provide :css, "bootstrap"
+
+%span.h2= l(:label_issue_to_special_test_result)
+
+.issue-details#update
+  = render :partial => 'show'
+
+= labelled_form_for @result, :url => project_issue_to_special_test_results_path(project_id: @project, special_test_id: @special_test.id), :html => {:multipart => true} do |f|
+  = render :partial => 'form', :locals => {:f => f}

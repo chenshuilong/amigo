@@ -1,0 +1,50 @@
+%div{:style => "width:100%;"}
+  %ul.notification-list
+    %li.notification-list-item
+      .notification-content
+        %p
+          %strong= "查询条件"
+      .clearfix
+      .notification-acton.select2-rectify
+        %form#formLeaveAmountGroupByOwnerAndRom.form-inline{:role => "form"}
+          .form-group
+            .input-group
+              .input-group-addon 项目
+              = hidden_field_tag "project","project_id"
+              %select#project_value.form-control{:name => "project_value"}
+                = project_tree_options_for_select(Project.all)
+          -#= select_tag "project_value", project_tree_options_for_select(Project.all)
+          .form-group
+            .input-group
+              .input-group-addon 时间
+              %input#start_dt_owner_and_rom.form-control{:name => "start_dt",:value => "2016-09-01"}
+          .form-group
+            .input-group
+              .input-group-addon 至
+              %input#end_dt_owner_and_rom.form-control{:name => "end_dt",:value => "#{Time.now.strftime('%Y-%m-%d')}"}
+          .form-group
+            = hidden_field_tag "created_time_yn","2"
+            = hidden_field_tag "dwm_yn","1"
+            %input{:id => "dwm_yn",:type => "checkbox",:style => "display:none",:checked => true}
+            %input{:type => "button",:onclick => "queryLeaveAmountGroupByOwnerAndRom('leave_amount_group_by_owner_and_rom')",:class => "btn btn-primary",:value => "查询"}
+
+#chartLeaveAmountGroupByOwnerAndRom{:style => "height:680px"}
+
+:javascript
+  initSelect("project_value");
+  initDateTimePicker("start_dt_owner_and_rom","Y-m-d",false);
+  initDateTimePicker("end_dt_owner_and_rom","Y-m-d",false);
+
+  $('#project_value,#start_dt_owner_and_rom,#end_dt_owner_and_rom').on("change", function (e) {
+    //queryLeaveAmountRankByDept('leave_amount_rank_by_dept');
+  });
+
+  setTimeout(function () {
+        $('.notification-acton').css("display","block");
+        //queryLeaveAmountGroupByOwnerAndRom('leave_amount_group_by_owner_and_rom');
+    }, 500);
+
+:css
+  .select2-selection--single{
+    width: 200px;
+  }

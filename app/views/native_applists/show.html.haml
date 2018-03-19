@@ -1,0 +1,27 @@
+- provide :nav, "2,4"
+- provide :css, "bootstrap"
+
+- content_for :bread do
+  %li= link_to l(:label_native_applist), native_applists_path
+  %li= l(:native_applist_show)
+
+.h2= l(:native_applist_show)
+
+.clearfix
+.issue-details
+  .attributes
+    = issue_fields_rows do |rows|
+      - rows.left l(:apk_base_name), load_value(@app, :name)
+      - rows.left l(:apk_base_cn_name), load_value(@app, :cn_name)
+      - rows.left l(:apk_base_desktop_name), load_value(@app, :desktop_name)
+      - rows.left l(:apk_base_developer), load_value(@app, :developer)
+      - rows.left l(:apk_base_cn_description), simple_format(@app.cn_description)
+      - rows.left l(:apk_base_package_name), load_value(@app, :package_name)
+      - rows.left l(:apk_base_category_id), load_value(@app.apk_base_category, :name)
+      - rows.left l(:apk_base_removable), load_value(@app, :removable)
+      - rows.left l(:apk_base_app_category), load_value(@app, :app_category)
+      - rows.left l(:apk_base_android_platform), load_value(@app, :android_platform)
+      - rows.left l(:plan_author_id), link_to_user(@app.author)
+      - rows.left l(:plan_created_at), format_time(@app.created_at)
+  .clearfix
+

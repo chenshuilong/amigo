@@ -1,0 +1,46 @@
+- provide :nav, "2,4"
+- provide :css, "bootstrap"
+
+- content_for :bread do
+  %li= link_to l(:label_version_publish), version_publishes_path
+  %li= l(:label_version_permission)
+
+- if policy(:version_permission).change?
+  .top-action-menu.pull-right
+    %a{:href => "/version_permissions/change", "data-remote" => true, "data-method" => "post", :rel => "nofollow", class:"btn btn-sm btn-primary"}
+      = l(:label_new)
+.h2= l(:label_version_permission)
+
+#roadmap#version-permissions-index
+%br
+- if @version_permissions.present?
+  .version-permissions
+    .wiki
+      - if @version_permissions.size > 20
+        = data_table_for 'versionPermissions',
+          dom: '<"data-table-top"f>rt<"data-table-bottom"pil><"clear">',
+          lengthMenu: [[-1, 10, 25, 50, 100], ["#{l(:label_all)}", 10, 25, 50, 100]]
+      = fields_table :class => 'list data-table', :id => 'versionPermissions' do |t|
+        - t.title :numerical_order_all
+        - t.title :version_permission_name
+        - t.title :version_permission_meaning
+        - t.title :option_all if policy(:version_permission).destroy?
+        - @version_permissions.each_with_index do |vp, index|
+          - t.row do
+            - t.data index+1
+            - t.data vp.name
+            - t.data vp.meaning
+            - t.data link_to l(:button_delete), "", remote: true, "data-id" => vp.id, class: "btn btn-danger btn-xs permission" if policy(:version_permission).destroy?
+              
+      %h5= "附加信息"  
+      = fields_table :class => 'list data-table', :id => 'versionPermissionNotes' do |t|
+        - t.title :numerical_order_all
+        - t.title "Note"
+        - t.title "应用卸载及恢复方法说明"
+        - t.title :option_all if policy(:version_permission).change?
+        - @remove_note.each_with_index do |vp, index|
+          - t.row do
+            - t.data index+1
+            - t.data '备注'
+            - t.data simple_format vp.meaning
+            - t.data link_to(l(:button_change), "/version_permissions/change?id=#{vp.id}", remote: true, method:"post", class: "btn btn-primary btn-xs") if policy(:version_permission).change?

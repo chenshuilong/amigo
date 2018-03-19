@@ -1,0 +1,28 @@
+- provide :nav, "4,3"
+- provide :css, "bootstrap"
+
+= title [l(:label_production_members), app_members_path], l(:label_history)
+
+#roadmap
+  .roadmap-table
+    - if @records.blank?
+      %p.nodata= l(:label_no_data)
+    - else
+      .issues-wrapper
+        .issues-body                 
+          %table#issueTable{:class => "list issues table table-striped table-bordered"}
+            %thead
+              %tr
+                %th{width: 100} #
+                %th= '变更内容'
+                %th{width: 160}= '变更时间'
+                %th{width: 160}= '操作者'
+            %tbody
+              - @records.each_with_index do |r, idx|
+                %tr
+                  %td= idx+1
+                  %td= details_text(r)
+                  %td= r.created_at.strftime("%F %T") 
+                  %td= link_to_user r.user
+
+        %span.pagination= pagination_links_full @pages, @count

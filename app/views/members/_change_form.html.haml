@@ -1,0 +1,14 @@
+= form_for(member, {:as => :membership, :remote => true,
+  :url => membership_path(member),
+  :method => :put,
+  :html => { :id => "MemberChangeForm" }} ) do |f|
+  %p
+    - roles.each do |role|
+      %label
+        = check_box_tag('membership[role_ids][]',
+          role.id, member.roles.include?(role),
+          :id => nil,
+          :disabled => !member.role_editable?(role))
+        = role
+      %br/
+  = hidden_field_tag 'membership[role_ids][]', '', :id => nil

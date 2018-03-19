@@ -1,0 +1,280 @@
+= labelled_fields_for :project, @project do |f|
+  - if (["projects"]).include?(controller_name) || (["project"]).include?(action_name)
+    %p
+      = f.select :category, Project::PROJECT_CATEGORY, {:required => true}, :disabled => @project.category_frozen?
+      - unless @project.category_frozen?
+        %small.form-text.text-muted 一旦保存，类别无法修改。
+
+  - if @project.show_by(1,2,3)
+    %p
+      = f.select :android_platform, Project::PROJECT_ANDROID_PLATFORM, {:required => true}, :disabled => @project.android_platform_frozen?
+      - unless @project.android_platform_frozen?
+        %small.form-text.text-muted 一旦保存，平台无法修改。
+
+  - if @project.show_by(4)
+    %p= f.select :production_type, list_for_select(@project, :production_type), {:required => true}, :disabled => @type.present?
+    - if @type
+      = hidden_field_tag "project[production_type]", @type
+
+  - if @project.show_by(4) && (@project.production_type.to_i == 5 || (@type && @type.to_i == 5) || @project.nil? || @type.nil?)
+    %p= f.select :sub_production_type, list_for_select(@project, :sub_production_type), {:required => true}, :disabled => @project.sub_production_type.present?
+
+  %p
+    - if @project.show_by(1,2,3)
+      = label_tag :name, '内部型号<span class="required">*</span>'.html_safe
+      = text_field_tag "project[name]", @project.name, :size => 60
+    - else
+      = label_tag :name, '产品名称<span class="required">*</span>'.html_safe
+      = text_field_tag "project[name]", @project.name, :size => 60
+
+  - if @project.show_by(1,2,3)
+    %p
+      = label_tag :external_name, '外部型号<span class="required">*</span>'.html_safe
+      = text_field_tag "project[external_name]", @project.external_name, :size => 60
+
+  - if @project.show_by(1,2,3)
+    %p
+      = label_tag :cta_name, '入网型号<span class="required">*</span>'.html_safe
+      = text_field_tag "project[cta_name]", @project.cta_name, :size => 60
+
+  - if @project.show_by(1,2,3)
+    %p
+      = label_tag :app_version_type, '软件版本类型<span class="required">*</span>'.html_safe
+      = text_field_tag "project[app_version_type]", @project.app_version_type, :size => 60
+
+  - if @project.show_by(4) && (@project.production_type.in?([1, 4, 6]) || (@type && @type.to_i.in?([1, 4, 6])) || @project.nil? || @type.nil?)
+    %p
+      = label_tag :cn_name, '应用中文名<span class="required">*</span>'.html_safe
+      = text_field_tag "project[cn_name]", @project.cn_name, :size => 60
+    %p
+      = label_tag :config_info, '配置信息'.html_safe
+      = text_field_tag "project[config_info]", @project.config_info, :size => 60
+
+  - if @project.show_by
+    %p#description_and_toolbar= f.text_area :description, :rows => 5, :class => 'wiki-edit'
+    = wikitoolbar_for 'project_description'
+
+  - if @project.show_by
+    %p
+      = f.text_field :identifier, :required => true, :size => 20, :disabled => @project.identifier_frozen?, :maxlength => Project::IDENTIFIER_MAX_LENGTH
+      - unless @project.identifier_frozen?
+        %small.form-text.text-muted
+          = l(:text_length_between, :min => 5, :max => Project::IDENTIFIER_MAX_LENGTH)
+          - if @project.show_by(4)
+            = l(:text_production_identifier_info).html_safe
+          - else
+            = l(:text_project_identifier_info).html_safe
+          -#= popover(:trigger => "click", :content => identifier_description, :title => l(:field_description)) do
+          -#  = icon 'question-circle'
+
+  - if @project.show_by
+    %p= f.select :ownership, list_for_select(@project, :ownership), {:required => true}
+
+  - if @project.show_by(1,2)
+    %p= f.select :hardware_group, Project::HARDWARE_GROUP.map {|r| [r, r]}
+
+  - if @project.show_by(1,2)
+    %p= f.text_field :rom_version, :size => 20, placeholder: "例如: amigo3.2.0"
+
+  - if @project.show_by(1,2,3)
+    %p
+      = f.select :mokuai_class, options_for_select([["终端", 1]]), {:required => true}, :disabled => User.current.admin? ? false : @project.mokuai_class_frozen?
+      -# f.select :mokuai_class, Mokuai::MOKUAI_CATEGORY.to_a.take(Mokuai.pluck(:category).max), {:required => true}, :disabled => User.current.admin? ? false : @project.mokuai_class_frozen?
+      -# unless @project.mokuai_class_frozen?
+      -#  %small.form-text.text-muted 安卓平台项目选 1 ，运营商项目选 2 。
+      -# else
+      -#  %small.form-text.text-muted 目前无法修改此字段。
+
+  - if @project.show_by(1,2,3)
+    %p= f.select :product_serie, Project::PRODUCTION_SERIE.map {|r| [r, r]}
+
+  - if @project.show_by(1,3)
+    %p
+      = f.text_field :approval_date, :value => nil, multiple: true, :size => 20
+      = load_exist_date(@project, :approval_date)
+      = calendar_for('project_approval_date')
+
+  - if @project.show_by(1)
+    %p
+      = f.text_field :tone_date, :value => nil, multiple: true, :size => 20
+      = load_exist_date(@project, :tone_date)
+      = calendar_for('project_tone_date')
+
+  - if @project.show_by(1)
+    %p
+      = f.text_field :producing_date, :value => nil, multiple: true, :size => 20
+      = load_exist_date(@project, :producing_date)
+      = calendar_for('project_producing_date')
+
+  - if @project.show_by(2)
+    %p
+      = f.text_field :adaptive_date, :value => nil, multiple: true, :size => 20
+      = load_exist_date(@project, :adaptive_date)
+      = calendar_for('project_adaptive_date')
+    %p
+      = f.text_field :full_featured_date, :value => nil, multiple: true, :size => 20
+      = load_exist_date(@project, :full_featured_date)
+      = calendar_for('project_full_featured_date')
+    %p
+      = f.text_field :version_complete_date, :value => nil, multiple: true, :size => 20
+      = load_exist_date(@project, :version_complete_date)
+      = calendar_for('project_version_complete_date')
+    %p
+      = f.text_field :ota_month, :size => 20, :placeholder => "例如：#{Time.now.strftime('%Y年%m月')}"
+
+  - if @project.show_by(3)
+    %p
+      = f.text_field :platform_version_export_date, :value => nil, multiple: true, :size => 20
+      = load_exist_date(@project, :platform_version_export_date)
+      = calendar_for('project_platform_version_export_date')
+    %p
+      = f.text_field :storage_version_export_date, :value => nil, multiple: true, :size => 20
+      = load_exist_date(@project, :storage_version_export_date)
+      = calendar_for('project_storage_version_export_date')
+    %p
+      = f.text_field :storage_test_complete_date, :value => nil, multiple: true, :size => 20
+      = load_exist_date(@project, :storage_test_complete_date)
+      = calendar_for('project_storage_test_complete_date')
+    %p
+      = f.text_field :storage_complete_date, :value => nil, multiple: true, :size => 20
+      = load_exist_date(@project, :storage_complete_date)
+      = calendar_for('project_storage_complete_date')
+
+  - if @project.show_by(Project::CATEGORY_APP)
+    %p= f.text_field :package_name, :size => 20
+    %p
+      = f.select :dev_department, grouped_options_for_select(IssueQuery.new.available_depts, @project.dev_department), :include_blank => true, :size => 20
+      = select2_for "project_dev_department"
+    %p
+      = f.text_field :initiate_date, :value => nil, multiple: true, :size => 20
+      = load_exist_date(@project, :initiate_date)
+      = calendar_for('project_initiate_date')
+    %p
+      = f.text_field :release_date, :value => nil, multiple: true, :size => 20
+      = load_exist_date(@project, :release_date)
+      = calendar_for('project_release_date')
+
+  - if @project.show_by(4) && (@project.production_type.to_i == 5 || (@type && @type.to_i == 5) || @project.nil? || @type.nil?)
+    %p
+      = label_tag :developer, '开发者信息'.html_safe
+      = text_field_tag "project[developer]", @project.developer, :size => 20
+    %p#note_and_toolbar
+      = f.text_area :note, :rows => 5, :class => 'wiki-edit', :value => (@project.note || "- 填写依赖关系或者其他需要注意的地方：")
+      = wikitoolbar_for 'project_note'
+
+  -# %p= f.check_box :is_public
+  - unless @project.allowed_parents.compact.empty?
+    %p
+      = label(:project, :parent_id, l(:field_parent))
+      = parent_project_select_tag(@project)
+      = select2_tag("project_parent_id")
+
+  -#  - if @project.inherit_members
+  -#    - if @project.safe_attribute? 'inherit_members'
+  -#      %p
+  -#        = f.check_box :inherit_members
+  -#  - else
+  -#    %p
+  -#      = label(:project, :copy_project_id, l(:label_copy_project_members))
+  -#      = select_tag "project[copy_project_id]", options_for_select(Project.default.map{|v| [v.name,v.id]}.unshift(['--- 请选择 ---', ''])), { class: 'form-control', style: 'width:100%'}
+  -#      = select2_tag("project_copy_project_id")
+
+  - if @project.safe_attribute?('default_version_id') && (default_version_options = project_default_version_options(@project)).present?
+    %p= f.select :default_version_id, project_default_version_options(@project), :include_blank => true
+
+  - @project.custom_field_values.each do |value|
+    %p= custom_field_tag_with_label :project, value
+
+  - if @project.new_record? || @project.module_enabled?('issue_tracking')
+    - unless @trackers.empty?
+      %p
+        = label_tag :tracker, l(:label_tracker_plural)
+        - @trackers.each do |tracker|
+          = check_box_tag 'project[tracker_ids][]', tracker.id, @project.trackers.to_a.include?(tracker), :id => nil
+          = tracker
+        = hidden_field_tag 'project[tracker_ids][]', ''
+
+  = call_hook(:view_projects_form, :project => @project, :form => f)
+
+
+-# - if @project.new_record?
+-#   %fieldset.box.tabular
+-#     %legend= l(:label_module_plural)
+-#     - Redmine::AccessControl.available_project_modules.each do |m|
+-#       %label.floating
+-#         = check_box_tag 'project[enabled_module_names][]', m, @project.module_enabled?(m), :id => "project_enabled_module_names_#{m}"
+-#         = l_or_humanize(m, :prefix => "project_module_")
+-#     = hidden_field_tag 'project[enabled_module_names][]', ''
+
+
+-# - unless @issue_custom_fields.empty?
+-#   %fieldset#project_issue_custom_fields.box.tabular
+-#     %legend= l(:label_custom_field_plural)
+-#     - @issue_custom_fields.each do |custom_field|
+-#       %label.floating
+-#         = check_box_tag 'project[issue_custom_field_ids][]', custom_field.id, (@project.all_issue_custom_fields.include? custom_field), |
+-#           :disabled => (custom_field.is_for_all? ? "disabled" : nil),                                                                   |
+-#           :id => nil                                                                                                                    |
+-#         = custom_field_name_tag(custom_field)
+-#     = hidden_field_tag 'project[issue_custom_field_ids][]', ''
+
+
+- if !User.current.admin? && @project.inherit_members? && @project.parent && User.current.member_of?(@project.parent)
+  = javascript_tag do
+    $(document).ready(function() {
+    $("#project_inherit_members").change(function(){
+    if (!$(this).is(':checked')) {
+    if (!confirm("#{escape_javascript(l(:text_own_membership_delete_confirmation))}")) {
+    $("#project_inherit_members").attr("checked", true);
+    }
+    }
+    });
+    });
+
+= javascript_tag do
+  $(document).ready(function() {
+  $('#project_production_type').val(#{@type});
+  $('#project_enabled_module_names_issue_tracking').on('change', function(){
+  if ($(this).prop('checked')){
+  $('#project_trackers, #project_issue_custom_fields').show();
+  } else {
+  $('#project_trackers, #project_issue_custom_fields').hide();
+  }
+  }).trigger('change');
+
+  hideOrShow($('#project_production_type').val());
+  $('#project_production_type').on('change', function(){
+  hideOrShow($(this).val());
+  })
+
+  function hideOrShow(production_type){
+  var project_cn_name_p = $('#project_cn_name').parent();
+  var project_config_info_p = $('#project_config_info').parent();
+  var project_jar_type_p = $('#project_sub_production_type').parent();
+  var project_developer_p = $('#project_developer').parent();
+  var project_note_p = $('#note_and_toolbar');
+  if([1, 3, 4].indexOf(parseInt(production_type)) > -1){
+  project_cn_name_p.show();
+  project_jar_type_p.hide();
+  project_developer_p.hide();
+  project_note_p.hide();
+  if(parseInt(production_type)==4){
+  project_config_info_p.show();
+  }else{
+  project_config_info_p.hide();
+  }
+  }else{
+  project_cn_name_p.hide();
+  project_config_info_p.hide();
+  if(parseInt(production_type)==5){
+  project_jar_type_p.show();
+  project_developer_p.show();
+  project_note_p.show();
+  }else{
+  project_jar_type_p.hide();
+  project_developer_p.hide();
+  project_note_p.hide();
+  }
+  }
+  }
+  });

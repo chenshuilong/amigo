@@ -1,0 +1,19 @@
+%p= "#{@user.dept.try(:orgNm)} #{@user.name} 申请对 BUG##{@issue.id} 进行裁决，请及时处理！"
+%table
+  %tr
+    %td{:style => 'width: 100px;'}
+      %table.button.small
+        %tr
+          %td
+            %table
+              %tr
+                %td= link_to '立即处理', @issue
+    %td
+      %table.button.small
+        %tr
+          %td
+            %table
+              %tr
+                %td= link_to '查看所有未处理的申请', issues_url(:search => "(#{@recipient.condition_of_all_umpirage_apply}) and issues.status_id = #{IssueStatus::APPY_UMPIRAGE_STATUS}")
+
+%p 提示，编辑BUG之前，需先登录。

@@ -1,0 +1,60 @@
+= error_messages_for 'user'
+#user_form
+  / [form:user]
+  .splitcontentleft
+    %fieldset.box.tabular
+      %legend= l(:label_information_plural)
+      %p
+        = label_tag '员工号'
+        = text_field_tag 'empid', nil, :size => 15
+        = link_to "获取信息", new_user_path, :remote => true, :class => "btn btn-default", :onclick => "this.search='?empid='+$('#empid').val()"
+      %p= f.text_field :login, :required => true, :size => 20
+      %p= f.text_field :firstname, :required => true
+      %p= f.text_field :mail, :required => true
+      - unless @user.force_default_language?
+        %p= f.select :language, lang_options_for_select
+      - if Setting.openid?
+        %p= f.text_field :identity_url
+      - @user.custom_field_values.each do |value|
+        %p= custom_field_tag_with_label :user, value
+      / Dept
+      - if @user.empId.blank?
+        %p
+          = f.select :orgNo, grouped_options_for_select(IssueQuery.new.available_depts(:orgNo), @user.orgNo),  |
+            :include_blank => true, :class => "form-control", :label => :user_contact_department
+          = select2_for "user_orgNo"
+
+      %p= f.check_box :admin, :disabled => (@user == User.current)
+      = call_hook(:view_users_form, :user => @user, :form => f)
+    -# %fieldset.box.tabular
+    -#   %legend= l(:label_authentication)
+    -#   - unless @auth_sources.empty?
+    -#     %p= f.select :auth_source_id, ([[l(:label_internal), ""]] + @auth_sources.collect { |a| [a.name, a.id] }), {}, :onchange => "if (this.value=='') {$('#password_fields').show();} else {$('#password_fields').hide();}"
+    -#   #password_fields{:style => "#{'display:none;' if @user.auth_source}"}
+    -#     %p
+    -#       = f.password_field :password, :required => true, :size => 25
+    -#       %em.info= l(:text_caracters_minimum, :count => Setting.password_min_length)
+    -#     %p= f.password_field :password_confirmation, :required => true, :size => 25
+    -#     %p= f.check_box :generate_password
+    -#     %p= f.check_box :must_change_passwd
+  .splitcontentright
+    %fieldset.box
+      %legend= l(:field_mail_notification)
+      = render :partial => 'users/mail_notifications'
+    %fieldset.box.tabular
+      %legend= l(:label_preferences)
+      = render :partial => 'users/preferences'
+      = call_hook(:view_users_form_preferences, :user => @user, :form => f)
+%div{:style => "clear:left;"}
+/ [eoform:user]
+= javascript_tag do
+  $(document).ready(function(){
+  $('#user_generate_password').change(function(){
+  var passwd = $('#user_password, #user_password_confirmation');
+  if ($(this).is(':checked')){
+  passwd.val('').attr('disabled', true);
+  }else{
+  passwd.removeAttr('disabled');
+  }
+  }).trigger('change');
+  });

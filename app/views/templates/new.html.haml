@@ -1,0 +1,5 @@
+= title [l(("template_role_type_"+@type).to_sym), templates_path], l(:label_new) + l(("template_role_type_"+@type).to_sym)
+= labelled_form_for :template, @temp, :url => templates_path do |f|
+  = f.hidden_field :role_type
+  = render :partial => 'form', :locals => {:f => f}
+  = submit_tag l(:button_create)

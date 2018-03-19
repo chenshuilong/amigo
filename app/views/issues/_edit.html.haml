@@ -1,0 +1,48 @@
+= labelled_form_for @issue, :html => {:id => 'issue-form', :multipart => true, :class => "issue-update-form"} do |f|
+  = error_messages_for 'issue', 'time_entry'
+  = render :partial => 'conflict' if @conflict
+  .box
+    - if @issue.attributes_editable?
+      .label.label-line= l(:label_change_properties)
+      #all_attributes
+        = render :partial => 'form', :locals => {:f => f}
+
+    -# - if User.current.allowed_to?(:log_time, @project)
+    -#   .label= l(:button_log_time)
+    -#   = labelled_fields_for :time_entry, @time_entry do |time_entry|
+    -#     .form-inline
+    -#       = time_entry.text_field :hours, :size => 6, :label => :label_spent_time
+    -#       = l(:field_hours)
+    -#       = time_entry.select :activity_id, activity_collection_for_select_options
+    -#       = time_entry.text_field :comments, :size => 60
+    -#       - @time_entry.custom_field_values.each do |value|
+    -#         = custom_field_tag_with_label :time_entry, value
+
+    - if @issue.notes_addable?
+      .add-notes
+        .label= l(:label_add_note)
+        .note_and_toolbar
+          = f.text_area :notes, :cols => 60, :rows => 5, :class => 'wiki-edit', :no_label => true
+          = wikitoolbar_for 'issue_notes'
+          - if @issue.safe_attribute? 'private_notes'
+            = f.check_box :private_notes, :no_label => true
+            %label{:for => "issue_private_notes"}= l(:field_private_notes)
+        = call_hook(:view_issues_edit_notes_bottom, { :issue => @issue, :notes => @notes, :form => f })
+
+      .add-attachment
+        .label= l(:label_add_attachments)
+        #attachments_form
+          = render :partial => 'attachments/form', :locals => {:container => @issue}
+  %hr
+  .button-group.text-center
+    = f.hidden_field :lock_version
+    = hidden_field_tag 'last_journal_id', params[:last_journal_id] || @issue.last_journal_id
+    = submit_tag l(:button_submit), :class => "btn btn-primary"
+    = submit_tag "提交并返回", :class => "btn btn-primary"
+    = link_to l(:button_cancel), session[:return_to], :onclick => ("$('#update').hide(); return false;" if current_page?(action: 'show'))
+
+  \#{hidden_field_tag 'prev_issue_id', @prev_issue_id if @prev_issue_id}
+  \#{hidden_field_tag 'next_issue_id', @next_issue_id if @next_issue_id}
+  \#{hidden_field_tag 'issue_position', @issue_position if @issue_position}
+  \#{hidden_field_tag 'issue_count', @issue_count if @issue_count}
+#preview.wiki

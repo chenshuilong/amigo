@@ -1,0 +1,204 @@
+#planTaskTreeGrid
+
+:javascript
+
+  var tasks = #{raw_json @plan_tasks}
+  var status = #{raw_json @status};
+  var assigned_status = #{raw_json @assigned_status};
+  var spm_status = #{raw_json @spm_status};
+  var checker_status = #{raw_json @checker_status};
+
+  var newRowID = null;
+
+  var grid = $("#planTaskTreeGrid");
+  // prepare the data
+  var source =
+  {
+      dataType: "json",
+      dataFields: [
+          { name: "task_id", type: "number" },
+          { name: "project_name", type: "string" },
+          { name: "plan_name", type: "string" },
+          { name: "task_name", type: "string" },
+          { name: "plan_start_date", type: "date" },
+          { name: "plan_due_date", type: "date" },
+          { name: "status_id", type: "number" },
+          { name: "status_name", type: "string" },
+          { name: "note", type: "string" },
+          { name: "assigned_to_id", type: "number" },
+          { name: "check_user_id", type: "number" },
+          { name: "author_id", type: "number" }
+      ],
+      hierarchy:
+      {
+          keyDataField: { name: 'id' },
+          parentDataField: { name: 'parent_id' }
+      },
+      id: 'task_id',
+      localData: tasks,
+      addRow: function (rowID, rowData, position, parentID, commit) {
+           commit(true);
+           newRowID = rowID;
+       },
+       updateRow: function (rowID, rowData, commit) {
+           commit(true);
+       },
+       deleteRow: function (rowID, commit) {
+           commit(true);
+       }
+  };
+  var dataAdapter = new $.jqx.dataAdapter(source, {
+      loadComplete: function () {
+          // data is loaded.
+      }
+  });
+  grid.jqxTreeGrid(
+  {
+      width: '100%',
+      height: 680,
+      source: dataAdapter,
+      pageable: false,
+      editable: true,
+      altRows: true,
+      columnsResize: true,
+      filterable: true,
+      // theme: 'orange',
+      filterMode: "advanced",
+      localization: getLocalization(),
+      ready: function()
+      {
+          // called when the DatatreeGrid is loaded.
+          grid.jqxTreeGrid('expandAll');
+      },
+      pagerButtonsCount: 8,
+      toolbarHeight: 35,
+      renderToolbar: function(toolBar)
+      {
+          grid.on('rowEndEdit', function (event) {
+              var row = event.args.row;
+
+              if (row.task_id) {
+                var remoteData = {};
+                remoteData.status = row.status_id;
+                remoteData.note = row.note;
+                remote("/tasks/" + row.task_id.toString() + "/edit", "GET", remoteData, function(res) {
+                  layer.msg(res.message.toString());
+                });
+              } else {
+                layer.msg("没有任务可以编辑!");
+                return false;
+              }
+          });
+      },
+      // called when jqxTreeGrid is going to be rendered.
+      rendering: function()
+      {
+          // destroys all buttons.
+          if ($(".editButtons").length > 0) {
+              $(".editButtons").jqxButton('destroy');
+          }
+          if ($(".cancelButtons").length > 0) {
+              $(".cancelButtons").jqxButton('destroy');
+          }
+      },
+      // called when jqxTreeGrid is rendered.
+      rendered: function () {
+          if ($(".editButtons").length > 0) {
+              $(".cancelButtons").jqxButton();
+              $(".editButtons").jqxButton();
+
+              var editClick = function (event) {
+                  var target = $(event.target);
+                  // get button's value.
+                  var value = target.val();
+                  // get clicked row.
+                  var rowKey = event.target.getAttribute('data-row');
+                  if (value == "编辑") {
+                      // begin edit.
+                      grid.jqxTreeGrid('beginRowEdit', rowKey);
+                      target.parent().find('.cancelButtons').show();
+                      target.val("保存");
+                  }
+                  else {
+                      // end edit and save changes.
+                      target.parent().find('.cancelButtons').hide();
+                      target.val("编辑");
+                      grid.jqxTreeGrid('endRowEdit', rowKey, false);
+                  }
+              }
+              $(".editButtons").on('click', function (event) {
+                  editClick(event);
+              });
+
+              $(".cancelButtons").click(function (event) {
+                  // end edit and cancel changes.
+                  var rowKey = event.target.getAttribute('data-row');
+                  grid.jqxTreeGrid('endRowEdit', rowKey, true);
+              });
+          }
+      },
+      columns: [
+        {
+          text: '#{l(:my_task_project_name)}', dataField: "project_name", align: 'center', cellsAlign: 'center',width: '10%', editable: false
+        },
+        {
+          text: '#{l(:my_task_plan_name)}', dataField: "plan_name", align: 'center', cellsAlign: 'center',width: '20%', editable: false
+        },
+        {
+          text: '#{l(:plan_start_date)}', dataField: "plan_start_date", align: 'center', cellsAlign: 'center', width: '15%', cellsFormat: "yyyy-MM-dd", editable: false
+        },
+        {
+          text: '#{l(:plan_due_date)}', dataField: "plan_due_date", align: 'center', cellsAlign: 'center', width: '15%', cellsFormat: "yyyy-MM-dd", editable: false
+        },
+        {
+          text: '#{l(:my_task_status_name)}', dataField: "status_id", align: 'center', cellsAlign: 'center', width: '10%', columnType: "template", cellsRenderer: function (row, column, value) {
+             var status_name = "";
+             $.each(JSON.parse(status).data, function(idx, item) {
+                if(item.id == value)
+                  status_name = item.name.toString();
+             })
+             return status_name;
+          },
+          createEditor: function (row, cellvalue, editor, cellText, width, height) {
+              // construct the editor.
+              var currentRow = grid.jqxTreeGrid('getSelection')[0];
+
+              var statusJson = JSON.parse(status).data;
+              if (currentRow.assigned_to_id.toString() == "#{User.current.id}"){
+                statusJson = JSON.parse(assigned_status).data;
+              }else if (currentRow.check_user_id.toString() == "#{User.current.id}"){
+                statusJson = JSON.parse(checker_status).data;
+              }else if (currentRow.author_id.toString() == "#{User.current.id}"){
+                statusJson = JSON.parse(spm_status).data;
+              }
+
+              editor.jqxComboBox(
+              {
+                  width: '100%',
+                  height: '100%',
+                  source: statusJson,
+                  autoDropDownHeight: true,
+                  selectedIndex: 0,
+                  displayMember: "name",
+                  valueMember: "id"
+              });
+          },
+          initEditor: function (row, cellvalue, editor, celltext, width, height) {
+              // set the editor's current value. The callback is called each time the editor is displayed.
+              editor.jqxComboBox('val', editor.val());
+          },
+          getEditorValue: function (row, cellvalue, editor) {
+              // return the editor's value.
+              return editor.val();
+          }
+        },
+        {
+            text: '#{l(:plan_description)}', dataField: "note", align: 'center', cellsAlign: 'center',width: '20%', editable: true, columntype: 'textbox'
+        },
+        {
+            text: '#{l(:plan_opts)}', cellsAlign: 'center', align: "center", columnType: 'none', editable: false, sortable: false, dataField: null , width: '10%', cellsRenderer: function (row, column, value) {
+                return "<button data-row='" + row + "' class='editButtons'>编辑</button><button style='display: none; margin-left: 5px;' data-row='" + row + "' class='cancelButtons'>取消</button>";
+            }
+        }
+      ]
+  });

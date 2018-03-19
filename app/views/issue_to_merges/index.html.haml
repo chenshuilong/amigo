@@ -1,0 +1,121 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+.h2= l(:label_issue_to_merges)
+
+.clearfix
+
+  #roadmap
+  .roadmap-query{:style => "width:100%;"}
+    %ul.notification-list
+      %li.notification-list-item
+        .notification-menu
+          %i.fa.fa-chevron-up
+        .notification-content
+          %p
+            %strong= "查询条件"
+        .clearfix
+        .notification-acton.select2-rectify{:style => "display:block;"}
+
+  .roadmap-table
+    %table#issueTable.list.table.table-striped.table-bordered
+      %thead
+        %tr
+          = sort_header_tag('id', :caption => "#")
+          = sort_header_tag('issue_id', :caption => l(:issue_to_merge_issue_id))
+          %th= l(:issue_to_merge_master_version_id)
+          %th= l(:issue_to_merge_branch_version_ids)
+          %th= l(:issue_to_merge_commit_id)
+          %th= l(:issue_to_merge_related_issue_ids)
+          %th= l(:issue_to_merge_related_apks)
+          %th= l(:issue_to_merge_finish_dt)
+          %th= l(:issue_to_merge_branch_merge_result)
+          %th= l(:option_all)
+      %tbody
+        - @issues.each do |issue|
+          %tr{"data-id"=> "tr_#{issue.id}"}
+            %td= issue.id
+            %td
+              = popover(:trigger => "click", :content => issue.issue.subject,:title => "问题##{issue.issue.id}主题", :placement => 'bottom') do
+                = link_to_issue(issue.issue, :subject => false, :tracker => true)
+            %td= issue.master_version_id
+            %td= issue.branch_version_ids
+            %td
+              = popover(:trigger => "click", :content => issue.commit_id,:title => "详细信息", :placement => 'bottom') do
+                = issue.commit_id.to_s[0,10]
+            %td= issue.related_issue_ids
+            %td= issue.related_apks
+            %td= "" # issue.finish_dt
+            %td= repo_request_merge_details(issue)
+            %td
+              %a.editIssueBtn{"data-id"=> "#{issue.id}"}
+                %i.fa.fa-edit
+  %span.pagination= pagination_links_full @issue_pages, @issue_count
+
+.editIssue{:style => "display:none;width:540px;padding:20px;"}
+  = form_tag({}, :id => "sendTaskForm", :remote => true, :class => "form-horizontal") do
+    .form-group
+      = label_tag :need_merge, l(:issue_to_merge_need_merge), class: 'control-label col-sm-3'
+      .col-xs-9
+        %label.radio-inline
+          %input#need_merge_yes{:name => "issues[need_merge]", :type => "radio", :value => "1", :checked => "checked"} 需要合入流
+        %label.radio-inline
+          %input#need_merge_no{:name => "issues[need_merge]", :type => "radio", :value => "0"} 不需要合入流
+    .form-group
+      = label_tag :liu, l(:issue_to_merge_liu), class: 'control-label col-sm-3'
+      .col-xs-9
+        %table.table{:style => "border-right: 1px solid transparent !important;"}
+          - @repos.each do |repo|
+            %tr
+              %td
+                = check_box_tag "repos[repo_#{repo.id}]".to_sym, nil, false, class: 'repos'
+                = load_value(repo, :branch)
+              %td= load_value(repo, :use)
+    .form-group
+      = label_tag :related_issue_ids, l(:issue_to_merge_related_issue_ids), class: 'control-label col-sm-3'
+      .col-xs-9
+        = text_field_tag "issues[related_issue_ids]", "", class: 'form-control'
+    .form-group
+      = label_tag :related_apks, l(:issue_to_merge_related_apks), class: 'control-label col-sm-3'
+      .col-xs-9
+        = text_field_tag "issues[related_apks]", "", { style: 'width:100%;', class: 'form-control'}
+    .form-group
+      = label_tag :tester_advice, l(:issue_to_merge_tester_advice), class: 'control-label col-sm-3'
+      .col-xs-9
+        = text_field_tag "issues[tester_advice]", "", { style: 'width:100%;', class: 'form-control'}
+    .form-group
+      = label_tag :notes, '状态', class: 'control-label col-sm-3'
+      .col-xs-9
+        = select_tag "issues[status_id]", options_for_select(@status.map{|v| [v[:name],v[:id]]}), { class: 'form-control', style: 'width:100%'}
+        = select2_tag("issues_status_id")
+        = hidden_field_tag "issues[id]"
+    .form-group
+      = label_tag :dept_result, l(:issue_to_merge_dept_result), class: 'control-label col-sm-3'
+      .col-xs-9
+        = text_field_tag "issues[dept_result]", "", { style: 'width:100%;', class: 'form-control'}
+    .form-group
+      = label_tag :project_result, l(:issue_to_merge_project_result), class: 'control-label col-sm-3'
+      .col-xs-9
+        = text_field_tag "issues[project_result]", "", { style: 'width:100%;', class: 'form-control'}
+
+:javascript
+  $('.editIssueBtn').showToolTip("编辑");
+  $('.editIssueBtn').click(function() {
+    var row = $("tr[data-id='tr_" + $(this).attr("data-id") + "']").children().eq(1).end();
+    $('#issues_notes').val(row.eq(7).text())
+    openLayer("编辑评审合入", '580px', $(".editIssue"),function() {
+      var form = $('#editIssueForm');
+      var actionPath = "/projects/#{@project.identifier}/issue_to_approve_merges/" + row.eq(0).text() + "/edit";
+      form.attr("method", "get").attr("action", actionPath).submit();
+      refreshPage();
+    })
+  })
+
+  $('#issues_related_issue_ids').onlyNum();
+  $('#check_all').on('click',function() {
+    if($(this).is(':checked')){
+      $("[class = liu]:checkbox").attr("checked", true);
+    }else{
+      $("[class = liu]:checkbox").attr("checked", false);
+    }
+  })

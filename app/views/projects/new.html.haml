@@ -1,0 +1,16 @@
+- provide :nav, "2,1"
+- provide :css, "bootstrap"
+
+= title l(:label_project_new)
+= labelled_form_for @project, :html => {:class => "form-wrapper"} do |f|
+  = error_messages_for 'project'
+  .box.tabular
+    #all_attributes
+      = render :partial => 'form'
+  .button-group.text-center
+    = submit_tag l(:button_create), class: "btn btn-primary"
+    = submit_tag l(:button_create_and_continue), :name => 'continue', class: "btn btn-primary"
+
+- unless @project.identifier_frozen?
+  - content_for :header_tags do
+    = javascript_include_tag 'project_identifier'

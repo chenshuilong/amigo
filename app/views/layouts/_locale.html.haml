@@ -1,0 +1,9 @@
+:javascript
+  (function($){
+
+    $.datetimepicker.setLocale("#{I18n.locale.to_s}");
+    $.emojiarea.path = '/images/emoji/#{User.current.emoji_font}/';
+
+  })(jQuery)
+
+

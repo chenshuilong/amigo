@@ -1,0 +1,25 @@
+%table.cal
+  %thead
+    %tr
+      %th.week-number{:scope => "col", :title => "#{l(:label_week)}"}
+      - 7.times do |i|
+        %th{:scope => "col"}= day_name( (calendar.first_wday+i)%7 )
+  %tbody
+    %tr
+      - day = calendar.startdt
+      - while day <= calendar.enddt
+        = ("<td class='week-number' title='#{ l(:label_week) }'>#{(day+(11-day.cwday)%7).cweek}</td>".html_safe) if day.cwday == calendar.first_wday
+        %td{:class => "#{day.month==calendar.month ? 'even' : 'odd'}#{' today' if User.current.today == day}"}
+          %p.day-num= day.day
+          -# - calendar.events_on(day).each do |i|
+          -#   - if i.is_a? Issue
+          -#     %div{:class => "#{i.css_classes} #{'starting' if day == i.start_date} #{'ending' if day == i.due_date} tooltip"}
+          -#       = "#{i.project} -" unless @project && @project == i.project
+          -#       = link_to_issue i, :truncate => 30
+          -#       %span.tip= render_issue_tooltip i
+          -#   - else
+          -#     %span.icon.icon-package
+          -#       = "#{i.project} -" unless @project && @project == i.project
+          -#       = link_to_version i
+          = '</tr><tr>'.html_safe if day.cwday==calendar.last_wday and day!=calendar.enddt
+          - day = day + 1

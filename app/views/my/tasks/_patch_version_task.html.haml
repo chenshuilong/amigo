@@ -1,0 +1,114 @@
+#patchVersionLibrary
+
+:css
+  .unread{
+    font-weight: 700;
+    color: #f88829;
+  } 
+
+:javascript
+
+  var table = $("#patchVersionLibrary");
+
+  var tasksSource =
+  {
+      dataFields: [
+          { name: 'id', type: 'int' },
+          { name: 'patch_no', type: 'string' },
+          { name: 'pv_category', type: 'string'},
+          { name: 'name', type: 'string'},
+          { name: 'version_url', type: 'string' },
+          { name: 'version_log', type: 'string' },
+          { name: 'pv_status', type: 'string' },
+          { name: 'due_at', type: 'date'},
+          { name: 'result', type: 'string' },
+          { name: 'is_read', type: 'boolean'}
+      ],
+      type: 'POST',
+      dataType: "json",
+      id: 'id',
+      url: "/tasks/patch_version_task",
+      addRow: function (rowID, rowData, position, commit) {
+          commit(true);
+      },
+      updateRow: function (rowID, rowData, commit) {
+          commit(true);
+      },
+      deleteRow: function (rowID, commit) {
+          commit(true);
+      }
+  };
+  var dataAdapter = new $.jqx.dataAdapter(tasksSource,
+      {
+          formatData: function (data) {
+              $.extend(data, {
+                  token: "#{Token.generate_token_value}",
+                  issue_type: "IssueToSpecialTestResult",
+                  maxRows: 50
+              });
+              return data;
+          },
+          loadComplete: function () {
+            // data is loaded.
+          }
+      }
+  );
+
+  var cellClass = function (row, dataField, cellText, rowData) {
+      var unread = rowData.is_read == false ? 'unread' : ''
+      return unread;
+  }
+
+  table.jqxDataTable({
+      width: '100%',
+      height: 680,
+      source: dataAdapter,
+      pageable: true,
+      sortable: true,
+      altRows: true,
+      filterable: true,
+      filterMode: 'advanced',
+      localization: getLocalization(),
+      pagerButtonsCount: 8,
+      columns: [
+        { text: '#', dataField: 'id', cellsAlign: 'center', align: 'center', width: 100, cellClassName: cellClass },
+        { text: 'Patch编号', dataField: 'patch_no', cellsAlign: 'center', align: 'center', width: 150, cellClassName: cellClass },
+        { text: '版本类型', dataField: 'pv_category', cellsAlign: 'center', align: 'center', width: 150, cellClassName: cellClass },
+        { text: '版本名', dataField: 'name', cellsAlign: 'center', align: 'center', width: 200, cellClassName: cellClass },
+        { text: '编译路径', dataField: 'version_url', cellsAlign: 'center', align: 'center', width: 300, cellClassName: cellClass },
+        { text: '编译日志', dataField: 'version_log', cellsAlign: 'center', align: 'center', width: 300, cellClassName: cellClass },
+        { text: '编译结果', dataField: 'pv_status', cellsAlign: 'center', align: 'center', width: 100, cellClassName: cellClass },
+        { text: '编译完成时间', dataField: 'due_at', cellsAlign: 'center', align: 'center', width: 150,cellsFormat: 'yyyy-MM-dd HH:mm:ss', cellClassName: cellClass },
+        { text: '确认结果', dataField: 'result', cellsAlign: 'center', align: 'center', width: 100, cellClassName: cellClass },
+        { text: 'is_read', dataField: 'is_read', hidden: true, cellClassName: 'isRead' }
+      ]
+  });
+
+  table.on('rowClick', function (event) {
+      var args = event.args;
+      var index = args.index;
+      var row = args.row;
+
+      var cur_row = $("[data-key="+ row.id +"]");
+      var $isRead = cur_row.children(".isRead");
+      if($isRead.text() == 'false'){
+        cur_row.children().removeClass("unread");
+        $isRead.text(true);
+        $.post('/tasks/'+ row.id +'/handle');
+      }
+
+      var taskId = row.id;
+          
+      layer.closeAll();
+      content = "/tasks/"+taskId+"/patch_version_task_edit";    
+      layer.open({
+        type: 2,
+        title: '<b>版本验证任务</b>',
+        area: ['90%', '80%'],
+        zIndex: 999,
+        moveType: 1,
+        maxmin: false,
+        shadeClose: false,
+        content: content
+      });
+  });

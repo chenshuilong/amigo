@@ -1,0 +1,12 @@
+- status = @status || @exception.status
+- message = @message || @exception.try(:description)
+
+.oh-exception{data: { status: status}}
+  = image_tag("oops.png", height: '220', width: '400')
+  %p.notice= message
+  %p.notice= request.original_url
+  - if status == 500
+    %p.help 截图发送至#{mail_to "os-help@gionee.com"}，让开发哥加速处理！
+  %p
+    %a{:href => "javascript:history.back()"}= l(:button_back_to_previous_page)
+- html_title @status

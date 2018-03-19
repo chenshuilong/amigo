@@ -1,0 +1,139 @@
+- provide :nav, "4,3"
+- provide :css, "bootstrap"
+- content_for :header_tags do
+  %link{:href => "/amg/rangeslider/rangeslider.css", :rel => "stylesheet"}
+  %script{:src => "/amg/rangeslider/rangeslider.js", :type => "text/javascript"}
+
+- unless @type.present?
+  .top-action-menu.pull-right
+    = link_to(l(:native_applist_history), history_apk_bases_path, :class => 'btn btn-primary btn-sm')
+    = link_to(l(:label_export_to), apk_bases_path(:format =>"xlsx", params: params), :class => 'btn btn-primary btn-sm')
+.h2= @type.present? ? l(:label_apk_base_o) : l(:label_apk_base)
+%hr
+#roadmap#version-publishes-index.version_publishes_index
+  .roadmap-query
+    %ul.notification-list 
+      %li.notification-list-item
+        .notification-menu
+          %i.fa.fa-chevron-up
+        .notification-content
+          %p
+            %strong= "查询条件"
+        .clearfix
+        .notification-acton.select2-rectify{:style => "display:block;"}
+          = form_tag({}, {method: :get, class: 'form-horizontal'}) do |f|
+            .form-group
+              = label_tag 'name', l(:apk_base_name), class: "col-sm-2 control-label"
+              .col-sm-2
+                = text_field_tag 'name', @name, placeholder: l(:apk_base_name),class: "form-control"
+              = label_tag 'removable', l(:apk_base_removable), class: "col-sm-1 control-label"
+              .col-sm-2
+                = select_tag 'removable', options_for_select([[l(:label_all), ''], [l(:general_text_yes), 1], [l(:general_text_no), 0], [l(:apk_base_removable_no_integration), 2], [l(:label_none), 'none']], @removable), class: "form-control", :onchange => "this.form.submit(); return false;"
+              = label_tag 'category_id', l(:apk_base_category_id), class: "col-sm-1 control-label"
+              .col-sm-2
+                = select_tag 'category_id', options_for_select(@categories.pluck(:name, :id).unshift([l(:label_all), '']), @category_id), class: "form-control", :onchange => "this.form.submit(); return false;"
+            .form-group
+              = label_tag 'project_id', l(:project_apk_project_id), class: "col-sm-2 control-label"
+              .col-sm-2
+                = select_tag 'project_id', options_for_select(@project_apks.pluck(:name, :project_id).unshift([l(:label_all), '']), @project_id), class: "form-control", :onchange => "this.form.submit(); return false;"
+              = label_tag 'app_category', l(:apk_base_app_category), class: "col-sm-1 control-label"
+              .col-sm-2
+                = select_tag 'app_category', options_for_select(list_for_select(:apk_base, :app_category).unshift([l(:label_all), '']), @app_category), class: "form-control", :onchange => "this.form.submit(); return false;"
+              = label_tag 'package_name', l(:apk_base_package_name), class: "col-sm-1 control-label"
+              .col-sm-2
+                = text_field_tag 'package_name', @package_name, placeholder: l(:apk_base_package_name),class: "form-control"
+            .form-group
+              = label_tag 'android_platform', l(:apk_base_android_platform), class: "col-sm-2 control-label"
+              .col-sm-2
+                = select_tag 'android_platform', options_for_select(list_for_select(:apk_base, :android_platform).unshift([l(:label_all), '']), @android_platform), class: "form-control", :onchange => "this.form.submit(); return false;"
+              = label_tag 'integrated', l(:apk_base_integrated), class: "col-sm-1 control-label"
+              .col-sm-2
+                = select_tag 'integrated', options_for_select([[l(:label_all), ''], [l(:general_text_yes), 1], [l(:general_text_no), 0]], @integrated), class: "form-control", :onchange => "this.form.submit(); return false;"
+              .col-sm-2.col-sm-offset-1
+                = hidden_field_tag 'type', @type
+                = submit_tag l(:button_submit), :name => nil, class: "btn btn-primary btn-sm"  
+
+- if @apks.blank?
+  .alert.alert-warning 查询不到任何数据。
+- else
+  %hr
+  .filter-right#version_publish_edit
+    .panel.panel-default
+      .panel-heading
+        .panel-body
+          .row.filter-main{:class => "filter-slide"}
+            .filter-right
+              .issues-wrapper
+                .issues-head
+                  .row.issues-head-function-write
+                    .col-sm-3.col-sm-offset-9
+                      %input.issues-head-function-slider{:type => "range"}
+                .issues-body                 
+                  .autoscroll
+                    %table#issueTable{:class => "list issues table table-striped table-bordered"}
+                      %thead
+                        %tr
+                          %th{width: '60'}= "#"
+                          %th{width: '150'}= l(:apk_base_name)
+                          %th{width: '120'}= l(:apk_base_cn_name)
+                          // %th= l(:apk_base_en_name)
+                          %th{width: '120'}= l(:apk_base_desktop_name)
+                          %th{width: '200'}= l(:apk_base_cn_description)
+                          //%th= l(:apk_base_en_description)
+                          %th{width: '180'}= l(:apk_base_developer)
+                          %th{width: '100'}= l(:apk_base_package_name)
+                          %th{width: '100'}= l(:apk_base_category_id)
+                          %th{width: '100'}= l(:apk_base_desktop_icon)
+                          %th{width: '100'}= l(:apk_base_removable)
+                          %th{width: '100'}= l(:apk_base_os_category)
+                          %th{width: '100'}= l(:project_apk_project_id)
+                          %th{width: '100'}= l(:apk_base_app_category)
+                          %th{width: '100'}= l(:apk_base_android_platform)
+                          %th{width: '60'}= l(:apk_base_integrated)
+                      %tbody
+                        - @apks.each_with_index do |apk, index|
+                          %tr
+                            %td= load_value(apk, :id)
+                            %td= load_value(apk, :name)
+                            %td= load_value(apk, :cn_name)
+                            //%td= load_value(apk, :en_name)
+                            %td= load_value(apk, :desktop_name)
+                            %td                      
+                              = popover(:trigger => "click", :content => simple_format(apk.cn_description),:title => "详细信息") do
+                                = apk.cn_description.to_s[0,15]
+                            //%td= load_value(apk, :en_description)
+                            %td= load_value(apk, :developer)
+                            %td= load_value(apk, :package_name)
+                            %td= load_value(apk, :category)# if apk.apk_base_category.present?
+                            %td= load_value(apk, :desktop_icon_text)
+                            %td= load_value(apk, :removable_text)
+                            %td= load_value(apk, :os_category_text)
+                            %td= load_value(apk, :production)# if apk.project_apk.present?
+                            %td= load_value(apk, :app_category_text)# if apk.app_category.present?
+                            %td= load_value(apk, :android_platform_text)
+                            %td= load_value(apk, :integrated_text)
+                  %span.pagination= pagination_links_full @pages, @count
+
+:javascript
+
+  // Pin roadmap-query
+  $('.roadmap-query').pin({padding: {top: 70, bottom: 10}});
+
+  // Pin issues-head
+  $('.issues-head').pin({padding: {top: 120, bottom: 10}});
+
+  $(window).on('scroll', function(event) {
+      var htop = $(event.target).scrollTop();
+      if (htop > 150) {
+          $('.notification-acton').css("display","none");
+          $('.notification-menu').children().eq(0).removeClass("fa fa-chevron-up").addClass("fa fa-chevron-down");
+      } else {
+          $('.notification-acton').css("display","block");
+          $('.notification-menu').children().eq(0).removeClass("fa fa-chevron-down").addClass("fa fa-chevron-up");
+      }
+  }.bind(this))
+
+:css
+
+  .roadmap-query{z-index: 999}
+  .issues-head{z-index: 999}

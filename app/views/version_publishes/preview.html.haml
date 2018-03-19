@@ -1,0 +1,101 @@
+- provide :nav, "2,4"
+- provide :css, "bootstrap"
+- content_for :header_tags do
+  %link{:href => "/amg/dataTable/datatable.css", :rel => "stylesheet"}
+  %link{:href => "/amg/dataTable/fixedColumns.bootstrap.min.css", :rel => "stylesheet"}
+
+  %script{:src => "/amg/dataTable/dataTables.fixedColumns.min.js", :type => "text/javascript"}
+  %script{:src => "/amg/dataTable/dataTables.bootstrap.min.js", :type => "text/javascript"}
+
+- content_for :bread do
+  %li= link_to l(:label_version_publish), version_publishes_path
+  %li= @spec.fullname
+
+.h2= @spec.fullname
+
+.clearfix
+- if policy(:version_publish).edit?
+  .filter-right
+    .panel.panel-default
+      .panel-body
+        = form_tag({}, {method: :get, class: 'form-inline'}) do |f|
+          .form-group
+            = label_tag 'version_id', l(:label_version)
+            = select_tag 'version_id', options_for_select(@versions.collect{|s| [s.name, s.id]}, params[:version_id]), |
+              class: "form-control", prompt: "请选择"
+            = select2_for 'version_id'
+            = hidden_field_tag 'spec_id', @spec.id 
+          = submit_tag l(:label_version_publish_lock), :name => nil, class: "btn btn-primary btn-sm"
+
+- if @version_publish.present?
+  .filter-right#version-publish-preview
+    .panel.panel-default
+      .panel-heading
+        .issues-head
+          .row.issues-head-title
+            .col-sm-6
+              .h2= [@version_publish.spec.fullname, @version_publish.version.name].join("_")
+            .col-sm-6.issues-head-title-new.text-right
+              %a.btn.btn-primary.btn-sm{:href => export_version_publish_path(@version_publish)} 导出信息
+              - if policy(:version_publish).edit?
+                - if @version_publish.version.status == 4
+                  %a.btn.btn-primary.btn-sm.publish{"data-id"=>"#{@version_publish.id}"} 上传官网
+                %a.btn.btn-primary.btn-sm{:href => "/version_publishes/#{@version_publish.id}/edit"} 编辑
+              %a.btn.btn-primary.btn-sm{:href => "/version_publishes/history?spec_id=#{params[:spec_id]}"} 历史记录
+      .panel-body
+        -if @rows.present?
+          .roadmap-table
+            %table#publishPreviewTable.list.table.table-bordered
+              %thead
+                %tr
+                  %th 序号 
+                  %th{class: "table-row-gray"}= "APK名称"
+                  %th= l(:spec_version_cn_name)
+                  %th= l(:spec_version_desktop_name)
+                  %th= l(:spec_version_description)
+                  %th= l(:spec_version_developer)
+                  %th= l(:version_name_tag)
+                  %th= l(:version_applist_apk_permission)
+                  %th= l(:version_applist_apk_removable)
+              %tbody
+                - @rows.each_with_index do |row, index|
+                  %tr{class: error_notice_class(row[1][:exist], row[1][:missing], 'tr')}
+                    %td= index+1
+                    %td{class: error_notice_class(row[1][:exist], row[1][:missing], 'td')}= row[0]
+                    %td= row[1][:cn_name]
+                    %td= row[1][:desktop_name]
+                    %td= row[1][:description]
+                    %td= row[1][:developer]
+                    %td= row[1][:apk_version]
+                    %td= row[1][:apk_permission]
+                    %td= row[1][:apk_removable]
+            %table.table.table-striped.table-bordered.table-hover
+              %thead
+                %tr
+                  %th 应用卸载及恢复方法说明 
+              %tbody
+                %tr
+                  %td= simple_format(@remove_note)
+:javascript
+  var publishPreviewTable = initDataTable('publishPreviewTable',{
+    paging: false, ordering: true, info: false, searching: false, select: true, scrollX: true
+  });
+
+- if @can_alert
+  :javascript
+    $(document).ready(function(){
+      content = $("#ajax-modal").html('#{j render :partial => "abnormal_report", :locals => { :notes => @notes }}');
+      records_window = layer.open({
+        type: 1,
+        title: '<b>#{l(:product_definition_records)}</b>',
+        area: ['988px', '680px'],
+        zIndex: 666,
+        moveType: 1,
+        shadeClose: false,
+        content: content,
+        btn: ['关闭'],
+        yes: function(index, layero){
+          layer.close(records_window)
+        }
+      });
+    })

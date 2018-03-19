@@ -1,0 +1,7 @@
+= error_messages_for 'enumeration'
+.box.tabular
+  %p= f.text_field :name, :value => @enumeration.real_name
+  %p= f.check_box :active
+  %p= f.check_box :is_default
+  - @enumeration.custom_field_values.each do |value|
+    %p= custom_field_tag_with_label :enumeration, value

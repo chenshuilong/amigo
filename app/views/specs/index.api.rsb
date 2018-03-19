@@ -1,0 +1,21 @@
+api.array :specs, api_meta(:total_count => @specs.size) do
+  @specs.each do |spec|
+    api.spec do
+      api.id spec.id
+      api.project(:id => spec.project_id, :name => spec.project.name) unless spec.project.nil?
+
+      api.name                 spec.name
+      api.jh_collect_finish_dt spec.jh_collect_finish_dt
+      api.sj_collect_finish_dt spec.sj_collect_finish_dt
+      api.deleted              spec.deleted
+      api.locked               spec.locked
+      api.is_default           spec.is_default
+      api.note                 spec.note
+      api.freezed              spec.freezed
+      api.for_new              spec.for_new
+
+      api.created_at  spec.created_at
+      api.updated_at  spec.updated_at
+    end
+  end
+end

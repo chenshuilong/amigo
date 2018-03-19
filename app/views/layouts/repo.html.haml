@@ -1,0 +1,85 @@
+!!!
+%html{:lang => current_language}
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %meta{:charset => "utf-8"}/
+    %meta{:content => "IE=edge", "http-equiv" => "X-UA-Compatible"}/
+    %title= html_title
+    %meta{:content => "width=device-width, initial-scale=1, maximum-scale=1", :name => "viewport"}/
+    %meta{:content => "#{Redmine::Info.app_name}", :name => "description"}/
+    %meta{:content => "#{Redmine::Info.app_name}", :name => "keywords"}/
+    %meta{:content => "none", :name => "robots"}/
+    = csrf_meta_tag
+    = favicon
+    = stylesheet_link_tag 'jquery/jquery-ui-1.11.0', 'application', 'responsive', :media => 'all' if (yield :css).empty?
+    = stylesheet_link_tag "/stylesheets/jquery.datetimepicker"
+    = stylesheet_link_tag 'rtl', :media => 'all' if l(:direction) == 'rtl'
+    = javascript_heads
+    = javascript_include_tag "applications"
+    = stylesheet_link_tag 'applications'
+    = heads_for_theme if (yield :css).empty?
+    = yield :header_tags
+    = call_hook :view_layouts_base_html_head
+    / page specific tags
+  %body{:class => body_css_classes}
+    = render_browser_notice
+    = render_top_notice
+    = render :partial => "layouts/navigation"
+
+    - if yield(:css).present?
+      #content.contents
+        .container
+          - if %w(repo_requests custom_permissions).include?(controller_name) || (controller_name == "repos" && action_name != "compile_machine_status")
+            .row.seamless.notification
+              .col-md-2.notification-left
+                %p.project-menu-info 代码管理
+                = repo_sidebar
+              
+              .col-md-10
+                = render_flash_messages
+                = yield
+                = call_hook :view_layouts_base_content
+          - elsif (controller_name == "mokuais" && %w(list history).include?(action_name)) || controller_name == "apk_bases" || (controller_name == "productions" && %w(members records).include?(action_name))
+            .row.seamless.notification
+              .col-md-2.notification-left
+                %p.project-menu-info 产品信息
+                = system_info_sidebar
+              
+              .col-md-10
+                = render_flash_messages
+                = yield
+                = call_hook :view_layouts_base_content
+          - elsif (controller_name == "google_tools" || controller_name == "tools")
+            .row.seamless.notification
+              .col-md-2.notification-left
+                %p.project-menu-info 工具
+                = tools_sidebar
+              
+              .col-md-10
+                = render_flash_messages
+                = yield
+                = call_hook :view_layouts_base_content
+          - else
+            = render_flash_messages unless yield(:sidebar).present?
+            = yield
+            = call_hook :view_layouts_base_content
+        #ajax-indicator{:style => "display:none;"}
+          %span= l(:label_loading)
+        #ajax-modal{:style => "display:none;"}
+    .expand-pad.collapse
+      .expand-pad-button
+        %i.fa.fa-angle-double-left
+      .expand-pad-content
+    / Locale Setting
+    = render :partial => "layouts/locale"
+
+
+:javascript
+
+  $(".navbar-default").pin();
+  // $(".nav-content").pin({padding: {top: 70, bottom: 10}})
+
+:css
+
+  .navbar-default{z-index: 666}
+  .nav-content{z-index: 666}

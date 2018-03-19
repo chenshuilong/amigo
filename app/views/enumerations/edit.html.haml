@@ -1,0 +1,4 @@
+= title [l(@enumeration.option_name), enumerations_path], @enumeration.name
+= labelled_form_for :enumeration, @enumeration, :url => enumeration_path(@enumeration) do |f|
+  = render :partial => 'form', :locals => {:f => f}
+  = submit_tag l(:button_save)

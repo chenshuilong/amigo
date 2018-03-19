@@ -1,0 +1,10 @@
+= labelled_fields_for :user, @user do |f|
+  / Password
+  .label= l(:field_password)
+  .well 更改密码后，HR登录密码也会同时更改。留空则不更改。
+  %p
+    = label_tag "旧密码"
+    = text_field_tag "user[old_password]"
+  %p
+    =label_tag "新密码"
+    = text_field_tag "user[new_password]"

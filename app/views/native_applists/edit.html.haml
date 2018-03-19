@@ -1,0 +1,16 @@
+- provide :nav, "2,4"
+- provide :css, "bootstrap"
+- content_for :bread do
+  %li= link_to l(:label_native_applist), native_applists_path
+  %li= l(:native_applist_edit)
+
+%span.h2= l(:native_applist_edit)
+
+= labelled_form_for @app, :url => native_applist_path(@app) do |f|
+  = error_messages_for @app
+  = render :partial => 'form', :locals => {:f => f}
+
+  .button-group.text-center
+    = submit_tag l(:button_save), class: "btn btn-primary"
+
+- html_title(l(:native_applist_edit))

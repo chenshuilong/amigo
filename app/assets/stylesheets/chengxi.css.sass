@@ -1,0 +1,2920 @@
+// Container
+@media (min-width: 1300px) and (max-width: 1499px)
+  .container
+    width: 1150px
+@media (min-width: 1500px) and (max-width: 1699px)
+  .container
+    width: 1350px
+@media (min-width: 1700px) and (max-width: 1899px)
+  .container
+    width: 1550px
+@media (min-width: 1900px) and (max-width: 2099px)
+  .container
+    width: 1750px
+@media (min-width: 2100px) and (max-width: 2299px)
+  .container
+    width: 1950px
+@media (min-width: 2300px)
+  .container
+    width: 2150px
+
+.top-notice
+  display: none
+  padding: 15px 20px
+  font-weight: 500
+  color: $amigoColor
+  background-color: #fff
+  .top-notice-container
+    display: table
+    div
+      display: table-cell
+      vertical-align: middle
+    .top-notice-title
+      white-space: nowrap
+      span
+        padding: 5px 10px
+        background-color: $amigoColor
+        color: #fff
+        border-radius: 4px
+        &:empty
+          display: none
+    .top-notice-message
+      padding: 0 10px
+      p
+        margin: 5px 0
+    .top-notice-close
+      padding: 0 5px
+      a
+        font-size: 16px
+        color: $amigoColor
+        cursor: pointer
+
+.browser-notice
+  +padding(10px 20px)
+  text-align: center
+  background-color: #F8EF84
+  > span
+    +margin-right(1em)
+
+.development_env_flag
+  position: absolute
+  font-size: 60%!important
+  right: -25px
+  top: 0
+
+// Scrollbar
+\::-webkit-scrollbar-track
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3)
+  background-color: #F5F5F5
+\::-webkit-scrollbar
+  width: 5px
+  height: 5px
+  background-color: #F5F5F5
+\::-webkit-scrollbar-thumb
+  background-color: #9F9F9F
+  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent)
+
+// Navigation
+.comingsoon
+  color: #ccc!important
+.navbar-brand
+  margin-right: 30px
+  position: relative
+  img
+    margin-top: -10px
+
+#navigation
+  & > ul
+    margin: 0
+    padding: 0
+    .dropdown-menu i
+      margin-right: 5px
+    & > li > a
+      &:hover
+        border-top-right-radius: 2px
+        border-top-left-radius: 2px
+    .active
+      a
+        border-top-right-radius: 2px
+        border-top-left-radius: 2px
+    .open
+      border-top-right-radius: 2px
+      border-top-left-radius: 2px
+
+#navigation.navbar-collapse
+  padding-right: 0!important
+
+.nav-search
+  display: inline-block
+  padding: 2px 10px
+  margin-top: 12px
+  margin-right: 8px
+  border-left: 1px solid #fff
+  border-right: 1px solid #fff
+  input
+    color: #fff
+    border: none
+    background: none
+    width: 100px
+    outline: medium
+    +placeholder
+      font-size: 11px
+      color: rgba(255,255,255,0.8)
+  i
+    color: #fff
+
+.nav-downlaod
+  display: inline-block
+  // margin-top: 12px
+  // margin-right: 15px
+  position: relative
+  i
+    padding: 10px
+    color: #fff
+
+.nav-notification
+  display: inline-block
+  margin-top: 12px
+  padding: 2px 11px 2px 0
+  margin-right: 10px
+  border-right: 1px solid #fff
+  position: relative
+  i
+    color: #fff
+
+*[data-badge='0'], *[data-badge='']
+  &:after
+    display: none
+
+.export-badge[data-badge]:after, .mail-badge[data-badge]:after
+  content: attr(data-badge)
+  font-family: monospace
+  position: absolute
+  top: -5px
+  right: 3px
+  font-size: .7em
+  background: #ed1c24
+  color: white
+  width: 18px
+  height: 18px
+  text-align: center
+  line-height: 18px
+  border-radius: 50%
+  box-shadow: 0 0 1px #d67979
+
+.nav-content
+  padding: 10px 0
+  background-color: #fff
+  border-bottom: 1px solid #eee
+  ul
+    margin: 0
+    padding: 0
+    li
+      display: inline
+      padding-bottom: 10px
+      margin-right: 25px
+      cursor: pointer
+      a
+        color: #000
+        text-decoration: none
+      &:hover
+        color: $amigoColor
+        border-bottom: 2px solid $amigoColor
+    .active
+      a
+        color: $amigoColor
+      border-bottom: 2px solid $amigoColor
+.nav-breadcrumb
+  background: #fff
+  ol
+    margin: 0
+    & > a
+      display: inline-block
+      padding: 0 5px
+      color: #fff
+      background: $amigoColor
+      margin-right: 10px
+      border-radius: 2px
+      text-decoration: none
+
+.help_window
+  display: none
+  header
+    background: $amigoColor
+    margin-bottom: 20px
+    color: #fff
+    text-align: center
+    height: 120px
+    p
+      padding: 20px 0 10px
+      font-size: 28px
+    span
+      padding: 6px 10px
+      border: 1px solid #fff
+      border-radius: 4px
+      margin-bottom: 20px
+
+  .main
+    position: relative
+    max-width: 640px
+    margin: 0 auto
+    padding: 0 10px
+    a
+      margin: 20px 0
+      color: #fff
+
+
+// Content
+.contents
+  margin-top: 20px
+
+// Homepage
+
+#ajax-modal
+  padding: 20px
+
+// Issue Filter
+.filter-main
+  position: relative
+  overflow: hidden
+  min-height: 700px
+  .filter-left
+    position: absolute
+    padding-right: 25px
+    left: 0
+    width: 25%
+    transition: 0.5s
+  .filter-right
+    float: right
+    width: 75%
+    transition: 0.5s
+.filter-slide
+  .filter-left
+    left: -25%
+    transition: 0.5s
+  .filter-right
+    width: 100%
+    transition: 0.5s
+.filter-slide-button
+  position: fixed
+  left: 2vw
+  bottom: 20px
+  padding:  6px 10px
+  color: #fff
+  cursor: pointer
+  background: rgba(8, 8, 8, 0.5)
+  &:hover
+    background: rgba(8, 8, 8, 0.7)
+
+.filter-side
+  width: 100%
+.filter-head
+  background: #989898
+  border-top-right-radius: 4px
+  border-top-left-radius: 4px
+  .filter-add-icon
+    color: #fff
+    float: right
+    padding: 6px 10px
+    background: $amigoColor
+    border-top-right-radius: 4px
+    cursor: pointer
+    &:hover
+      background-color: darken($amigoColor, 10%)
+  .filter-head-title
+    font-size: 15px
+    color: #fff
+    padding: 5px 10px
+.filter-list
+  .filter-current-all
+    .active
+      span, i
+        color: darken($amigoColor, 10%)
+    .panel-heading
+      display: block
+      color: #333333
+      &:hover
+        text-decoration: none
+  .panel-group, .panel-default, .panel-heading
+    border-radius: 0
+  .panel-group
+    border: 1px solid #cbcbcb
+    border-top: none
+  .panel
+    border: none
+    margin-top: 0!important
+  .panel-heading
+    background-color: #DADADA
+    border-top: 1px solid #cbcbcb
+    border-bottom: 1px solid #cbcbcb
+    padding: 6.5px 15px
+    cursor: pointer
+    font-weight: bold
+    position: relative
+    &:hover
+      background: darken(#ccc, 5%)
+    .panel-heading-addition
+      position: absolute
+      padding: 7px 10px
+      right: 0
+      top: 0
+  .panel-body
+    height: 400px
+    padding: 0
+    overflow: auto
+
+  .filter-more
+    position: absolute
+    margin-right: 10px
+    width: 10px
+    cursor: pointer
+    display: none
+    right: 5px
+    top: 5px
+
+  .filter-menu
+    padding: 2px
+    background: #fff
+    color: #A01D1D
+    display: none
+    border: 1px solid #ccc
+    border-radius: 2px
+    box-shadow: 0px 2px 8px 1px rgba(0,0,0,0.2)
+    position: absolute
+    z-index: 999
+    // display: none
+    ul
+      clear: both
+      list-style: none
+      margin: 0
+      padding: 0
+    li
+      float: none
+      a
+        font-size: 12px
+        white-space: nowrap
+        min-width: 50px
+        padding: 7px 13px
+        color: #333
+        display: block
+        cursor: pointer
+        text-decoration: none
+        &:hover
+          background: #eee
+          color: #FF7416
+
+.filter-window, #filterStarRename, #filterStarNewforlder, #filter-menu-past, #filterStarShare, #filterChoose
+  display: none
+.filter-window-left
+  padding: 20px
+.filter-window-control
+  margin: 20px auto 0
+  width: 200px
+  .filter-window-control-conditions, .filter-window-control-columns
+    border: 1px solid $amigoColor
+    display: inline-block
+    padding: 2px 14px
+    text-decoration: none
+  .active
+    background: $amigoColor
+    color: #fff
+  .filter-window-control-conditions
+    float: left
+    border-right: 0
+    border-bottom-left-radius: 12.5px
+    border-top-left-radius: 12.5px
+  .filter-window-control-columns
+    overflow: hidden
+    border-bottom-right-radius: 12.5px
+    border-top-right-radius: 12.5px
+.filter-window-wrapper, .window-wrapper
+  padding: 20px
+.filter-window-name
+  border: 1px solid #ccc
+  border-radius: 4px
+  padding: 0 10px
+  input
+    width: 100%
+    height: 30px
+    border: none
+    outline: none
+.filter-window-search
+  margin-bottom: 10px
+.filter-window-select
+  border: 1px solid #ccc
+  border-radius: 4px
+  width: 100%
+  height: 300px
+  .filter-window-select-list
+    width: 30%
+    height: 100%
+    background: #fff
+    border-right: 1px solid #ccc
+    float: left
+    overflow-y: auto
+    li
+      padding: 5px 10px
+      line-height: 26px
+      &:hover
+        background: #F0F0F0
+      button
+        float: right
+        display: inline-block
+        padding: 3px 7px
+        white-space: nowrap
+        vertical-align: middle
+  .select-window-select-result
+    width: 70%
+    height: 100%
+    background: #F0F0F0
+    padding: 10px
+    overflow-x: hidden
+    overflow-y: auto
+    li
+      list-style-type: none
+      float: left
+      background: #fff
+      border: 1px solid #ccc
+      border-radius: 4px
+      min-width: 50px
+      margin-right: 5px
+      margin-bottom: 10px
+      padding: 5px 5px
+      input[type="checkbox"]
+        display: none
+      i
+        margin-left: 5px
+        color: #ccc
+        cursor: pointer
+        &:hover
+          color: #aaa
+.filter-window-conditions
+  margin-top: 20px
+  border: 1px solid #ccc
+  border-radius: 4px
+  .filter-window-conditions-head
+    position: relative
+    border-bottom: 1px solid #ccc
+    padding: 10px
+  input[type="checkbox"]
+    margin-top: -2px
+    vertical-align: middle
+    display: inline-block
+  .filter-window-pickall
+    display: inline-block
+    line-height: 30px
+    span
+      margin-left: 10px
+  .filter-window-function
+    position: absolute
+    right: 10px
+    display: inline-block
+  .filter-window-conditions-body
+    height: 300px
+    overflow: auto
+    .filter-window-example
+      display: none
+    .filter-window-element, .filter-window-group
+      margin: 5px 10px
+      .category
+        width: 150px
+      .relation
+        width: 100px
+      .value
+        width: 200px
+      .filter-window-element-check, .filter-window-group-check
+        display: inline-block
+        float: left
+        margin-top: 10px
+        margin-right: 10px
+      .filter-window-element-func, .filter-window-group-func
+        float: right
+        display: inline-block
+        line-height: 35px
+        vertical-align: middle
+      .filter-window-group-relation
+        span, i
+          line-height: 38px
+          vertical-align: middle
+          cursor: pointer
+      .filter-window-element
+        margin-left: 20px
+  ul.filter-pane
+    padding: 0
+    margin: 0
+    li
+      list-style-type: none
+    > li
+      min-width: 490px
+      .fa
+        width: 20px
+        line-height: 280%
+        float: left
+        cursor: pointer
+      // Select2
+      .select2-container
+        width: 194px!important
+        .select2-selection
+          border-bottom-left-radius: 0!important
+          border-top-left-radius: 0!important
+          padding: 2px!important
+          font-weight: bold
+
+// Select2
+.select2-container
+  display: inline-block!important
+  .select2-results__option[aria-selected=true]
+    display: none
+
+
+
+.filter-window-right
+  margin: 20px auto
+  width: 450px
+  border: 1px solid #DADADA
+  height: 405px
+  overflow: auto
+  display: none
+  .filter-window-right-head
+    padding: 5px 0
+    background: #f0f0f0
+    height: 30px
+    .filter-window-right-head-check
+      padding-left: 20px
+      float: left
+      width: 150px
+    .filter-window-right-head-field
+      float: left
+      width: 200px
+    .filter-window-right-head-order
+      float: left
+      width: 50px
+  .filter-window-right-body
+    display: table
+    .table-row
+      height: 30px
+      display: table-row
+      &:hover
+        background: #ffffaa
+      .table-cell
+        display: table-cell
+        vertical-align: middle
+        &:nth-child(1)
+          width: 150px
+          input
+            margin-left: 25px
+        &:nth-child(2)
+          width: 202px
+        &:nth-child(3)
+          width: 80px
+  .filter-window-right-example
+    display: none
+
+
+.filter-window-buttons
+  margin-bottom: 20px
+  input
+    display: inline-block
+    width: 100px
+    &:first-child
+      margin-right: 20px
+      background: #ccc
+      color: #fff
+      &:hover
+        border: none
+        background: #bbb
+
+.issues-head
+  .issues-head-title
+    height: 30px
+    color: $amigoColor
+    font-size: 18px
+    font-weight: bold
+    line-height: 30px
+  .issues-head-function
+    margin: 8px 0 0
+    background: #DADADA
+    padding: 8px
+    border-top-left-radius: 4px
+    border-top-right-radius: 4px
+    .issues-head-function-form
+      .issues-head-function-search
+        margin-left: -10px
+        margin-right: 20px
+        width: 235px
+        > input
+          height: 33px
+    .issues-head-function-slider
+      display: none
+.issues-body
+  .alert
+    margin-top: 20px
+#export-options
+  display: none
+
+//Rangeslider Custom Setting
+.rangeslider--horizontal
+  margin-top: 15px
+  height: 10px!important
+  width: 150px!important
+  float: right
+  .rangeslider__fill
+    background: #e6e6e6!important
+  .rangeslider__handle
+    width: 15px!important
+    height: 30px!important
+    border-radius: 0!important
+    -webkit-border-radius: 0!important
+    &:after
+      display: none!important
+
+
+// Layer Custom Setting
+.layui-layer-title
+  background-color: $amigoColor
+  color: #fff
+.layui-layer-ico
+  background: none
+.layui-layer-close
+  position: relative
+  display: inline-block
+  width: 20px
+  height: 20px
+  overflow: hidden
+  margin-top: -5px
+  &:hover
+    &::before, &::after
+      background: darken(#fff, 10%)
+  &::before, &::after
+    content: ''
+    position: absolute
+    height: 2px
+    width: 100%
+    top: 50%
+    left: 0
+    background: #fff
+  &::before
+    -webkit-transform: rotate(45deg)
+    -moz-transform: rotate(45deg)
+    -ms-transform: rotate(45deg)
+    -o-transform: rotate(45deg)
+    transform: rotate(45deg)
+  &::after
+    -webkit-transform: rotate(-45deg)
+    -moz-transform: rotate(-45deg)
+    -ms-transform: rotate(-45deg)
+    -o-transform: rotate(-45deg)
+    transform: rotate(-45deg)
+.layui-layer-btn
+  text-align: center
+  margin-top: -10px
+  margin-bottom: 15px
+  a
+    display: inline-block
+    min-width: 100px
+    margin-bottom: 0
+    height: auto
+    font-weight: normal
+    text-align: center
+    vertical-align: middle
+    touch-action: manipulation
+    cursor: pointer
+    background-image: none
+    border: 1px solid transparent
+    color: #fff
+    background-color: $amigoColor
+    border-color: #f77a10
+    white-space: nowrap
+    padding: 6px 12px
+    font-size: 14px
+    line-height: 1.42857
+    border-radius: 4px
+    -webkit-user-select: none
+    &:hover
+      background: darken($amigoColor, 10%)
+    &:not(:first-child)
+      margin-left: 20px
+  .layui-layer-btn0
+    border-color: #ccc
+    background: #ccc
+    &:hover
+      background: darken(#ccc, 10%)
+.window-wrapper
+  padding: 20px
+
+// Sort Handle
+
+.sort-handle
+  width: 16px
+  height: 16px
+  background: url(../images/reorder.png) no-repeat 0 50%
+  cursor: move
+  display: inline-block
+  vertical-align: middle
+
+// wice-grid
+.wice-grid-container
+  background: #fff
+
+// Filter Style
+.add-filter
+  .active > a
+    color: white!important
+
+// Choose Project in Header
+
+#project_quick_jump_box
+  option
+    color: #000
+
+
+
+// Issue Table via Original Redmine
+
+.autoscroll
+  overflow-x: auto
+  margin-bottom: 1.2em
+  position: relative
+
+table.list, .table-list
+  border: 1px solid #e4e4e4
+  border-collapse: collapse
+  width: 100%
+  margin-bottom: 4px
+  thead
+    a
+      color: #484844
+    th
+      white-space: nowrap
+
+table.issues
+  a
+    &:link, &:hover, &:visited
+      color: #333
+  a.sort
+    padding-right: 16px
+    background-position: 100% 50%
+    background-repeat: no-repeat
+    &.asc
+      background-image: url(../images/sort_asc.png)
+    &.desc
+      background-image: url(../images/sort_desc.png)
+  td
+    white-space: nowrap
+    table
+      margin-bottom: 0
+  td.id a
+    border-bottom: 1px dotted #ccc
+  td.assigned_to, .author, .user, .status
+    text-align: center
+
+  td.project_priority_highest
+    color: red
+    &:before
+      font-family: "FontAwesome"
+      margin-right: 5px
+      content: "\f06a"
+      color: red
+
+  tr.created-by-me
+    td.author
+      color: green
+      &:before
+        font-family: "FontAwesome"
+        margin-right: 5px
+        content: "\f007"
+        color: $amigoColor
+  tr.assigned-to-me
+    td.assigned_to
+      color: green
+      &:before
+        font-family: "FontAwesome"
+        margin-right: 5px
+        content: "\f007"
+        color: $amigoColor
+
+  tr.closed
+    td.status
+      &:before
+        font-family: "FontAwesome"
+        margin-right: 5px
+        content: "\f058"
+        color: green
+
+  td.subject, td.latest_note
+    word-break: break-all
+    white-space: normal
+    min-width: 600px
+    width: 600px
+
+  .highlight, .context-menu-selection
+    background: #ffffaa!important
+    color: #333!important
+    a
+      color: #333!important
+
+  #issue-preview
+    td
+      background: #fff
+    .issue-preview-box
+      padding: 10px 20px
+    .issue-preview-tab
+      margin-bottom: 20px
+      .active a
+        background: $amigoColor
+        color: #fff
+    .tab-content
+      .note-title
+        border-left: 3px solid $amigoColor
+        padding-left: 10px
+        margin-bottom: 5px
+      .note-content
+        margin-left: 13px
+        min-width: 780px
+        width: 58vw
+        p
+          background: #efefef
+          border-radius: 4px
+          padding: 10px
+          word-wrap: break-word
+          word-break: break-all
+          white-space: normal
+        pre
+          white-space: pre-wrap
+    .issue-preview-edit-line
+      padding-left: 60px
+      & > label
+        margin-left: -110px
+        width: 100px
+      input[type="text"], select
+        min-width: 230px
+      textarea, .select2-container
+        width: 230px!important
+
+table.messages
+  td.author
+    width: 80px
+  td.created_on
+    width: 140px
+
+
+p.other-formats
+  text-align: right
+  font-size: 0.9em
+  color: #666
+
+.other-formats span + span:before
+  content: "| "
+
+a.atom
+  background: url(../images/feed.png) no-repeat 1px 50%
+  padding: 2px 0px 3px 16px
+
+.pagination ul.pages
+  margin: 0 5px 0 0
+  padding: 0
+  display: inline
+  li
+    display: inline-block
+    padding: 0
+    border: 1px solid #ccc
+    margin-left: -1px
+    line-height: 2em
+    margin-bottom: 1em
+    white-space: nowrap
+    text-align: center
+    a, span
+      padding: 3px 8px
+    &:first-child
+      border-top-left-radius: 4px
+      border-bottom-left-radius: 4px
+    &:last-child
+      border-top-right-radius: 4px
+      border-bottom-right-radius: 4px
+    &.current
+      color: white
+      background-color: #da7c2b
+      border-color: #c76f1a
+    &.page
+      &:hover
+        background-color: #EEE
+      a
+        &:hover, &:active
+          color: inherit
+          text-decoration: inherit
+
+span.pagination > span
+  white-space: nowrap
+
+
+// New Issue page
+
+.h2
+  margin-top: 15px
+  color: $amigoColor
+  font-size: 18px
+  font-weight: 700
+  display: inline-block
+.remove-upload
+  margin-left: 10px
+.defalut-value
+  float: right
+  margin-top: 7px
+  .load-default-value:hover
+    .icon-right
+      display: block
+
+.icon-right
+  display: none
+  position: absolute
+  margin-top: 2px
+  right: 10px
+
+.required
+  color: red
+.text-muted
+  display: block
+
+.fileover
+  border: 3px dotted $amigoColor!important
+
+
+.form-wrapper
+  .label
+    padding-left: 0
+    width: 100%
+    padding-bottom: 10px
+    border-bottom: 1px solid #DCDCDC
+    margin-bottom: 20px
+
+  .tabular
+    background: #fff
+    padding: 40px
+    border: 1px solid #DCDCDC
+    border-radius: 4px
+
+  .almost-80-persent
+    +width(80%)
+
+  p
+    margin: 0
+    padding: 4px 0
+    padding-left: 190px
+    min-height: 1.8em
+    clear: left
+    & > label
+      font-weight: bold
+      float: left
+      text-align: right
+      margin-left: -190px
+      width: 180px
+      line-height: 30px
+    #issue_project_id, #issue_tracker_id
+      width: 250px
+    #issue_subject
+      width: 80%
+    .splitcontent
+      width: 85%
+    .vcenter
+      line-height: 33px
+
+  #watchers_form
+    height: 33px
+    vertical-align: middle
+    line-height: 33px
+    #watchers_inputs label
+      margin-right: 10px
+
+  // Issue Switch
+  .issue-switch
+    margin: 10px -20px
+    padding: 10px 20px 25px 20px
+    border-bottom: 2px solid #eee
+    margin-bottom: 40px
+    ul
+      position: relative
+      padding: 0
+      margin: 0
+      li
+        width: 50%
+        line-height: 20px
+        text-align: center
+        float: left
+        display: inline
+        cursor: pointer
+        &.active
+          color: #ff6600
+          font-weight: bold
+      i
+        position: absolute
+        top: 25px
+        left: calc((50% - 150px)/2)
+        height: 7px
+        width: 150px
+        border-top: 3px solid #ff6600
+        overflow: hidden
+        text-align: center
+.button-group
+  padding: 20px
+  input
+    margin-right: 20px
+.navbar-fixed-bottom
+  background: RGBA(47,47,47,0.7)
+
+
+
+//Wiki
+#description_and_toolbar
+  display: block
+  width: 80%
+.note_and_toolbar
+  display: block
+  width: 600px
+.jstElements
+  background: #FBFBFB
+  border: 1px solid #ccc
+  border-top-right-radius: 4px
+  border-top-left-radius: 4px
+  padding-left: 5px
+  button
+    border-radius: 2px
+.jstEditor
+  textarea
+    width: 100%
+    border: 1px solid #ccc
+    border-top: 0
+    border-bottom-right-radius: 4px
+    border-bottom-left-radius: 4px
+
+//CustomField Edit
+
+#all_attributes
+  input[type="text"], input[type="date"], select, .bootstrap-select button
+    height: 33px
+    min-width: 250px
+    padding: 4px 12px
+    font-size: 14px
+    line-height: 1.42857
+    color: #555555
+    background-color: #fff
+    background-image: none
+    border: 1px solid #ccc
+    border-radius: 4px
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075)
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075)
+    -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s
+    -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s
+    transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s
+  p > textarea
+    width: 250px
+    height: 200px
+    border: 1px solid #ccc
+    border-radius: 4px
+  .bootstrap-select button .caret
+    right: 5px!important
+  .select2-container
+    width: 250px!important
+
+.attachment-list
+  span
+    margin-bottom: 10px
+    display: block
+  .filename
+    border: none
+    height: 1.8em
+    width: 400px
+    color: #25211c
+    background: url(../images/attachment.png) no-repeat 1px 50%
+    padding-left: 18px
+  .description
+    display: inline-block!important
+    height: 30px
+    width: 400px
+    border: 0
+    outline: 0
+    border-bottom: 1px solid #ccc
+    line-height: 1.42857
+  .progress
+    display: inline-block
+    height: 10px
+    width: 800px
+    margin-top: 10px
+
+.attachment_area
+  display: block
+  position: relative
+  width: 60%
+  height: 80px
+  border: 3px dotted #c1c1c1
+  border-radius: 4px
+  background: #f5f5f5
+  margin-top: 8px
+  text-align: center
+  padding-top: 25px
+  &:hover
+    background: darken(#f5f5f5, 5%)
+
+.attachment-paste-screenshot-window
+  margin: 20px
+  width: 460px
+  height: 300px
+  line-height: 300px
+  text-align: center
+  img
+    max-width: 100%
+    max-height: 100%
+
+// Issue Show page (with Issue edit page)
+
+.vcenter
+  display: inline-block
+  vertical-align: middle
+  float: none
+
+.wiki
+  table
+    color: #333333
+    border-width: 1px
+    border-color: #d0c9c9
+    border-collapse: collapse
+    th
+      border-width: 1px
+      padding: 8px
+      border-style: solid
+      border-color: #d0c9c9
+      background-color: #dedede
+    td
+      border-width: 1px
+      padding: 8px
+      border-style: solid
+      border-color: #d0c9c9
+      background-color: #ffffff
+  p
+    word-wrap: break-word
+
+.label
+  color: #333
+  display: inline-block
+  font-weight: bold
+  font-size: 14px
+  text-align: left
+  width: 200px
+  min-width: 200px
+
+.issue-details
+  padding: 20px 40px
+  background: #fff
+  border: 1px solid #DCDCDC
+  border-radius: 4px
+  margin-bottom: 20px
+  .next-prev-links
+    i
+      font-size: 18px
+    span
+      letter-spacing: 2px
+  .issue-subject
+    margin-left: -15px
+    font-size: 18px
+    font-weight: bold
+    border-left: 3px solid $amigoColor
+    p
+      margin-left: 12px
+      padding-top: 3px
+  .author
+    display: inline-block
+  .status-history
+    color: $amigoColor
+    padding: 1px 5px
+    display: inline-block
+    border: 1px solid $amigoColor
+    border-radius: 3px
+    cursor: pointer
+    margin-left: 10px
+  .status-show-history
+    display: none
+    .status-history-wraper
+      padding: 20px
+
+  .value
+    display: inline-block
+  .attribute
+    margin-bottom: 10px
+
+  .description
+    .wiki
+      margin-top: 15px
+      margin-left: 8px
+  .attributes
+    .splitcontentleft, .splitcontentright, .splitcontentline
+      padding-left: 0
+  .attachments-list
+    margin-left: 8px
+    margin-top: 10px
+
+  #relations
+    margin-bottom: 40px
+    .issues-relations-table
+      margin-top: 10px
+      margin-left: 0.6em
+    .checkbox
+      display: none
+
+  .allchange
+    margin: 0 -40px
+    li > a
+      padding: 7px 10px 4px
+      font-weight: bold
+    li.active > a
+      background: #FBFBFB
+    #history, #gitChangeset, #notes
+      margin: 20px 40px
+      padding-left: 8px
+    #history
+      .history-details
+        margin: 20px -40px
+        padding-left: 40px
+        padding-right: 40px
+        background: #FBFBFB
+      .thumbnails
+        padding-left: 40px
+    #gitChangeset
+      .gerrit
+        margin-bottom: 10px
+      .repo
+        display: inline-block
+        margin-right: 15px
+        margin-left: 1em
+        span
+          display: inline-block
+          padding: .2em 1.5em .2em 1em
+          position: relative
+          color: white
+          height: 2em
+          box-sizing: border-box
+          &::before
+            box-sizing: border-box
+            position: absolute
+            content: ""
+            border-left: 1em solid transparent
+            border-top: 1em solid
+            border-top-color: inherit
+            border-bottom: 1em solid
+            border-bottom-color: inherit
+            left: -1em
+            top: 0
+            height: 100%
+            width: 1em
+          &::after
+            box-sizing: border-box
+            position: absolute
+            content: ""
+            border-left: 1em solid
+            border-left-color: inherit
+            border-top: 1em solid transparent
+            border-bottom: 1em solid transparent
+            right: -1em
+            top: 0
+            height: 100%
+            width: 1em
+          &:first-child
+            background-color: #209ad4
+            border-color: #209ad4
+          &:last-child
+            background-color: #31c9e1
+            border-color: #31c9e1
+    .journal
+      margin-bottom: 10px
+      .note-title
+        border-left: 3px solid $amigoColor
+        padding-left: 10px
+        margin-bottom: 5px
+      .note-content
+        background: #efefef
+        border-radius: 4px
+        padding: 10px
+        margin-left: 13px
+        p
+          //display: inline
+          display: block
+          word-wrap: break-word
+          word-break: break-all
+          white-space: normal
+      .details
+        margin-top: 10px
+
+  // Issue bulk_edit page
+  #all_lists
+    margin-bottom: 20px
+    #bulk-selection
+      li
+        white-space: nowrap
+      span
+        display: inline-block
+        margin-left: 10px
+        margin-bottom: -5px
+        margin-top: 5px
+        overflow: hidden
+        white-space: nowrap
+        width: calc(100% - 120px)
+        text-overflow: ellipsis
+
+#reverseMokuai
+  margin-left: 10px
+  i
+    color: #ccc
+    cursor: pointer
+
+
+#update
+  margin-bottom: 20px
+  .issue-update-form
+    padding: 20px 40px
+    background: #fff
+    border: 1px solid #DCDCDC
+    border-radius: 4px
+  .label
+    padding-left: 0
+    width: 100%
+    padding-bottom: 10px
+    border-bottom: 1px solid #DCDCDC
+    margin-bottom: 20px
+  #all_attributes
+    .inline
+      position: relative
+      display: inline-block
+      padding-left: 15px
+      margin-bottom: 0
+      font-weight: 400
+      vertical-align: middle
+    p
+      padding-left: 190px
+      min-height: 1.8em
+      clear: left
+      label:first-child
+        font-weight: bold
+        float: left
+        text-align: right
+        margin-left: -190px
+        width: 180px
+        line-height: 30px
+      #issue_project_id, #issue_tracker_id
+        width: 250px
+      #issue_subject
+        width: 80%
+      .splitcontent
+        width: 85%
+    .wangEditor-container
+      p
+        padding-left: 0
+        min-height: 0
+        clear: none
+        a
+          line-height: normal
+  .add-notes, .add-attachment
+    margin-top: 20px
+
+////// My/Links Page
+.links-head
+  padding-left: 10px
+  border-left: 5px solid $amigoColor
+  margin: 20px 15px
+  font-weight: 600
+  font-size: 14px
+  line-height: 14px
+
+.links-body
+  width: 100%
+  background: #fff
+  max-width: 450px
+  border: 1px solid #eeeeee
+  border-radius: 4px
+  box-shadow: .5px .5px 5px .5px rgba(0, 0, 0, 0.05)
+  display: block
+  margin-bottom: 20px
+  &:link, &:hover, &:active, &:visited
+    color: #333333
+    text-decoration: none
+  &:hover
+    border: 1px solid lighten($amigoColor, 10%)
+  .links-body-img
+    float: left
+    img
+      width: 100%
+  .links-body-text
+    padding: 15px 10px
+    height: 152px
+    background: none
+    overflow: hidden
+    .links-body-title
+      font-size: 14px
+      font-weight: 600
+    .links-body-content
+      color: $amigoColor
+      font-size: 12px
+    .links-body-desc
+      color: #9B9B9B
+      font-size: 12px
+      padding-top: 10px
+      position: absolute
+      bottom: 30px
+      border-top: 1px solid #eee
+      width: calc(100% - 114px)
+.links-no-stytle
+  +link-no-style
+////// My Notification Page
+
+.seamless
+  margin-top: -20px
+.notification-left
+  padding-left: 0!important
+  padding-right: 0!important
+  padding-top: 20px
+  padding-bottom: 20px
+  background: #EAEAEA
+  min-height: 400px
+  .title
+    margin-left: 15px
+    font-weight: bold
+  // Parent ul
+  > ul
+    padding-left: 0
+    margin-bottom: 20px
+    list-style: none
+    +link-no-style
+    > li.active > a, > li > a.selected
+      border-left: 5px solid $amigoColor
+      background: #DADADA
+      box-sizing: border-box
+      padding-left: 10px!important
+  // Children ul
+  ul.menu-children
+    margin-left: 0
+    padding-left: 0
+    list-style: none
+    +link-no-style
+    & a.selected
+      color: $amigoColor
+    li > a
+      padding-left: 30px
+  // Public
+  li
+    position: relative
+    a
+      +position-relative
+      +display-block
+      +padding(8px 15px)
+      +margin-bottom(-1px)
+      +font-bold
+      &:hover
+        background: #DEDEDE
+    a + ul
+      display: none
+    a.selected + ul
+      display: block
+  .tab-group-item .badge
+    position: absolute
+    z-index: 10
+    right: 5px
+    top: 7px
+.notification-right
+  .h2
+    +margin-top(20px)
+.notification-list
+  padding: 0
+  margin: 0
+  list-style-type: none
+  .notification-list-item
+    background: #fff
+    border: 1px solid #DBDBDB
+    border-radius: 4px
+    margin-bottom: 15px
+    position: relative
+    padding: 10px 30px 10px 15px
+    .notification-menu
+      float: right
+      color: #989898
+      line-height: 20px
+      span
+        margin-right: 15px
+      i
+        cursor: pointer
+    .notification-flag:before
+      float: left
+      font-family: "FontAwesome"
+      margin-right: 10px
+      content: "\f111"
+      color: #EAEAEA
+    .unread:before
+      color: $amigoColor
+    .notification-content
+      float: left
+      cursor: pointer
+    .notification-acton
+      border-top: 1px solid #F5F5F5
+      display: none
+      padding-top: 10px
+      margin-left: 22px
+      a.btn
+        margin-right: 5px
+
+////// User Info Pane
+
+.user-info-pane, .popover
+  position: absolute
+  display: none
+  min-width: 300px
+  max-width: 500px
+  min-height: 150px
+  z-index: 999
+  overflow-wrap: normal
+  overflow-wrap: break-word
+  table
+    width: 100%
+    max-width: 100%
+    tr
+      border-top: 1px dotted #eee
+      &:first-child
+        border-top: none
+    td
+      padding: 5px
+      line-height: 1.42857143
+      vertical-align: top
+
+//UI autoComplite CSS Component
+
+.ui-menu
+  list-style: none
+  padding: 0
+  margin: 0
+  display: block
+  outline: none
+
+.ui-widget-content
+  margin: 0
+  padding: 0
+  border: 1px solid #ddd
+  background: #fff
+  color: #333
+
+.ui-menu-item
+  position: relative
+  margin: 0
+  padding: 3px 1em 3px .4em
+  cursor: pointer
+  min-height: 0
+  &:hover
+    color: $amigoColor
+    background: #eee
+.ui-autocomplete
+  position: absolute
+  top: 0
+  left: 0
+  cursor: default
+
+.ui-front
+  z-index: 888
+
+// ContentMenu
+
+#context-menu
+  position: absolute
+  z-index: 40
+  font-size: 0.9em
+  ul, li, a
+    display: block
+    margin: 0
+    padding: 0
+    border: 0
+  ul
+    width: 150px
+    border: 1px solid #ccc
+    background: white
+    list-style: none
+    padding: 2px
+  li
+    position: relative
+    z-index: 39
+    &.folder
+      ul
+        position: absolute
+        left: 168px
+        top: -2px
+        max-height: 300px
+        overflow: hidden
+        overflow-y: auto
+      > ul
+        left: 148px
+  &.reverse-y li.folder > ul, li.folder.up > ul
+    top: auto
+    bottom: 0
+  &.reverse-x li.folder
+    ul
+      left: auto
+      right: 168p
+    > ul
+      right: 148px
+  &.reverse-y li.folder.down > ul
+    position: absolute
+    top: -2px
+    bottom: auto
+    max-height: 300px
+    overflow: hidden
+    overflow-y: auto
+  a
+    color: #333
+    cursor: pointer
+    text-decoration: none !important
+    background-repeat: no-repeat
+    background-position: 1px 50%
+    padding: 7px 13px
+    width: 100%
+  li > a
+    width: auto
+  a.disabled
+    color: #aaa
+    &:hover
+      color: #aaa
+  li
+    a.submenu
+      padding-right: 16px
+      background: url("../images/bullet_arrow_right.png") right no-repeat
+    &:hover
+      background-color: #eee
+  a:hover
+    color: $amigoColor
+  li.folder:hover
+    z-index: 40
+  ul ul
+    display: none
+  li:hover
+    ul
+      ul
+        display: none
+      display: block
+    li:hover ul
+      display: block
+  a.icon-checked
+    background: url(../images/toggle_check.png) no-repeat 3px 40%
+
+// Productions page
+
+.production-action-menu
+  margin-top: 10px
+
+#productions, #projects
+  .splitcontent
+    margin-bottom: 20px
+
+  ul.projects
+    margin: 0
+    padding-left: 1em
+    ul
+      padding-left: 1em
+    > .root
+      margin: 0
+      padding: 0 0 10px
+      border-bottom: 1px solid #eee
+    li
+      list-style-type: none
+      &.root
+        margin-bottom: 1em
+      &.child
+        margin-top: 1em
+    div.root a.project
+      font-weight: bold
+      font-size: 16px
+      margin: 0 0 10px 0
+
+  a.project.closed
+    color: #999
+    &:link, &:visited
+      color: #999
+  .wiki
+    +link-no-style
+
+
+// Webuploader
+
+.webuploader-container
+  position: relative
+  div
+    display: inline-block
+
+.webuploader-element-invisible
+  position: absolute !important
+  clip: rect(1px, 1px, 1px, 1px)
+
+.webuploader-pick-disable
+  opacity: 0.6
+  pointer-events: none
+
+
+// Form sitting - Error
+#errorExplanation, div.flash, .nodata, .warning, .success
+  display: block
+  position: relative
+  min-height: 1em
+  margin: 1em 0
+  padding: 1em 40px
+  line-height: 1.4285em
+  border-radius: .28571429rem
+  border: 1px solid rgba(34,36,38,.15)
+
+#errorExplanation
+  background: url(../images/exclamation.png) 15px 50% no-repeat
+  background-color: #FFF6F6
+  color: #9F3A38
+  border-color: #E0B4B4
+  > ul
+    +margin(5px null 5px null)
+
+.flash
+  margin-top: 8px
+  &.error
+    background-color: #FFF6F6
+    color: #9F3A38
+    border-color: #E0B4B4
+  &.success
+    background-color: #eef5e0
+    color: #2C662D
+    border-color: #A3C293
+    padding: 1em 3em
+  &.notice
+    background: url(../images/true.png) 14px 50% no-repeat
+    background-color: #eef5e0
+    color: #2C662D
+    border-color: #A3C293
+    padding: 1em 3em
+  &.warning
+    background-color: #FFFAF3
+    border-color: #C9BA9B
+    color: #573A08
+
+.conflict
+  background: url(../images/warning.png) 14px 14px no-repeat
+  background-color: #FFF6F6
+  color: #9F3A38
+  border-color: #E0B4B4
+  text-align: left
+  padding: 1em 3em
+
+.nodata
+  background-color: #FFFAF3
+  border-color: #e8c376
+  color: #865707
+  text-align: left
+
+// MokuaiOwnner
+
+#mokuai_ownner_form
+  .select2-container
+    width: 100%!important
+
+// Q and A
+#new_function, #qanda, #qusDetail, #find_person
+  header
+    form
+      background: #dbdbdb
+      &>div.input-group
+        margin: 0
+        padding: 5px 20px
+
+  .ask
+    font-size: 13px
+    word-wrap: break-word
+    color: $amigoColor
+    &:before
+      content: 'Q：'
+      color: $amigoColor
+  .QandA
+    margin: 0 20px
+    dl
+      margin: 0
+      padding: 15px 0
+      border-bottom: solid 1px #f5f5f5
+      dt
+        color: #5c5c5c
+        font-size: 13px
+        white-space: nowrap
+        text-overflow: ellipsis
+        &:before
+          content: 'Q：'
+        &:hover
+          color: $amigoColor
+          cursor: pointer
+          text-decoration: underline
+      dd
+        margin-top: 3px
+        white-space: nowrap
+        text-overflow: ellipsis
+        overflow: hidden
+    dl:last-child
+      margin-bottom: 0
+      border-bottom: none
+
+  .hotQuestion
+    ul
+      padding: 0
+      margin: 0 20px
+      padding-bottom: 10px
+      li
+        padding-top: 10px
+        font-weight: bold
+        white-space: nowrap
+        span
+          display: inline-block
+          width: 15px
+          height: 15px
+          background-color: #999
+          color: #fff
+          text-align: center
+          vertical-align: top
+          border-radius: 3px
+          line-height: 15px
+          margin: 3px 10px 0 0
+        a
+          vertical-align: top
+          white-space: normal
+          display: inline-block
+          margin-right: 20px
+
+      li:nth-child(-n+3)
+        span
+          background-color: #d6942e
+  .section-wrapper
+    border: solid 1px #dcdcdc
+    border-radius: 5px
+    background-color: #fff
+    overflow: hidden
+    > div
+      margin: 0 30px
+      &>header
+        font-size: 16px
+        border-bottom: solid 1px #f5f5f5
+        line-height: 80px
+        i
+          color: #dcdcdc
+        span
+          color: #4d4d4d
+          margin-left: 20px
+        a
+          float: right
+      &>section
+        padding-bottom: 20px
+        aside
+          color: #999
+          font-size: 16px
+          font-weight: bold
+          padding-top: 15px
+          sub
+            font-size: 12px
+        article
+          margin-top: 10px
+          .paper
+            cursor: default
+            border-bottom: solid 1px #f5f5f5
+            padding: 10px 20px
+            &:hover
+              background: #F0F0F0
+              border-radius: 4px
+
+#qusDetail
+  .skip
+    color: #595959
+
+  header
+    h2
+      color: #5c5c5c
+      font-size: 16px
+      font-weight: bold
+      margin-top: 10px
+      &:before
+        content: 'Q：'
+  article
+    margin: 0 20px
+    padding: 20px 10px
+    border-bottom: solid 1px #f5f5f5
+    &>p
+      margin: 10px 0
+  footer
+    margin-top: 20px
+    div
+      overflow: auto
+    form
+      overflow: auto
+      margin: 50px 30px
+      &>div
+        margin: 0
+        margin-bottom: 10px
+        span
+          vertical-align: middle
+          display: inline-block
+          color: #595959
+        ul
+          vertical-align: middle
+          display: inline-block
+          cursor: pointer
+          li
+            float: left
+            margin-left: 3px
+            .selected
+              color: #efb74a
+      textarea
+        resize: none
+      button
+        margin-top: 10px
+        span
+          font-size: 12px
+          display: inline-block
+          width: 100px
+
+#find_person
+  .find_people_depts
+    header
+      padding: 15px 10px
+      text-align: center
+      background: #dbdbdb
+      img
+        width: 60%
+    section
+      padding: 10px
+      border-top: solid 1px #f5f5f5
+      overflow: auto
+      background: #FFF
+      ul#menuList
+        &, ul
+          margin-left: 20px
+          padding: 0
+        li
+          list-style-type: none
+          line-height: 22px
+          i
+            display: inline-block
+            cursor: pointer
+          a
+            margin-left: 5px
+            cursor: pointer
+  .find_people_users
+    .person_list
+      overflow: auto
+      background: #fff
+      li
+        .user-name
+          font-weight: bold
+        .user-job
+          margin-left: 10px
+          color: #A2A2A2
+
+      &:first-child
+        li
+          padding: 8px 10px
+          border-bottom: solid 1px #f5f5f5
+          &:hover
+            cursor: pointer
+            background: #F0F0F0
+            border-radius: 4px
+    .person_detail
+      & header
+        border-bottom: none
+        div:first-child
+          background: url("../../public/amg/pic_big.png") no-repeat center
+          background-size: contain
+          height: 180px
+        div:nth-child(2)
+          margin-bottom: 20px
+          b, i
+            display: block
+            line-height: 25px
+            font-size: 16px
+            text-align: center
+            margin: 0
+            &:first-child
+              font-weight: bold
+              font-size: 18px
+      & section
+        font-size: 14px
+        li
+          padding: 10px 0
+          border-bottom: solid 1px #f5f5f5
+          b
+            &:after
+              content: '：'
+          i
+            margin-left: 5px
+
+.tag
+  display: inline-block
+  padding: .4em .4em
+  font-size: 75%
+  font-weight: 700
+  line-height: 1
+  color: #fff
+  text-align: center
+  white-space: nowrap
+  vertical-align: baseline
+  border-radius: .25rem
+  margin-right: 5px
+.tag-default
+  background-color: #818a91
+.tag-primary
+  background-color: $amigoColor
+.tag-success
+  background-color: #5cb85c
+.tag-info
+  background-color: #5bc0de
+.tag-danger
+  background-color: #d9534f
+.tag-warning
+  background-color: #f0ad4e
+.tag-complete
+  background-color: #FF55FF
+
+////// Project page
+
+.project-menu
+  .notification-left
+    li > a
+      +display-block
+
+.project-menu-info
+  +margin(null null 15px 15px)
+  +font-bold
+  +text-force-wrap
+  color: $amigoColor
+
+.font-bold
+  +font-bold
+
+.top-action-menu
+  margin-top: 15px
+  margin-bottom: 15px
+  a.icon
+    display: inline-block
+    margin-left: 10px
+    color: #333333
+  .issue-watched i
+    color: $amigoColor
+  .btn
+    margin-left: 8px
+
+div.contextual
+  +margin-top(15px)
+  +float-right
+  +clearfix
+
+.project-search
+  +margin-top(10px)
+  +position-relative
+  label
+    +position-absolute
+    right: 28px
+    top: 8px
+  .search-box
+    +padding(15px 10px)
+
+.members
+  .project-show-all-users
+    +background(#ccc)
+
+// Tabs
+#content .tabs
+  +height(2.6em)
+  +margin-bottom(1.2em)
+  +position-relative
+  overflow: hidden
+  ul
+    +margin(0)
+    +position(absolute, null null 0 null)
+    +padding-left(0.5em)
+    +width(2000px)
+    +border-bottom(1px, solid, #ddd)
+    li
+      +float-left
+      list-style-type: none
+      white-space: nowrap
+      +margin-right(4px)
+      +margin-bottom(-1px)
+      +position-relative
+      a
+        +display-block
+        text-decoration: none
+        line-height: 1.3em
+        +padding(7px 10px 4px 10px)
+        +font-bold
+        +border-top-radius(4px)
+        &:hover
+          +background(#eeeeee)
+          text-decoration: none
+        &.selected
+          +background(#FBFBFB)
+          +border(1px, solid, #ddd)
+          +no-border-bottom
+          color: #555
+
+div.tabs-buttons
+  +position(absolute, null 0 0 null)
+  +size(54px 24px)
+  +background(white)
+  +border-bottom(1px, solid, #bbbbbb)
+
+button
+  &.tab-left, &.tab-right
+    font-size: 0.9em
+    cursor: pointer
+    +size(20px 30px)
+    +border(1px, solid, #ccc)
+    +position(absolute, null null -1px null)
+    +padding(4px)
+  &.tab-left:hover, &.tab-right:hover
+    background-color: #f5f5f5
+  &.tab-left:focus, &.tab-right:focus
+    outline: 0
+  &.tab-left
+    right: 20px
+    background: #eeeeee url(../images/bullet_arrow_left.png) no-repeat 50% 50%
+    border-top-left-radius: 3px
+  &.tab-right
+    right: 0
+    background: #eeeeee url(../images/bullet_arrow_right.png) no-repeat 50% 50%
+    border-top-right-radius: 3px
+  &.tab-left.disabled, &.tab-right.disabled
+    background-color: #ccc
+    cursor: unset
+
+// Diff
+
+.diff_out
+  background: #fcc
+  span
+    background: #faa
+
+.diff_in
+  background: #cfc
+  span
+    background: #afa
+
+.text-diff
+  padding: 1em
+  background-color: #f6f6f6
+  color: #505050
+  border: 1px solid #e4e4e4
+
+a.wiki-anchor
+  display: none
+  margin-left: 6px
+  text-decoration: none
+  &:hover
+    color: #aaa !important
+    text-decoration: none
+
+h1:hover a.wiki-anchor, h2:hover a.wiki-anchor, h3:hover a.wiki-anchor
+  display: inline
+  color: #ddd
+
+div.wiki img
+  vertical-align: middle
+  max-width: 100%
+
+// My page layout
+
+.block-receiver
+  border: 1px dashed #c0c0c0
+  margin-bottom: 20px
+  padding: 15px 0 15px 0
+
+.mypage-box
+  margin: 0 0 20px 0
+  color: #505050
+  line-height: 1.5em
+
+.handle
+  cursor: move
+
+a.close-icon
+  display: block
+  margin-top: 3px
+  overflow: hidden
+  width: 12px
+  height: 12px
+  background-repeat: no-repeat
+  cursor: pointer
+  background-image: url('../images/close.png')
+  &:hover
+    background-image: url('../images/close_hl.png')
+
+// Gantt chart
+
+.gantt_hdr
+  position: absolute
+  top: 0
+  height: 16px
+  border-top: 1px solid #c0c0c0
+  border-bottom: 1px solid #c0c0c0
+  border-right: 1px solid #c0c0c0
+  text-align: center
+  overflow: hidden
+  &.nwday
+    background-color: #f1f1f1
+    color: #999
+
+.gantt_subjects
+  font-size: 0.8em
+  div
+    line-height: 16px
+    height: 16px
+    overflow: hidden
+    white-space: nowrap
+    text-overflow: ellipsis
+
+.task
+  position: absolute
+  height: 8px
+  font-size: 0.8em
+  color: #888
+  padding: 0
+  margin: 0
+  line-height: 16px
+  white-space: nowrap
+  &.label
+    width: 100%
+    &.project, &.version
+      font-weight: bold
+
+.task_late
+  background: #f66 url(../images/task_late.png)
+  border: 1px solid #f66
+
+.task_done
+  background: #00c600 url(../images/task_done.png)
+  border: 1px solid #00c600
+
+.task_todo
+  background: #aaa url(../images/task_todo.png)
+  border: 1px solid #aaa
+  &.parent
+    background: #888
+    border: 1px solid #888
+    height: 3px
+
+.task_late.parent, .task_done.parent
+  height: 3px
+
+.task.parent.marker
+  &.starting
+    position: absolute
+    background: url(../images/task_parent_end.png) no-repeat 0 0
+    width: 8px
+    height: 16px
+    margin-left: -4px
+    left: 0px
+    top: -1px
+  &.ending
+    position: absolute
+    background: url(../images/task_parent_end.png) no-repeat 0 0
+    width: 8px
+    height: 16px
+    margin-left: -4px
+    right: 0px
+    top: -1px
+
+.version
+  &.task_late
+    background: #f66 url(../images/milestone_late.png)
+    border: 1px solid #f66
+    height: 2px
+    margin-top: 3px
+  &.task_done
+    background: #00c600 url(../images/milestone_done.png)
+    border: 1px solid #00c600
+    height: 2px
+    margin-top: 3px
+  &.task_todo
+    background: #fff url(../images/milestone_todo.png)
+    border: 1px solid #fff
+    height: 2px
+    margin-top: 3px
+  &.marker
+    background-image: url(../images/version_marker.png)
+    background-repeat: no-repeat
+    border: 0
+    margin-left: -4px
+    margin-top: 1px
+
+.project
+  &.task_late
+    background: #f66 url(../images/milestone_late.png)
+    border: 1px solid #f66
+    height: 2px
+    margin-top: 3px
+  &.task_done
+    background: #00c600 url(../images/milestone_done.png)
+    border: 1px solid #00c600
+    height: 2px
+    margin-top: 3px
+  &.task_todo
+    background: #fff url(../images/milestone_todo.png)
+    border: 1px solid #fff
+    height: 2px
+    margin-top: 3px
+  &.marker
+    background-image: url(../images/project_marker.png)
+    background-repeat: no-repeat
+    border: 0
+    margin-left: -4px
+    margin-top: 1px
+
+.version-behind-schedule a, .issue-behind-schedule a
+  color: #f66914
+
+.version-overdue a, .issue-overdue a, .project-overdue a
+  color: #f00
+
+// Board & Message
+
+.board-content
+  +border(1px, solid, #eee)
+  +background(#fff)
+.message-wrapper
+  +padding(10px 15px)
+  +border-bottom(1px, solid, #eee)
+  +position-relative
+  &:hover
+    +background(#F4F6F9)
+  .message-head
+    +float-left
+    +width(70px)
+  .message-reply_count
+    +display-inline-block
+    +size(50px 30px)
+    line-height: 26px
+    +margin-right(20px)
+    text-align: center
+    background: image-url("message_reply_bg.png") no-repeat
+  .message-body
+    overflow: hidden
+    .message-body-top
+      +height(30px)
+      +clearfix
+      .message-body-top-subject
+        +float-left
+        +width(75%)
+      .message-body-top-author
+        +float-left
+        +width(15%)
+      .message-body-top-date
+        +float-left
+        +width(10%)
+    .message-body-bottom
+      +clearfix
+      .message-body-bottom-content
+        +float-left
+        +width(75%)
+      .message-body-bottom-last_reply
+        +float-left
+        +width(15%)
+      .message-body-top-last_reply_date
+        +float-left
+        +width(10%)
+    .fa
+      color: #ccc
+      +width(35px)
+      +padding(null 10px null 20px)
+
+#add-message
+  +padding(20px null 20px 80px)
+  +border(1px, solid, #eee)
+  +background(#fff)
+  +margin-bottom(20px)
+
+.message-section
+  +border(1px, solid, #eee)
+  +background(#fff)
+  +margin-top(10px)
+  .message-section-subject
+    +height(53px)
+    +border-bottom(1px, solid, #bbbdbf)
+    > h4
+      line-height: 50px
+      +margin-left(20px)
+  .message-section-message
+    background: #fafbfc
+    +border-bottom(1px, solid, #eee)
+    .message-section-message-author
+      +size(120px 100%)
+      +float-left
+      text-align: center
+      .word-avatar
+        +display-block
+        +margin(15px auto)
+    .message-section-message-content
+      background: #fff
+      overflow: hidden
+      +clearfix
+      +padding(20px)
+      .wiki-and-attachment
+        min-height: 180px
+      .floor
+        text-align: right
+
+.message-pagination
+  +margin-left(20px)
+
+#message-form
+  input[type="text"], textarea, .jstElements
+    +width(60%!important)
+
+.reply-section
+  +border(1px, solid, #eee)
+  +no-border-top
+  +padding(20px)
+  +background(#fff)
+  +margin-bottom(20px)
+
+
+// Avatar icon
+.word-avatar
+  +user-select(none)
+  +border(1px, solid, #ccc)
+  cursor: default
+  text-align: center
+  color: #FFF
+  width: 86px
+  .avatar
+    margin: 2px
+    +size(80px 80px)
+    font-size: 45px
+    line-height: 74px
+    +background(linear-gradient(#ccc 10%, #ccc 50%, #ccc 100%))
+
+
+.large-avatar
+  +size(200px)
+  +border(1px, solid, #ccc)
+  +margin(20px auto)
+  img
+    width: 100%
+
+.upload-avatar
+  position: relative
+  #avatar-input
+    +size(70px 30px)
+    position: absolute!important
+    top: 0
+    left: 50%
+    margin-left: -35px
+    cursor: pointer
+    opacity: 0
+
+#toUploadAvatar
+  overflow: hidden
+  height: 430px
+  & > img
+    max-width: 100%
+
+// Version
+*[disabled]
+  background: #E5E5E5!important
+  color: #B1ABAB!important
+
+#roadmap
+  +margin(15px null)
+  .roadmap-query
+  .roadmap-table
+    +margin_top(15px)
+
+.form-inline
+  .form-group
+    +margin-right(15px)
+
+.version-path, .version-issues
+  .wiki
+    +margin(15px null null 8px)
+    overflow: auto
+.unit-test-report-page
+  p, h1, h2, h3, th
+    font-size: 10pt
+
+  h2, h3
+    +font-bold
+
+  table, td, th
+    border-style: solid
+    border-color: black
+
+  table
+    border-spacing: 0
+    border-collapse: collapse
+    border-width: 0 0 1px 1px
+    tr:hover td
+      background-color: #ffffaa!important
+    &.cn
+      border-width: 0 0 1px 0
+    &.s
+      border-width: 1px 0 1px 1px
+
+  table.hdft
+    border-spacing: 0
+    border-collapse: collapse
+    border-style: none
+    margin-top: 10px
+    th, td
+      border-style: none
+      line-height: normal
+    th.tl
+      background: #EAEAEA
+      +padding(8px null)
+    td
+      &.tl
+        text-align: right
+        color: #ccc
+        +link-no-style
+      &.nv
+        display: none
+
+  table.s
+    td
+      padding-left: 0.25em
+      padding-right: 0.25em
+      &.l
+        padding-left: 0.25em
+        padding-right: 0.25em
+        text-align: right
+        background: #f0f0f0
+    tr
+      &.z td
+        background: #ff9999
+      &.p td
+        background: #ffff88
+      &.c td
+        background: #ccffcc
+
+  table.it
+    border-style: none
+    td, th
+      border-style: none
+      +padding(0.2em 0.5em)
+
+  td, th
+    background: white
+    margin: 0
+    line-height: 100%
+    +padding(0.5em 0.5em)
+
+  th
+    border-width: 1px 1px 1px 0
+
+  tr td.h
+    color: red
+
+  td
+    font-family: courier,monospace
+    font-size: 10pt
+    border-width: 0 1px 0 0
+    &.h
+      color: red
+      border-width: 0 1px 0 0
+    &.f
+      border-width: 0 1px 0 1px
+    &.hf
+      color: red
+      border-width: 0 1px 0 1px
+    &.b
+      border-style: none
+      background: transparent
+      line-height: 50%
+    &.bt
+      border-width: 1px 0 0 0
+      background: transparent
+      line-height: 50%
+
+  th.f
+    border-width: 1px 1px 1px 1px
+
+  tr.cis td
+    background: #f0f0f0
+    border-width: 1px 1px 1px 0
+    &.h
+      color: red
+      border-width: 1px 1px 1px 0
+    &.f
+      border-width: 1px 1px 1px 1px
+    &.hf
+      color: red
+      border-width: 1px 1px 1px 1px
+
+  tr.o td
+    background: #f0f0f0
+
+  .in
+    color: #356085
+
+.data-table-top
+  text-align: right
+  input
+    outline: medium
+    border: 1px solid #ccc
+    background-color: #fff
+    transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075)
+.data-table-bottom
+  margin-top: 10px
+  padding-left: 1px
+  & > div
+    display: inline-block
+    margin-right: 10px
+  .dataTables_paginate
+    a.paginate_button, span.ellipsis
+      display: inline-block
+      padding: 5px 8px
+      border: 1px solid #ccc
+      margin-left: -1px
+      margin-bottom: 1em
+      white-space: nowrap
+      text-align: center
+    a.paginate_button
+      cursor: pointer
+    a.current
+      color: white
+      background-color: #da7c2b
+      border-color: #c76f1a
+
+
+//// Emoji
+.emoji
+  vertical-align: middle
+  +size(20px)
+.jstb_emoji
+  background: image-url('emoji.png')
+  background-size: 13px 13px
+.emoji-menu > div
+  overflow-y: auto
+  +width(197px)
+
+//// Log
+.log
+  vertical-align: middle
+  +size(20px)
+.jstb_log
+  background: image-url('add_log.png')
+  background-size: 13px 13px
+
+
+////// Repo
+
+.popover-tips
+  display: inline-block
+  .fa
+    color: #A6A6A6
+
+///// Exception
+
+.oh-exception
+  width: 400px
+  height: 400px
+  position: absolute
+  left: 50%
+  top: 50%
+  margin: -150px 0 0 -200px
+  text-align: center
+  p.notice
+    font-size: 1.1em
+    color: #BDBDBD
+  p.help
+    font-size: .9em
+    color: #BDBDBD
+
+///// Version Release
+
+.version-release-form
+  p.description
+    .jstElements, .jstEditor
+      width: 80%
+  #all_attributes
+    .additional-info textarea
+      height: auto
+
+.release-results-list
+  +margin(10px null null 8px)
+
+// Admin
+
+#admin-items
+  ul
+    li
+      display: inline-flex
+      +size(100px)
+      +float-left
+      +margin(10px)
+      text-align: center
+      background: #E6E5E3
+      justify-content: center
+      align-items: center
+      +link-no-style
+      a
+        +display-block
+      &:hover
+        background: #E8730F
+        a
+          color: white
+
+
+// Version Release Log
+
+.release_log_pane
+  +padding(20px)
+  .release_log_list
+    td
+      +text-force-wrap
+      min-width: 150px
+      max-width: 500px
+  .release_log_bar
+    +margin-bottom(15px)
+
+// Version Release Note
+.release-notes
+  .release-notes-list
+    margin-top: 10px
+    margin-left: 8px
+    .note-title
+      border-left: 3px solid #f88829
+      padding-left: 10px
+      margin-bottom: 5px
+    .note-content
+      background: #efefef
+      border-radius: 4px
+      padding: 10px
+      margin-left: 22px
+    .note-details
+      margin-top: 10px
+
+// Find staffs
+
+#companies
+  #companiesTree
+    height: 70vh
+    border: 1px solid #DCDCDC
+    background: #fff
+  select
+    width: 100%
+
+  .gionee-logo
+    height: 80px
+    padding: 10px
+    text-align: center
+    background: #ccc
+    line-height: 60px
+    img
+      width: 50%
+
+#staffs
+  .name_search
+    padding: 8px 10px
+    background: #ccc
+  #staffLists
+    border: 1px solid #DCDCDC
+    height: 70vh
+    background: #fff
+    overflow: auto
+    ul
+      list-style: none
+      padding: 0
+      margin: 0
+      li
+        height: 60px
+        padding: 10px
+        border-bottom: 1px solid #F0F0F0
+      .active
+        background: #eee
+  .user-picture
+    margin-right: 20px
+    img
+      width: 40px
+      height: 40px
+      border-radius: 50%
+  .user-brief
+    .user-name
+      display: block
+      font-size: 16px
+      font-weight: bold
+    .user-job_name
+      color: #A1A1A1
+
+  #staffInfo
+    margin-left: -31px
+    padding: 20px
+    border: 1px solid #DCDCDC
+    background: #fff
+    height: 70vh
+    background-image: url(image_path("find_staff_bg.png"))
+    .user-avatar
+      width: 200px
+      margin: 20px auto
+      img
+        width: 100%
+        border-radius: 50%
+    .user-details
+      margin: 10px auto
+      padding: 20px
+      width: 100%
+      height: 300px
+      background: rgba(240, 240, 240, 0.5)
+      text-align: center
+      ul
+        margin: 0 25%
+      li
+        span
+          display: block
+          border: 1px dote #eee
+          margin-top: 15px
+        &:first-child
+          font-weight: bold
+          font-size: 20px
+          marg-bottom: 20px
+
+#staffNoContents
+  margin: 0 15px
+  height: 70vh
+  border: 1px solid #DADADA
+  display: flex
+  justify-content: center
+  align-items: center
+  .no-data
+    font-size: 20px
+    color: #ccc
+    text-shadow: 0 1px 1px #fff
+
+// Criterions
+#criterionTable
+  tbody td
+    vertical-align: middle
+#criterionForm
+  .divider
+    margin: 5px 15px 15px
+    border-bottom: 1px solid #eee
+
+// ExportPanel
+
+.export-pane-wrapper
+  ul.export-pane
+    list-style: none
+    padding: 0
+    margin: 0
+    li.export-pane-list
+      position: relative
+      height: 72px
+      padding: 15px 20px
+      border-bottom: 1px solid #eee
+      .export-pane-list-body
+        float: left
+        width: 90%
+      .export-pane-list-foot
+        float: left
+        padding-left: 30px
+        width: 10%
+        height: 38px
+        line-height: 38px
+        a
+          color: #ccc
+          &:hover
+            color: #FF9B7D
+  .export-pane-list-body
+    padding-left: 60px
+    .export-download-btn
+      color: #fff
+      display: inline-block
+      margin-top: -10px
+  @-webkit-keyframes moving-gradient
+    0%
+      background-position: left bottom
+    100%
+      background-position: right bottom
+  .export-progress-bar
+    display: block
+    margin-top: 10px
+    height: 2px
+    width: 100%
+    background: -webkit-linear-gradient(left, #0DB015 30%, #71E504 80%, #00AA00 100%) repeat
+    -webkit-background-size: 50% 100%
+    -webkit-animation-name: moving-gradient
+    -webkit-animation-duration: 1s
+    -webkit-animation-iteration-count: infinite
+    -webkit-animation-timing-function: linear
+
+  +export-format-icon(xlsx)
+  +export-format-icon(csv)
+  +export-format-icon(pdf)
+
+  .export-notice
+    color: #ccc
+    margin: 20px
+    text-align: center
+
+  .export-no-files
+    margin-top: 160px
+    text-align: center
+    font-size: 18px
+    color: #ccc
+    text-shadow: 0 1px 1px #fff
+
+.resourcing-user-table
+  margin: 20px 0

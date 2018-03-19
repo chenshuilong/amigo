@@ -1,0 +1,107 @@
+- if @version.compiled_successfully?
+  %p
+    %span.tag.tag-success 成功
+    %span #{@version.fullname} 版本编译成功！
+  %hr
+  %table
+    %tbody
+      %tr
+        %td.talbe-col-md-2
+          %p.label= @project.show_by(4) ? "产品" : "项目"
+        %td.talbe-col-md-4= @project.try(:name)
+        %td.talbe-col-md-2
+          %p.label 作者
+        %td.talbe-col-md-4= @version.author.try(:name)
+      - unless @project.show_by(4)
+        - keys = [:compile_type, :signature, :ota_whole_compile, :ota_increase_compile]
+        - keys.each_slice(2).each do |attrs|
+          %tr
+            - attrs.each do |attr|
+              %td.talbe-col-md-2
+                %p.label= l("version_#{attr.to_s}")
+              %td.talbe-col-md-4= load_value(@version, attr)
+      - if @project.show_by(4)
+        %tr
+          %td.talbe-col-md-2
+            %p.label= l(:version_auto_test)
+          %td.talbe-col-md-4= load_value(@version, :auto_test)
+        %tr
+          %td.talbe-col-md-2
+            %p.label= l(:version_auto_test_projects)
+          %td.talbe-col-md-4= @version.auto_test_projects.join(',')
+
+      %tr
+        %td.talbe-col-md-2
+          %p.label 版本路径
+        %td{:colspan => 3}= auto_link simple_format(@version.path)
+      %tr
+        %td.talbe-col-md-2
+          %p.label= l("version_repo_one_of_#{@project.show_by(4)? 'app' : 'project'}")
+        %td{:colspan => 3}= link_to_url(@version.repo_one)
+      %tr
+        %td.talbe-col-md-2
+          %p.label= l("version_repo_two_of_#{@project.show_by(4)? 'app' : 'project'}")
+        %td{:colspan => 3}= link_to_url(@version.repo_two)
+  %hr
+  - if @issues.any?
+    %table
+      %tbody
+        %tr
+          %td.talbe-col-md-1= l(:field_type)
+          %td.talbe-col-md-2= "#"
+          %td.talbe-col-md-1= l(:field_status)
+          %td= l(:field_subject)
+          %td.talbe-col-md-1= l(:field_assigned_to)
+        - @issues.each do |vi|
+          %tr
+            %td= load_value(vi, :issue_type)
+            %td= vi.issue.is_a?(Issue) ? (link_to vi.issue.id, vi.issue) : vi.issue.id
+            %td= vi.issue.status
+            %td{class: 'subject'}= vi.issue.subject
+            %td= link_to_user vi.issue.assigned_to
+
+  %hr
+  - if @app_lists.any?
+    %table
+      %tbody
+        %tr
+          - unless @project.show_by(4)
+            %td.talbe-col-md-2= l(:field_production_name)
+            %td.talbe-col-md-3= l(:label_version)
+          %td.talbe-col-md-3= l(:version_applist_apk_name)
+          %td.talbe-col-md-2= l(:version_applist_apk_interior_version)
+          %td.talbe-col-md-2= l(:version_applist_apk_size)
+        - @app_lists.each do |al|
+          %tr
+            - unless @project.show_by(4)
+              %td.talbe-col-md-2= al.app_version.present?? link_to_project(al.app_version.project) : '-'
+              %td.talbe-col-md-3= al.app_version.present?? link_to_version(al.app_version) : '-'
+            %td.talbe-col-md-3= al.apk_name
+            %td.talbe-col-md-2= al.apk_interior_version
+            %td.talbe-col-md-2= al.apk_size.to_i.try(:to_s, :human_size)
+
+- else
+  %p
+    %span.tag.tag-danger 失败
+    %span #{@version.fullname} 版本编译失败！
+  - if @version.log_url.present?
+    %hr
+    %table
+      %tbody
+        %tr
+          %td.talbe-col-md-2
+            %p.label 编译日志
+          %td= auto_link simple_format(@version.log_url)
+
+
+/ Public
+%hr
+%table.button.small
+  %tr
+    %td
+      %table
+        %tr
+          %td= link_to '查看详情', @version
+
+
+

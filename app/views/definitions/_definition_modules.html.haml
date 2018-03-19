@@ -1,0 +1,79 @@
+%form#formModule.form-horizontal{:role => "form"}
+  .form-group
+    = label_tag nil, l(:definition_module_name), class: 'control-label col-sm-2'
+    .col-xs-3
+      = text_field_tag "definition_modules[name]", nil, { class: 'form-control', style: 'width:100%'}
+    = label_tag nil, l(:definition_module_parent), class: 'control-label col-sm-2'
+    .col-xs-3
+      = select_tag "definition_modules[parent_id]", options_for_select(@main_module.map{|v| [v.name,v.id]}), { class: 'form-control', style: 'width:100%'}
+    .col-xs-2
+      = button_tag l(:definition_module_create), {id: 'btn-definitions-module-create', class: "btn btn-primary"}
+  %hr
+  .roadmap-table
+    %table#moduleTable.list.table.table-striped.table-bordered{:class => "csacsa", style: 'width:100%'}
+      %thead
+        %tr
+          %th= l(:numerical_order_all)
+          %th= l(:definition_module_name)
+          %th= l(:definition_module_parent)
+          %th= l(:definition_module_created_at)
+          %th= l(:definition_module_updated_at)
+          %th= l(:option_all)
+      %tbody
+
+:javascript
+
+  new SMValidator('#formModule', {
+      focus: true,
+      required: '这是必填项',
+      rules: {
+        onlyNumber:   [/^\d*$/, '只能输入数字'],
+        onlyAlphabet: [/^[a-z]*$/, '只能输入字母'],
+      },
+      fields: {
+        "definition_modules[name]":         'required',
+        "definition_modules[parent_id]":    'required'
+      },
+      submit: function(valid, form) {
+        if(valid) {
+          onCreateDefinitionModule(getFormParams($('#formModule').get(0)), "#{@project.id}")
+        }
+      }
+  });
+
+  dataTableEditor("moduleTable2",
+    {ajax: {
+      tyoe: "POST",
+      url: ''
+    },
+    fields: [{
+        label: "#{l(:numerical_order_all)}",
+        name: "id"
+      },{
+        label: "#{l(:definition_module_name)}",
+        name: "name"
+      },{
+        label: "#{l(:definition_module_parent)}",
+        name: "parent_id"
+      },{
+        label: "#{l(:definition_module_created_at)}",
+        name: "created_at"
+      },{
+        label: "#{l(:definition_module_updated_at)}",
+        name: "updated_at"
+      },{
+        label: "#{l(:option_all)}",
+        name: "opts"
+      }],
+    columns: [{
+      data: 'id'
+    },{
+      data: 'name'
+    },{
+      data: 'parent_id'
+    },{
+      data: 'created_at'
+    },{
+      data: 'updated_at'
+    }]})
+

@@ -1,0 +1,54 @@
+- provide :nav, "5,2"
+- provide :css, "bootstrap"
+
+- if @labels
+  .h2= l(:repo_compile_machine_status)
+  .issue-details
+    %p.label= l(:repo_all_compile_machines)
+    #compileMachinesTable
+      %table.list.table.table-striped.table-bordered
+        %thead
+          %tr
+            %th= l(:field_category)
+            %th= l(:repo_all_compile_machine_name)
+            %th= l(:field_status)
+            %th= l(:repo_compile_machine_status_current_task)
+            %th= l(:repo_compile_machine_status_remains)
+            %th= l(:field_author)
+        %body
+          - @labels.keys.each do |label|
+            - tasks_in_queue = @jenkins.lable_tasks_in_queue(label)
+            - @labels[label].each_with_index do |node, index|
+              - task = @jenkins.node_current_task(node)
+              - status = @jenkins.node_status(node)
+              %tr
+                - if index == 0
+                  %td{:rowspan => @labels[label].size}
+                    = l("repo_compile_machine_status_label_#{label.downcase}", default: label.gsub(/\Abuild/i, '').humanize)
+                    = popover(:trigger => "click", :content => render_tasks_in_queue(tasks_in_queue),
+                      :title => l(:repo_compile_machine_status_queued_task, :number => tasks_in_queue.count)) do
+                      = icon "tasks"
+                %td.compile-machie-info
+                  = popover(:trigger => "click", :content => @jenkins.node_info(node, :output => :html)) do
+                    = node
+                    = icon 'info-circle'
+                %td{:class => status_class(status)}= l("repo_compile_machine_status_#{status}")
+                %td= link_to_version task
+                %td= distance_of_time_in_words(task.compile_start_on, Time.now) if task.present?
+                %td= link_to_user task.try(:author)
+
+- else
+  .flash.error= l(:repo_access_jenkins_error)
+
+-# :javascript
+-#   $(function(){
+-#       var m=4;
+-#       var s=59;
+-#       var timer = setInterval(function(){
+-#         if(!m && !s){clearInterval(timer); window.location.reload();}
+-#         $('#refreshTimer').html(m+':'+("0"+s).slice(-2));
+-#         s--; if(s<0){s=59; m--;}
+-#       },1000);
+-#   })
+
+

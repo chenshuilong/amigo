@@ -1,0 +1,21 @@
+.attributes
+  %table.table.table-borderless
+    %tbody
+      %tr
+        %th.col-sm-2= l(:task_name)
+        %td.col-sm-10= load_value(@task, :name)
+      %tr
+        %th.col-sm-2= l(:task_description)
+        %td.col-sm-10= simple_format(@task.description)
+      %tr
+        %th.col-sm-2= l(:task_assigned_to_id)
+        %td.col-sm-10= @task.assigned_to
+      %tr
+        %th.col-sm-2= l(:plan_start_date)
+        %td.col-sm-10= @task.start_date.strftime("%F %T")
+      %tr
+        %th.col-sm-2= l(:plan_due_date)
+        %td.col-sm-10= @task.due_date.strftime("%F %T")
+      %tr
+        %th.col-sm-2= l(:field_status)
+        %td.col-sm-10=  Task::TASK_STATUS[@task.status.to_sym][1]

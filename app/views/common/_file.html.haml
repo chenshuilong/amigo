@@ -1,0 +1,11 @@
+.autoscroll
+  %table.filecontent.syntaxhl
+    %tbody
+      - line_num = 1
+      - syntax_highlight_lines(filename, Redmine::CodesetUtil.to_utf8_by_setting(content)).each do |line|
+        %tr{:id => "L#{line_num}"}
+          %th.line-num
+            %a{:href => "#L#{line_num}"}= line_num
+          %td.line-code
+            %pre= line.html_safe
+        - line_num += 1

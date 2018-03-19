@@ -1,0 +1,23 @@
+:plain
+
+  $(".nav-faster-new").removeClass('open');
+  layer.closeAll();
+
+  var type = "#{params[:type]}", content;
+  if(type=="version"){
+    content = '/faster_new/'+type+'?project_type=#{params[:sub_type]}'
+  }else{
+    content = '/faster_new/'+type
+  }
+  
+  var name = "#{scope_text(params[:type])}";
+  layer.open({
+    type: 2,
+    title: '<b>新建'+ name +'</b>',
+    area: ['90%', '80%'],
+    zIndex: 999,
+    moveType: 1,
+    maxmin: false,
+    shadeClose: false,
+    content: content
+  });

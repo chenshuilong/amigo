@@ -1,0 +1,211 @@
+#approveTaskTable
+#taskDialog{:style => "visibility: hidden;"}
+  %div 编辑窗口
+  %div{:style => "overflow: hidden;"}
+    %table{:style => "table-layout: fixed; border-style: none; padding: 10px;"}
+      %tr{:style => "margin-top: 5px;"}
+        %br
+        %br
+        %td{:align => "center"} 问题ID:
+        %td{:align => "center"}
+          %input#issue_id{:disabled => "disabled", :readonly => "true", :type => "text"}
+      %tr{:style => "margin-top: 5px;"}
+        %td{:align => "center"} 原因:
+        %td{:align => "center"}
+          %textarea#reason
+      %tr{:style => "margin-top: 5px;"}
+        %td{:align => "center"} 要求:
+        %td{:align => "center"}
+          %textarea#requirement
+      %tr{:style => "margin-top: 5px;"}
+        %td{:align => "center"} 任务时间:
+        %td{:align => "center"}
+          #created_at
+      %tr{:style => "margin-top: 5px;"}
+        %td{:align => "center"} 状态:
+        %td{:align => "center"}
+          #status
+      %tr{:style => "margin-top: 5px;"}
+        %td{:align => "center"} 拒绝理由:
+        %td{:align => "center"}
+          %textarea#notes
+      %tr{:style => "margin-top: 5px;"}
+        %td{:align => "center", :colspan => "2"}
+          %br
+          %br
+          %input#task_id{:type => 'hidden'}
+          %button#saveBtn 保存
+          %button#cancelBtn{:style => "margin-left: 5px;"} 取消
+
+:css
+  .unread{
+    font-weight: 700;
+    color: #f88829;
+  } 
+:javascript
+
+  var table = $("#approveTaskTable");
+  var dialog = $("#taskDialog");
+
+  var tasksSource =
+  {
+      dataFields: [
+          { name: 'id', type: 'int' },
+          { name: 'task_id', type: 'int' },
+          { name: 'task_name', type: 'string' },
+          { name: 'issue_id', type: 'int' },
+          { name: 'reason', type: 'string' },
+          { name: 'requirement', type: 'string' },
+          { name: 'created_at', type: 'date' },
+          { name: 'status_id', type: 'int' },
+          { name: 'status_name', type: 'string' },
+          { name: 'is_read', type: 'boolean' }
+      ],
+      // root: "Tasks",
+      // record: "Task",
+      type: 'POST',
+      dataType: "json",
+      id: 'id',
+      url: "/tasks/issue_to_task",
+      addRow: function (rowID, rowData, position, commit) {
+          commit(true);
+      },
+      updateRow: function (rowID, rowData, commit) {
+          commit(true);
+      },
+      deleteRow: function (rowID, commit) {
+          commit(true);
+      }
+  };
+  var dataAdapter = new $.jqx.dataAdapter(tasksSource,
+      {
+          formatData: function (data) {
+              $.extend(data, {
+                  token: "#{Token.generate_token_value}",
+                  issue_type: "IssueToApprove",
+                  maxRows: 50
+              });
+              return data;
+          },
+          loadComplete: function () {
+            // data is loaded.
+          }
+      }
+  );
+  var cellClass = function (row, dataField, cellText, rowData) {
+      var unread = rowData.is_read == false ? 'unread' : ''
+      return "grid-cell-overflow " + unread;
+  }
+  var unreadClass = function (row, dataField, cellText, rowData) {
+      var unread = rowData.is_read == false ? 'unread' : ''
+      return unread;
+  }
+  table.jqxDataTable(
+  {
+      width: '100%',
+      height: 680,
+      source: dataAdapter,
+      pageable: true,
+      sortable: true,
+      altRows: true,
+      filterable: true,
+      // theme: 'orange',
+      filterMode: 'advanced',
+      localization: getLocalization(),
+      ready: function () {
+          $("#issue_id").jqxInput({ disabled: true, width: 250, height: 30 });
+          $("#requirement").jqxTextArea({ disabled: true, placeHolder: "请输入要求:",width: 250, height: 80 });
+          $('#reason').jqxTextArea({ disabled: true, placeHolder: "请输入原因:", width: 250, height: 80 });
+          $('#notes').jqxTextArea({ disabled: true, placeHolder: "请输入拒绝理由:", width: 250, height: 80 });
+          $("#created_at").jqxDateTimeInput({ disabled: true, formatString: 'yyyy-MM-dd', width: 250, height: 30 });
+          $("#status").jqxDropDownList({source: new Array({id: 7, name: "拒绝"}, {id: 11, name: "已合入"}), placeHolder: "请选择:", filterPlaceHolder: "搜素", filterable: true, displayMember: 'name', valueMember: 'id', width: 250, height: 30});
+          $("#saveBtn").jqxButton({ height: 30, width: 80 });
+          $("#cancelBtn").jqxButton({ height: 30, width: 80 });
+
+          $("#cancelBtn").mousedown(function () {
+              dialog.jqxWindow('close');
+          });
+          $("#saveBtn").mousedown(function () {
+              dialog.jqxWindow('close');
+              // update edited row.
+              var editRow = parseInt(dialog.attr('data-row'));
+              var rowData = {
+                  task_id: $("#task_id").val(), issue_id: $("#issue_id").val(), reason: $("#reason").val(), notes: $('#notes').val(),
+                  requirement: $("#requirement").val(), created_at: $("#created_at").val(), status_id: $("#status").val(), issue_type: 'IssueToApprove'
+              };
+              remote('/tasks/edit_task', 'POST', { tasks: rowData }, function(res){
+                layer.msg(res.message.toString());
+                table.jqxDataTable('updateRow', editRow, rowData);
+              })
+          });
+          dialog.on('close', function () {
+              // enable jqxDataTable.
+              table.jqxDataTable({ disabled: false });
+          });
+          dialog.jqxWindow({
+              resizable: false, draggable: false,
+              position: { left: table.offset().left + 175, top: table.offset().top + 55 },
+              width: 340, height: 500,
+              autoOpen: false
+          });
+          dialog.css('visibility', 'visible');
+      },
+      pagerButtonsCount: 8,
+      columns: [
+        { text: '问题ID', dataField: 'issue_id', cellsAlign: 'center', align: 'center', width: 100, cellClassName: unreadClass },
+        { text: '原因', dataField: 'reason', cellClassName: cellClass, cellsAlign: 'center', align: 'center', width: 200 },
+        { text: '要求', dataField: 'requirement', cellClassName: cellClass, cellsAlign: 'center', align: 'center', width: 150 },
+        { text: '任务时间', dataField: 'created_at', cellsAlign: 'center', align: 'center', cellsFormat: 'c', cellClassName: unreadClass },
+        { text: '状态', dataField: 'status_id', width: 150, cellClassName: unreadClass, cellsRenderer: function (row, column, value) {
+            if (value == 1)
+              return "提交";
+            else if (value == 7)
+              return "拒绝";
+            else if (value == 11)
+              return "已合入";
+            else
+              return "";
+          }
+        },
+        { text: 'is_read', dataField: 'is_read', hidden: true, cellClassName: 'isRead' }
+      ]
+  });
+  table.on('rowClick', function (event) {
+      var args = event.args;
+      var index = args.index;
+      var row = args.row;
+
+      var cur_row = $("[data-key="+ index +"]");
+      var $isRead = cur_row.children(".isRead");
+      if($isRead.text() == 'false'){
+        cur_row.children().removeClass("unread");
+        $isRead.text(true);
+        var rest_unread = $("span#200_100").find('.badge').text() - 1;;
+        if(rest_unread == 0){
+          $("span#200_100").find('.badge').remove()
+        }else{
+          $("span#200_100").find('.badge').text(rest_unread);
+        }
+        $.post('/tasks/'+ row.task_id +'/handle');
+      }
+
+      dialog.jqxWindow('setTitle', "编辑窗口 -- " + row.task_name);
+      dialog.jqxWindow('open');
+      dialog.attr('data-row', index);
+      table.jqxDataTable({ disabled: true });
+      $("#task_id").val(row.task_id);
+      $("#issue_id").val(row.issue_id);
+      $("#reason").val(row.reason);
+      $("#requirement").val(row.requirement);
+      $("#created_at").val(row.created_at);
+      $("#status").val(row.status_id);
+  });
+  $('#status').on('change', function(event){
+    var args = event.args;
+    var item = args.item;
+    var value = item.value;
+    if (value == 7)
+      $('#notes').jqxTextArea({ disabled: false, placeHolder: "请输入拒绝理由:", width: 250, height: 80 });
+    else
+      $('#notes').jqxTextArea({ disabled: true, placeHolder: "请输入拒绝理由:", width: 250, height: 80 });
+  })

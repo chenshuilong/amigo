@@ -1,0 +1,22 @@
+.user-info-pane{:id => "UserInfo-#{user.id}"}
+  .panel.panel-warning
+    .panel-heading
+      %h3.panel-title= user.name
+    .panel-body
+      %table
+        -# %img.img-responsiv
+        %tr
+          - if user.picture?
+            %td{:rowspan => 10}= avatar(user, :size => :small)
+          %td= l(:user_contact_department)
+          %td= user.parentOrgNm.to_s + " / " + user.orgNm.to_s
+        %tr
+          %td= l(:user_contact_email)
+          %td= user.mails.reject(&:blank?).present?? (mail_to user.mails.reject(&:blank?).first) : "暂无"
+        %tr
+          %td= l(:user_contact_mobile)
+          %td= user.mobile.present?? user.mobile : "暂无"
+        - if user.phone.present?
+          %tr
+            %td= l(:user_contact_phone)
+            %td= user.phone

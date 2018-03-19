@@ -1,0 +1,10 @@
+- provide :nav, "8,1"
+- provide :css, "bootstrap"
+
+.top-action-menu.pull-right
+  = link_to l(:button_add) + @title, operate_google_tools_path(operate_type: 'new', category: @category), :class => 'btn btn-primary btn-sm', remote: true
+
+= title [l(:label_google_tool), google_tools_path], @title
+
+- if @tools.present?
+  = render :partial => 'tool_list', :locals => { :tools => @tools, :category => @category_text }

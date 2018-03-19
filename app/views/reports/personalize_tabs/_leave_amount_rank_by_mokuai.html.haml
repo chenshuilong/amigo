@@ -1,0 +1,48 @@
+%div{:style => "width:100%;"}
+  %ul.notification-list
+    %li.notification-list-item
+      .notification-content
+        %p
+          %strong= "查询条件"
+      .clearfix
+      .notification-acton.select2-rectify
+        %form#formLeaveAmountRankByMokuai.form-inline{:role => "form"}
+          .form-group
+            .input-group
+              .input-group-addon 项目
+              = hidden_field_tag "project","project_id"
+              %select#project_value.form-control{:name => "project_value"}
+                = project_tree_options_for_select(Project.all)
+              -#= select_tag "project_value", project_tree_options_for_select(Project.all)
+          .form-group
+            .input-group
+              .input-group-addon 时间
+              %input#start_dt_rank_mokuai.form-control{:name => "start_dt",:value => "2016-09-01"}
+          .form-group
+            .input-group
+              .input-group-addon 至
+              %input#end_dt_rank_mokuai.form-control{:name => "end_dt",:value => "#{Time.now.strftime('%Y-%m-%d')}"}
+          .form-group
+            %input{:id => "dwm_yn",:type => "checkbox",:style => "display:none",:checked => true}
+            %input{:type => "button",:onclick => "queryLeaveAmountRankByMokuai('leave_amount_rank_by_mokuai')",:class => "btn btn-primary",:value => "查询"}
+
+#chartLeaveAmountRankByMokuai{:style => "height:600px"}
+
+:javascript
+  initSelect("project_rank_mokuai");
+  initDateTimePicker("start_dt_rank_mokuai","Y-m-d",false);
+  initDateTimePicker("end_dt_rank_mokuai","Y-m-d",false);
+
+  $('#project_value,#start_dt,#end_dt').on("change", function (e) {
+    //queryLeaveAmountRankByMokuai('leave_amount_rank_by_mokuai');
+  });
+
+  setTimeout(function () {
+        $('.notification-acton').css("display","block");
+        queryLeaveAmountRankByMokuai('leave_amount_rank_by_mokuai');
+    }, 500);
+
+:css
+  .select2-selection--single{
+    width: 200px;
+  }

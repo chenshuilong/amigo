@@ -1,0 +1,3 @@
+%h1= link_to(@news.title, @news_url)
+%em= @news.author.name
+= textilizable(@news, :description, :only_path => false)

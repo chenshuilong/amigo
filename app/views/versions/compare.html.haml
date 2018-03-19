@@ -1,0 +1,32 @@
+- provide :nav, "5,4"
+- provide :css, "bootstrap"
+
+- content_for :bread do
+  %li= link_to l(:label_roadmap), all_versions_path
+  %li 版本比较
+
+- if @versions.present? 
+  - if @category == 'terminal'
+    .h2= @va.fullname.to_s + " 和 " + @vb.fullname.to_s + ' 的版本比较'
+  - elsif @category == 'other' 
+    .h2= @app.name + '版本比较'
+    %span= @va.sv_name.to_s + " To " + @vb.sv_name.to_s
+
+  .clearfix
+  %ul.nav.nav-tabs{style: "padding:0;border-bottom:0"}
+    - menus = @category == 'terminal' ? %w(app system apk) : %w(app)
+    - menus.each do |i|
+      %li{class: @type == i ? "active" : ""}
+        %a{href: @type == i ? "javascript:void(0);" : "/versions/compare?category=#{@category}&type=#{i}&version_ida=#{@version_ida}&version_idb=#{@version_idb}"}= i
+  .tab-content
+    .tab-pane.fade.in.active#group
+      .clearfix
+      #versionCompareList.issue-details
+        = render :partial => "versions/compares/#{@type}"
+
+:css
+  .select2-selection{
+    min-height: 30px;
+    max-height: 60px;
+    overflow-y: auto;
+  }

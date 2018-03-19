@@ -1,0 +1,26 @@
+- if ownners.present?
+  %table.table.table-striped
+    %thead
+      %tr
+        %th 序号
+        %th 归属
+        %th 模块
+        %th TFDE
+        %th OWNER
+        %th 次要OWNER
+        - if User.current.allowed_to?(:add_mokuai_ownners, project)
+          %th 操作
+    %tbody
+      - ownners.each_with_index do |ownner,index|
+        %tr{:data => {:id => ownner.id}}
+          %th= index + 1
+          %th= ownner.mokuai.reason
+          %th= ownner.mokuai.name
+          %th= ownner.tfder.try(:name)
+          %th= ownner.main_ownner
+          %th= ownner.minor_ownner
+          - if User.current.allowed_to?(:add_mokuai_ownners, project)
+            %th
+              = link_to "编辑", edit_project_mokuai_ownner_path(project.to_param, ownner.id), remote: true
+              = link_to "删除", project_mokuai_ownner_path(project.to_param, ownner.id), "data-confirm" => "确定删除吗？", method: :delete, remote: true
+

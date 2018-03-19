@@ -1,0 +1,114 @@
+#libraryUpdateTask
+
+:css
+  .unread{
+    font-weight: 700;
+    color: #f88829;
+  } 
+
+:javascript
+
+  var table = $("#libraryUpdateTask");
+
+  var tasksSource =
+  {
+      dataFields: [
+          { name: 'id', type: 'int' },
+          { name: 'patch_no', type: 'string' },
+          { name: 'lib_name', type: 'string'},
+          { name: 'lib_path', type: 'string'},
+          { name: 'file', type: 'string'},
+          { name: 'status_name', type: 'string' },
+          { name: 'file_status', type: 'string'},
+          { name: 'conflict_type', type: 'string'},
+          { name: 'due_at', type: 'date' },
+          { name: 'is_read', type: 'boolean'}
+      ],
+      type: 'POST',
+      dataType: "json",
+      id: 'id',
+      url: "/tasks/library_update_task",
+      addRow: function (rowID, rowData, position, commit) {
+          commit(true);
+      },
+      updateRow: function (rowID, rowData, commit) {
+          commit(true);
+      },
+      deleteRow: function (rowID, commit) {
+          commit(true);
+      }
+  };
+  var dataAdapter = new $.jqx.dataAdapter(tasksSource,
+      {
+          formatData: function (data) {
+              $.extend(data, {
+                  token: "#{Token.generate_token_value}",
+                  issue_type: "IssueToSpecialTestResult",
+                  maxRows: 50
+              });
+              return data;
+          },
+          loadComplete: function () {
+            // data is loaded.
+          }
+      }
+  );
+
+  var cellClass = function (row, dataField, cellText, rowData) {
+      var unread = rowData.is_read == false ? 'unread' : ''
+      return unread;
+  }
+
+  table.jqxDataTable({
+      width: '100%',
+      height: 680,
+      source: dataAdapter,
+      pageable: true,
+      sortable: true,
+      altRows: true,
+      filterable: true,
+      filterMode: 'advanced',
+      localization: getLocalization(),
+      pagerButtonsCount: 8,
+      columns: [
+        { text: '#', dataField: 'id', cellsAlign: 'center', align: 'center', width: 100, cellClassName: cellClass },
+        { text: 'Patch编号', dataField: 'patch_no', cellsAlign: 'center', align: 'center', width: 150, cellClassName: cellClass },
+        { text: 'Name', dataField: 'lib_name', cellsAlign: 'center', align: 'center', width: 350, cellClassName: cellClass },
+        { text: 'Path', dataField: 'lib_path', cellsAlign: 'center', align: 'center', width: 350, cellClassName: cellClass },
+        { text: 'File', dataField: 'file', cellsAlign: 'center', align: 'center', width: 350, cellClassName: cellClass },
+        { text: '状态', dataField: 'status_name', cellsAlign: 'center', align: 'center', width: 150, cellClassName: cellClass },
+        { text: '文件状态', dataField: 'file_status', cellsAlign: 'center', align: 'center', width: 150, cellClassName: cellClass },
+        { text: '冲突类型', dataField: 'conflict_type', cellsAlign: 'center', align: 'center', width: 150, cellClassName: cellClass },
+        { text: '计划完成时间', dataField: 'due_at', cellsAlign: 'center', align: 'center', width: 150, cellsFormat: 'yyyy-MM-dd', cellClassName: cellClass },
+        { text: 'is_read', dataField: 'is_read', hidden: true, cellClassName: 'isRead' }
+      ]
+  });
+
+  table.on('rowClick', function (event) {
+      var args = event.args;
+      var index = args.index;
+      var row = args.row;
+
+      var cur_row = $("[data-key="+ row.id +"]");
+      var $isRead = cur_row.children(".isRead");
+      if($isRead.text() == 'false'){
+        cur_row.children().removeClass("unread");
+        $isRead.text(true);
+        $.post('/tasks/'+ row.id +'/handle');
+      }
+
+      var taskId = row.id;
+          
+      layer.closeAll();
+      content = "/tasks/"+taskId+"/library_update_task_edit";    
+      layer.open({
+        type: 2,
+        title: '<b>分支升级任务</b>',
+        area: ['90%', '80%'],
+        zIndex: 999,
+        moveType: 1,
+        maxmin: false,
+        shadeClose: false,
+        content: content
+      });
+  });

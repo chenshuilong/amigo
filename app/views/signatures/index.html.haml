@@ -1,0 +1,94 @@
+- provide :nav, "5,6"
+- provide :css, "bootstrap"
+- content_for :header_tags do
+  %link{:href => "/amg/rangeslider/rangeslider.css", :rel => "stylesheet"}
+  %script{:src => "/amg/rangeslider/rangeslider.js", :type => "text/javascript"}
+
+.top-action-menu.pull-right
+  - if policy(:signature).new?
+    = link_to l(:label_signatures_new), new_signature_path, :class => 'btn btn-primary btn-sm'
+
+.h2= l(:label_signatures)
+
+#roadmap.signature-index
+  .roadmap-query
+    %ul.notification-list 
+      %li.notification-list-item
+        .notification-menu
+          %i.fa.fa-chevron-up
+        .notification-content
+          %p
+            %strong= "查询条件"
+        .clearfix
+        .notification-acton.select2-rectify{:style => "display:block;"}
+          = form_tag({}, {method: :get, class: 'form-horizontal'}) do |f|
+            .form-group
+              = label_tag 'name', l(:signature_name), class: "col-sm-2 control-label"
+              .col-sm-2
+                = text_field_tag 'name', @name, class: "form-control"
+              = label_tag 'status', l(:signature_status), class: "col-sm-2 control-label"
+              .col-sm-2
+                = select_tag 'status', options_for_select(list_for_select(:signature, :status).unshift([l(:label_all), '']), @status), class: "form-control"
+              = label_tag 'author', l(:signature_author_id), class: "col-sm-2 control-label"
+              .col-sm-2
+                = select_tag 'author', options_for_select([[User.find_by(:id => @author), @author]]),                                     |
+                  class: "form-control", :style => "width: 150px;", :onchange => "this.form.submit(); return false;"
+                = select2_remote('author', nil, nil, {withme: false})
+            .form-group
+              = label_tag 'created_at', l(:field_created_on), class: "col-sm-2 control-label"
+              .col-sm-2
+                = text_field_tag 'created_at_start', @created_at_start, class: "form-control", :id => 'patch_created_at_start'
+                = hidden_field_tag 'created_at_end', @created_at_end, class: "form-control", :id => 'patch_created_at_end'
+                = calendar_range_for 'patch_created_at_start', 'patch_created_at_end'
+              .col-sm-2.col-sm-offset-2
+                = submit_tag l(:button_submit), :name => nil, class: "btn btn-primary btn-sm"
+
+%hr
+- if @signs.blank?
+  .alert.alert-warning= l(:label_no_data)
+- else
+  .filter-right#signature_index_table
+    .panel.panel-default
+      .panel-heading
+        .panel-body
+          .row.filter-main{:class => "filter-slide"}
+            .filter-right
+              .issues-wrapper
+                .issues-head
+                  .row.issues-head-function-write
+                    .col-sm-3.col-sm-offset-9
+                      %input.issues-head-function-slider{:type => "range"}
+                .issues-body                 
+                  .autoscroll
+                    %table#issueTable{:class => "list issues table table-striped table-bordered"}
+                      %thead
+                        %tr
+                          %th #
+                          %th= l(:signature_name)
+                          %th= l(:signature_status)
+                          %th= l(:signature_upload_url)
+                          %th= l(:signature_download_url)
+                          %th= l(:signature_infos)
+                          %th= l(:signature_author_id)
+                          %th= l(:field_created_on)
+                          %th= l(:signature_due_at)
+                          %th= l(:signature_notes)
+                      %tbody
+                        - @signs.each do |s|
+                          %tr
+                            %td= link_to s.id, signature_path(s.id)
+                            %td= load_value(s, :name)
+                            %td= load_value(s, :status)
+                            %td= s.upload_url.present? ? link_to(s.upload_url, s.upload_url) : ''
+                            %td= s.download_url.present? ? link_to(s.download_url, s.download_url) : ''
+                            %td= s.infos.present? ? link_to(s.infos, s.infos, target: "_blank") : ''
+                            %td= link_to_user s.author
+                            %td= s.created_at.try(:strftime, "%F %T")
+                            %td= s.due_at.try(:strftime, "%F %T")
+                            %td= load_value(s, :notes)
+                  %span.pagination= pagination_links_full @pages, @count               
+
+:css
+  table.issues a:link, table.issues a:hover, table.issues a:visited{
+    color: #f88829
+  }

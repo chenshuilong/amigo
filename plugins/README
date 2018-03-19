@@ -1,0 +1,14 @@
+## Development
+
+INSTALL PLUGINS:
+	rake redmine:plugins:migrate RAILS_ENV=development
+UNISTALL PLUGINS:
+	rake db:migrate:plugin NAME=plugin_name VERSION=0 RAILS_ENV=development
+
+
+## Production
+
+INSTALL PLUGINS:
+	rake redmine:plugins:migrate RAILS_ENV=production
+UNISTALL PLUGINS:
+	rake db:migrate:plugin NAME=plugin_name VERSION=0 RAILS_ENV=production

@@ -1,0 +1,10 @@
+=column($selector: '.column')
+  +media($desktop)
+    @for $i from 1 through 12
+      &#{$selector}-#{$i}
+        +span-columns($i of 12)
+      @for $j from 1 through $i
+        &#{$selector}-#{$j}-#{$i}
+          +span-columns($j of $i)
+
+

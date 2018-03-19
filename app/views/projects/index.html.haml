@@ -1,0 +1,36 @@
+- provide :nav, "2,1"
+- provide :css, "bootstrap"
+- content_for :header_tags do
+  = auto_discovery_link_tag(:atom, {:action => 'index', :format => 'atom', :key => User.current.rss_key})
+
+.row
+  .col-sm-6.col-md-push-6.top-action-menu.text-right
+    = render_project_action_links
+    = " | "
+    = link_to l(:label_show_closed_projects), {:closed => 1}
+  .col-sm-6.col-md-pull-6.project-search
+    %input{:type => "text", :class => "form-control search-box", :placeholder => l(:label_project_search), |
+      :data => {:nodata => l(:label_no_data)}}
+    %label= icon 'search'
+
+
+-# .h2= l(:label_project_plural)
+%ul.nav.nav-tabs{style: "padding:0;border-bottom:0"}
+  %li{class: params[:tab] == 'odm' ? "" : "active"}= link_to l(:label_project_group), projects_url(tab: "group")
+  %li{class: params[:tab] == 'odm' ? "active" : ""}= link_to l(:label_project_odm), projects_url(tab: "odm")
+
+.tab-content
+  .tab-pane.fade.in.active#group
+    #projects.issue-details
+      = render_project_hierarchy(@projects)
+
+- html_title(l(:label_project_plural))
+
+:javascript
+
+  $(function() {
+    $(".project-search > .search-box").trigger('input');
+  });
+
+  $('.row').pin({padding: {top: 70, bottom: 10}})
+

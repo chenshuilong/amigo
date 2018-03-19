@@ -1,0 +1,318 @@
+- provide :nav, (@project.present?? (@project.show_by(4)? "4,1" : "2,1") : "3,1")
+
+- provide :css, "bootstrap"
+- content_for :header_tags do
+  %link{:href => "/amg/easytree/skin-win8/ui.easytree.css", :rel => "stylesheet"}
+  %link{:href => "/amg/rangeslider/rangeslider.css", :rel => "stylesheet"}
+
+  %script{:src => "/amg/easytree/jquery.easytree.js", :type => "text/javascript"}
+  %script{:src => "/amg/rangeslider/rangeslider.js", :type => "text/javascript"}
+
+  -# %script{:src => "/amg/colResizable/colResizable-1.6.js", :type => "text/javascript"}
+  %script{:src => "/javascripts/context_menu.js"}
+
+- if @project.present?
+  - content_for :bread do
+    %li= link_to_project @project
+    %li= l(:field_issue)
+
+.row.filter-main{:class => ("filter-slide" if cookies[:filterSlideStatus])}
+  .filter-left
+    .filter-side
+      .filter-head
+        .filter-add-icon{:title => "新建筛选条件"}
+          %i.fa.fa-plus
+        .filter-head-title 条件筛选器
+      .filter-list
+        .filter-current-all
+          %a.panel-heading{:href => _project_issues_path(@project), :class => ("active" unless @condition_id.present?)}
+            = icon "cube"
+            %span #{@project? @project.name: nil}所有问题
+            .panel-heading-addition
+              = icon "check-circle-o" unless @condition
+        #filterList.panel-group
+          .panel.panel-default
+            .panel-heading{"data-parent" => "#filterList", "data-toggle" => "collapse", :href => "#filterStar"}
+              %i.fa.fa-star
+              %span 自定义
+              .panel-heading-addition.panel-heading-newfolder
+                = icon "folder-o"
+            #filterStar.panel-collapse.collapse
+              .panel-body.only_self_scroll
+                #filterStarList.filter-list-name
+                  - star_list_cache = $redis.fetch(:hget, "issues/index.condition_lists", User.current.id) do |opt|
+                    - star_list = condition_star_list
+                    - $redis.hset *opt, star_list
+                    - star_list
+                  = raw star_list_cache
+                #filterStarMenu.filter-menu
+                  %ul
+                    %li.forfile
+                      %a.filter-menu-open{:href => "#"} 打开
+                    %li
+                      %a.filter-menu-rename{:href => "#"} 重命名
+                    %li#filter-menu-past
+                      %a.filter-menu-past{:href => "#"} 粘贴
+                    %li.forfile
+                      %a.filter-menu-copy{:href => "#"} 复制
+                    %li.forfile
+                      %a.filter-menu-share{:href => "#"} 分享
+                    %li.forfolder
+                      %a.filter-menu-newfolder{:href => "#"} 新建文件夹
+                    %li.forfolder
+                      %a.filter-menu-newcondition{:href => "#"} 新建查询条件
+                    %li.forfile
+                      %a.filter-menu-edit{:href => "#"} 编辑
+                    %li
+                      %a.filter-menu-delete{:href => "#"} 删除
+          .panel.panel-default
+            .panel-heading{"data-parent" => "#filterList", "data-toggle" => "collapse", :href => "#filterClock"}
+              %i.fa.fa-clock-o
+              %sapn 最近
+            #filterClock.panel-collapse.collapse
+              .panel-body.only_self_scroll
+                #filterHistoryList.filter-list-name
+                  = raw condition_history_list
+                #filterHistoryMenu.filter-menu
+                  %ul
+                    %li.forfile
+                      %a.filter-menu-open{:href => "#"} 打开
+          .panel.panel-default
+            .panel-heading{"data-parent" => "#filterList", "data-toggle" => "collapse", :href => "#filterCog"}
+              %i.fa.fa-cog
+              %sapn 系统定制
+              - if User.current.admin?
+                .panel-heading-addition.panel-heading-newfolder
+                  = icon "folder-o"
+            #filterCog.panel-collapse.collapse
+              .panel-body.only_self_scroll
+                #filterSystemList.filter-list-name
+                  - system_list_cache = $redis.fetch(:hget, "issues/index.condition_lists", 'system') do |opt|
+                    - system_list = condition_system_list
+                    - $redis.hset *opt, system_list
+                    - system_list
+                  = raw system_list_cache
+                #filterSystemMenu.filter-menu
+                  %ul
+                    %li.forfile
+                      %a.filter-menu-open{:href => "javascript:;"} 打开
+                    %li.forfile
+                      %a.filter-menu-sendto{:href => "javascript:;"} 转到我的自定义
+                    %li.forfile
+                      %a.filter-menu-edit{:href => "javascript:;"} 编辑
+                    - if User.current.admin?
+                      %li.forfile
+                        %a.filter-menu-systemedit{:href => "javascript:;"} 系统编辑
+                      %li
+                        %a.filter-menu-rename{:href => "javascript:;"} 重命名
+                      %li.forfolder
+                        %a.filter-menu-newfolder{:href => "javascript:;"} 新建文件夹
+                      %li.forfolder
+                        %a.filter-menu-newcondition{:href => "javascript:;"} 新建查询条件
+                      %li
+                        %a.filter-menu-delete{:href => "javascript:;"} 删除
+      .filter-menu-func
+        #filterStarRename
+          .filter-window-wrapper
+            .filter-window-name
+              %input.filter-window-rename-value{:type => "text", :placeholder => "请输入新的文件名"}
+        #filterStarNewforlder
+          .filter-window-wrapper
+            .filter-window-name
+              %input.filter-window-newfolder-value{:type => "text", :placeholder => "请输入新的文件夹名"}
+        #filterStarShare
+          .filter-window-wrapper
+            = form_tag(share_conditions_path, :id => "shareForm", :remote => true, :onsubmit => "layer.close(share_window)") do
+              = hidden_field_tag "condition_id", nil, :id => "share_condition_id"
+              .filter-window-search
+                .input-group
+                  %input.form-control{:type => "text", :placeholder => "请输入姓名"}
+                  %span.input-group-btn
+                    %button.btn.btn-primary{:type => "button"}
+                      %i.fa.fa-search
+              .filter-window-select
+                .filter-window-select-list
+                .select-window-select-result
+      .filter-window
+        .filter-window-control
+          %a.filter-window-control-conditions.active{:href => "javascript:;" } 查询编辑器
+          %a.filter-window-control-columns{:href => "javascript:;" } 显示编辑器
+        .filter-window-left
+          .filter-window-name
+            %input.filter-window-name-value{:type => "text", :placeholder => "请输入新建查询条件的名称"}
+            %input.filter-window-targetID-value{:type => "hidden"}
+            %input.filter-window-projectID-value{:type => "hidden", :value => (@project.id if @project)}
+          .filter-window-conditions
+            .filter-window-conditions-head
+              .filter-window-pickall
+                %input{:type => "checkbox"}
+                %sapn 全选
+              .filter-window-function
+                %button#filter-func-delete.btn.btn-default.btn-sm
+                  %i.fa.fa-trash
+                  %span 删除
+                %button#filter-func-add.btn.btn-default.btn-sm
+                  %i.fa.fa-plus-square
+                  %span 添加条件
+                %button#filter-func-merge.btn.btn-default.btn-sm
+                  %i.fa.fa-compress
+                  %span 合并关系组
+            .filter-window-conditions-body
+              .filter-window-example
+                .filter-window-element.closest-div
+                  .filter-window-element-check
+                    %input{:type => "checkbox"}
+                  .filter-window-element-func
+                    %a.filter-window-element-delete{:href => "javascript:;"}
+                      %i.fa.fa-trash
+                    %a.filter-window-element-add{:href => "javascript:;"}
+                      %i.fa.fa-plus-square
+                  .filter-window-element-query.input-group.input-group-sm
+                    .input-group-btn
+                      = select_tag 'add_filter_select', filters_options_for_select(@query), :name => nil , :class => "category form-control", "data-tag" => "filter"
+                      %select.relation.form-control{:title => "Choose a item", "data-tag" => "filter"}
+                        %option{:value => " = "} 等于
+                        %option{:value => " LIKE "} 包含
+                        %option{:value => " > "} 大于
+                        %option{:value => " < "} 小于
+                        %option{:value => " <> "} 不等于
+                        %option{:value => " NOT LIKE "} 不包含
+                      = select_tag "add_filter_value", options_for_select(IssueStatus.all.collect{ |i| [i.name, i.id] }), :multiple => :multiple, class: 'value form-control select-multiple', "data-tag" => "filter"
+                .filter-window-group.isgroup.closest-div
+                  .filter-window-group-check
+                    %input{:type => "checkbox"}
+                  .folding.fa.fa-caret-down
+                  .filter-window-gruop-icon
+                  .filter-window-group-func
+                    %a.filter-window-element-delete{:href => "javascript:;"}
+                      %i.fa.fa-trash
+                    %a.filter-window-element-add{:href => "javascript:;"}
+                      %i.fa.fa-plus-square
+                  .filter-window-group-relation
+                    %span 并且
+                    %i.fa.fa-sort
+                    %input.operator{:type => "hidden", :value => " AND "}
+              %ul.filter-pane
+        .filter-window-right
+          .filter-window-right-head
+            .filter-window-right-head-check 显示
+            .filter-window-right-head-field 字段
+            .filter-window-right-head-order 排序
+            .clearfix
+          .filter-window-right-body
+          .filter-window-right-example
+            .table-row
+              .table-cell
+                %input.column_for{:type => "checkbox", :for => "gionee"}
+              .table-cell
+                %div.column_text chengxi
+              .table-cell
+                %span.sort-handle
+
+  .filter-right
+    .issues-wrapper
+      .issues-head
+        .row.issues-head-title
+          .col-sm-6.issues-head-title.sum
+            = "#{@issue_name} (#{@issue_count})"
+          .col-sm-6.issues-head-title-new.text-right
+            - if User.current.allowed_to?(:add_issues, @project, :global => true) && (@project.nil? || Issue.allowed_target_trackers(@project).any?)
+              = link_to _new_project_issue_path(@project), :class => 'btn btn-primary btn-sm' do
+                = icon "plus"
+                = l(:label_issue_new)
+
+        .row.issues-head-function
+          .col-sm-9
+            = form_tag({}, :class => "form-inline issues-head-function-form", :method => "get") do
+              .input-group.issues-head-function-search
+                = hidden_field_tag :condition_id, @condition_id
+                = text_field_tag :word, @word, :class => "form-control", :placeholder => "快速搜索#ID/主题/指派给"
+                %span.input-group-btn
+                  %button.btn.btn-default
+                    = icon "search"
+              - if @condition.present? && @condition.category != 2
+                %button.issues-head-function-changeColumns.btn.btn-primary.btn-sm{:type => "button"}
+                  = icon "pencil-square-o"
+                  修改显示字段
+          .col-sm-3
+            %input.issues-head-function-slider{:type => "range"}
+      .issues-body
+        - if @issues.blank?
+          .alert.alert-warning 查询不到任何数据。
+        - else
+          = render_query_totals(@query)
+          = render :partial => 'issues/list', :locals => {:issues => @issues, :query => @query}
+          %span.pagination= pagination_links_full @issue_pages, @issue_count
+        - other_formats_links do |f|
+          -# = f.link_to 'Atom', :url => params.merge(:key => User.current.rss_key)
+          = f.link_to 'XLSX', :url => params
+          = f.link_to 'CSV', :url => params
+          = f.link_to 'PDF', :url => params
+        #export-options
+          .window-wrapper
+            %p 导出已选列还是所有列?
+            = form_tag(_project_issues_path(@project, :format => 'csv'), :method => :get, :id => 'export-form') do
+              = query_as_hidden_field_tags(@query)
+              = hidden_field_tag 'condition_id', @condition_id, :id => nil
+              = hidden_field_tag 'search', @search, :id => nil
+              = hidden_field_tag 'preview', @preview, :id => nil
+              = hidden_field_tag 'sort', @sort_criteria.to_param, :id => nil
+              = hidden_field_tag 'word', @word, :id => nil
+              = hidden_field_tag 'export_ids', nil, :id => "export_ids"
+              = hidden_field_tag 'lines', @issue_count, :id => "issue_lines"
+              = hidden_field_tag 'caijue', @caijue, :id => nil
+              %p
+                %label
+                  = radio_button_tag 'csv[columns]', '', true
+                  = l(:description_selected_columns)
+                %br/
+                %label
+                  = radio_button_tag 'csv[columns]', 'all'
+                  = l(:description_all_columns)
+              %p
+                %label
+                  = check_box_tag 'csv[description]', '1', @query.has_column?(:description)
+                  = l(:field_description)
+              %p
+                %label
+                  = check_box_tag 'csv[status_histories]', '1', @query.has_column?(:status_histories)
+                  = l(:field_status_histories)
+              - if @issue_count > Setting.issues_export_limit.to_i
+                %p.icon.icon-warning
+                  = l(:setting_issues_export_limit)
+                  \: #{Setting.issues_export_limit.to_i}
+
+.filter-slide-button{:href => "javascript:;"}
+  %i.fa.fa-chevron-left{class: ("fa-chevron-right" if cookies[:filterSlideStatus])}
+
+
+:javascript
+  // Filter pane collapse
+  var availableFilters = #{raw_json @query.available_filters_as_json};
+  var filterCollapseID = localStorage.getItem("filterCollapseID") || "filterStar";
+  var lastViewIssueID  = localStorage.getItem("lastViewIssueID");
+
+  $("#"+filterCollapseID).addClass("in");
+  $('#filterStar, #filterClock, #filterCog').on('show.bs.collapse', function () {
+    localStorage.setItem("filterCollapseID", this.id);
+  })
+
+  // Load ContentMenu
+  contextMenuInit('/issues/context_menu')
+
+  // High light word
+  $("#issueTable").highlight("#{@word}");
+
+  // Fix Filter left panel
+  $(".filter-left").fixedBlock();
+
+  // Light last view issue subject !KEEP LAST!
+  if(lastViewIssueID){ $("#issue-"+lastViewIssueID).addClass('context-menu-selection') }
+
+  // Pin issue-head
+  $('.issues-head-function').pin({padding: {top: 70, bottom: 10}})
+
+:css
+  .select2-drop-active {border-top: 1px solid #5897fb !important;}
+
+  .issues-head-function {z-index: 999}

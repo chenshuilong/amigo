@@ -1,0 +1,109 @@
+- provide :css, "bootstrap"
+
+.clearfix
+  .issue-details{style: "margin-top: 20px"}
+    = render :partial => "issue_to_special_test_results/show"
+      
+- if !@task.finished? && (@task.is_design? || @task.is_assign?)
+  = error_messages_for @result
+  = labelled_form_for @task, :url => update_special_test_task_task_path(@task), :html => {:multipart => true, id: "specialTestTaskForm"} do |f|
+    .issue-details#update
+      #all_attributes
+        - if @task.is_design?
+          %p
+            %label
+              = l(:issue_to_special_test_result_steps)
+              %span.required *
+            = text_area_tag "result[steps]", @result.steps, :style => "width: 80%; height: 100px"
+        - elsif @task.is_assign?  
+          %p
+            %label
+              = l(:issue_to_special_test_result_start_date)
+              %span.required *
+            = text_field_tag "result[start_date]", @result.start_date.try(:strftime, "%F %T")
+            = calendar_for("result_start_date", timepicker = true, options = {})
+          %p
+            %label
+              = l(:issue_to_special_test_result_due_date)
+              %span.required *
+            = text_field_tag "result[due_date]", @result.due_date.try(:strftime, "%F %T")
+            = calendar_for("result_due_date", timepicker = true, options = {})
+          %p
+            %label
+              = l(:issue_to_special_test_result_sample_num)
+              %span.required *
+            = text_field_tag "result[sample_num]", @result.sample_num
+          %p
+            %label
+              = l(:issue_to_special_test_result_catch_log_way)
+              %span.required *
+            = text_field_tag "result[catch_log_way]", @result.catch_log_way
+          %p
+            %label
+              = l(:issue_to_special_test_result_result)
+              %span.required *
+            = select_tag "result[result]", options_for_select(list_for_select(:issue_to_special_test_result, :result), @result.result)
+          %p
+            %label
+              = "备注(专项发现的其他问题)"
+            = text_area_tag "result[notes]", @result.notes, :style => "width: 80%; height: 100px"
+          .box.tabular
+            %p#attachments_form
+              %label= l(:label_attachment_plural)
+              = render :partial => 'attachments/form', :locals => {:container => @result}
+        %p= f.select :status, task_status_options(@task), label: :issue_to_special_test_task_status  
+    .button-group.text-center
+      %a.btn.btn-primary.btn-bg{id:"updateSpecialTestTask", remote: true}= l(:button_save)
+      - if @task.is_assign?
+        %a.btn.btn-primary.btn-bg{id:"updateAssignedToId", remote: true}= "重新指定执行者"
+
+:javascript
+  $("#updateSpecialTestTask").on("click", function(){
+    window.onbeforeunload = null;
+
+    var data = $("form#specialTestTaskForm").serialize();
+    var taskId = "#{@task.id}";
+    $.ajax({
+      url: '/tasks/'+ taskId +'/update_special_test_task.json?key=#{User.current.api_key}',
+      type: "post",
+      data: data,
+      dataType: "json"
+    }).done( function(result){
+      success = result.success;
+      messages = result.message;
+      if(success == 1){
+        var url = "#{my_tasks_path(type: 'issue_to_special_test_task')}";
+        window.parent.location.href = url;
+      }else if(success == 0){
+        var html = '';
+        html = html + "<div id='errorExplanation'><ul>";
+              
+        $.each(messages, function(i, value) {
+          html = html + "<li>" + value + "</li>";
+        });    
+
+        html = html + "</ul></div>";    
+
+        $("#errorExplanation").remove();
+        $("form#specialTestTaskForm").prepend(html);
+      }
+    });   
+  })
+
+  $("#updateAssignedToId").on("click", function(){
+    window.onbeforeunload = null;
+    html = '#{j render :partial => "tasks/assigned_to_id"}';
+    layer.open({
+      type: 1,
+      title: "<b>#{l(:issue_to_special_test_result_assigned_to_id)}</b>",
+      area: ['700px', 'auto'],
+      zIndex: 1031,
+      moveType: 1,
+      shadeClose: false,
+      content: html,
+      btn: ['取消', '确定'],
+      yes: function(index, layero){
+        layer.close(index)
+      }
+    });
+  })

@@ -1,0 +1,83 @@
+- provide :nav, "9,1"
+
+.uaam-wrapper
+  .uaam-title.text-center
+    = icon "pencil"
+    %span UAAM注册
+
+  .row
+    = form_tag({}, :remote => true) do
+      .col-md-6
+        .form-group
+          = label_tag '用户名'
+          = text_field_tag "uaam[account]", nil, :class => "form-control", :required => "true", :tabIndex => "1"
+          %small.form-text.text-muted 请用姓名拼音加数字的格式，如：zhangsan123。
+        .form-group
+          = label_tag '密码'
+          = password_field_tag "uaam[password]", nil, :class => "form-control", :required => "true", :tabIndex => "3"
+        .form-group
+          = label_tag '姓名'
+          = text_field_tag "uaam[name]", nil, :class => "form-control", :required => "true", :tabIndex => "5"
+          %small.form-text.text-muted 外部人员请在姓名后加(外包)，如：张三(外包)。
+        .form-group
+          = label_tag '手机号'
+          = text_field_tag "uaam[mobile]", nil, :class => "form-control", :required => "true", :tabIndex => "7"
+          %small.form-text.text-muted 中国大陆11位的手机号。
+
+      .col-md-6
+        .form-group
+          = label_tag '邮箱'
+          = email_field_tag "uaam[email]", nil, :class => "form-control", :required => "true", :tabIndex => "2"
+          %small.form-text.text-muted 申请者的真实邮箱。
+        .form-group
+          = label_tag '确认密码'
+          = password_field_tag "uaam[password_confirm]", nil, :class => "form-control", :required => "true", :tabIndex => "4"
+        .form-group
+          = label_tag '昵称'
+          = text_field_tag "uaam[nickname]", nil, :class => "form-control", :required => "true", :tabIndex => "6"
+          %small.form-text.text-muted 如果没有，请填写成和姓名一样。
+        .form-group
+          = label_tag '部门'
+          = select_tag "uaam[orgNo]", grouped_options_for_select(IssueQuery.new.available_depts(:orgNo)), :include_blank => true, id: "uaam-dept", :class => "form-control"
+          = select2_for "uaam-dept"
+      .col-md-12
+        .form-group
+          = button_tag '创建', :class => "btn btn-primary", :tabIndex => "8"
+
+
+
+
+
+
+
+
+
+
+:css
+  .uaam-title{
+    font-size: 30px;
+    font-weight: 600;
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #eee;
+  }
+  .uaam-title i {
+    color: grey;
+  }
+
+  .uaam-wrapper {
+    padding: 20px;
+    width: 80%;
+    margin: 10px auto;
+  }
+
+  button[type="submit"] {
+    margin: 0 auto;
+    width: 100%;
+  }
+
+:javascript
+  $("#uaam_password, #uaam_password_confirm").blur(function(){
+    if(!$("#uaam_password").val() || !$("#uaam_password_confirm").val()) {return;}
+    if($("#uaam_password").val() != $("#uaam_password_confirm").val()){alert("两次密码输入不一致");}
+  })

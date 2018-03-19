@@ -1,0 +1,76 @@
+- provide :nav, "5,5"
+- provide :css, "bootstrap"
+
+.top-action-menu.pull-right
+  - if policy(:patch).new?
+    = link_to l(:label_patch_new), new_patch_path, :class => 'btn btn-primary btn-sm'
+.h2= l(:label_patch)
+
+
+#roadmap
+  .roadmap-query
+    %ul.notification-list 
+      %li.notification-list-item
+        .notification-menu
+          %i.fa.fa-chevron-up
+        .notification-content
+          %p
+            %strong= "查询条件"
+        .clearfix
+        .notification-acton.select2-rectify{:style => "display:block;"}          
+          = form_tag({}, {method: :get, class: 'form-horizontal'}) do |f|
+            .form-group
+              = label_tag 'author', l(:field_author), class: "col-sm-2 control-label"
+              .col-sm-2
+                = select_tag 'author', options_for_select([[User.find_by(:id => @author), @author]]),                                     |
+                  class: "form-control", :style => "width: 150px;", :onchange => "this.form.submit(); return false;"
+                = select2_remote('author', nil, nil, {withme: false})
+              = label_tag 'created_at', l(:field_created_on), class: "col-sm-2 control-label"
+              .col-sm-2
+                = text_field_tag 'created_at_start', @created_at_start, class: "form-control", :id => 'patch_created_at_start'
+                = hidden_field_tag 'created_at_end', @created_at_end, class: "form-control", :id => 'patch_created_at_end'
+                = calendar_range_for 'patch_created_at_start', 'patch_created_at_end'
+              = label_tag 'actual_due_at', l(:patch_actual_due_at), class: "col-sm-2 control-label"
+              .col-sm-2
+                = text_field_tag 'actual_due_at_start', @actual_due_at_start, class: "form-control", :id => 'patch_actual_due_at_start'
+                = hidden_field_tag 'actual_due_at_end', @actual_due_at_end, class: "form-control", :id => 'patch_actual_due_at_end'
+                = calendar_range_for 'patch_actual_due_at_start', 'patch_actual_due_at_end'
+            .form-group
+              = label_tag 'status', l(:patch_status), class: "col-sm-2 control-label"
+              .col-sm-2
+                = select_tag 'status', options_for_select([[l(:patch_status_doing), 'doing'], [l(:patch_status_success), 'success'], [l(:patch_status_failed), 'failed']].unshift([l(:label_all), '']), @status),                 |
+                  class: "form-control", :onchange => "this.form.submit(); return false;"
+              .col-sm-2.col-sm-offset-2
+                = submit_tag l(:button_submit), :name => nil, class: "btn btn-primary btn-sm"
+
+  %hr
+  .roadmap-table
+    - if @patches.blank?
+      %p.nodata= l(:label_no_data)
+    - else
+      %table#versionTable.list.table.table-striped.table-bordered
+        %thead
+          %tr
+            %th #
+            %th= l(:patch_patch_no)
+            %th= l(:patch_author_id)
+            %th= l(:patch_notes)
+            %th= l(:patch_status)
+            %th= l(:field_created_on)
+            %th= l(:patch_due_at)
+            %th= l(:patch_actual_due_at)
+        %tbody
+          - @patches.each do |p|
+            %tr
+              %td= link_to p.id, patch_path(p.id)
+              %td= p.patch_no
+              %td= link_to_user p.author
+              %td
+                = popover(:trigger => "click", :content => simple_format(p.notes.to_s), :title => l(:patch_notes), :placement => 'bottom') do
+                  = p.notes.to_s[0,10]
+              %td= l("patch_status_#{p.status}")
+              %td= format_time p.created_at
+              %td= format_date p.due_at
+              %td= format_date p.actual_due_at
+
+      %span.pagination= pagination_links_full @pages, @count

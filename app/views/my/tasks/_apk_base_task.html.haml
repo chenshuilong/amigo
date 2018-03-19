@@ -1,0 +1,118 @@
+.h2= l(:label_apk_base_task)
+
+#apkBaseLibrary
+
+:css
+  .unread{
+    font-weight: 700;
+    color: #f88829;
+  } 
+
+:javascript
+
+  var table = $("#apkBaseLibrary");
+
+  var tasksSource =
+  {
+      dataFields: [
+          { name: 'id', type: 'int' },
+          { name: 'apk_name', type: 'string' },
+          { name: 'platform', type: 'string'},
+          { name: 'app_name', type: 'string'},
+          { name: 'app_category', type: 'string'},
+          { name: 'status_name', type: 'string' },
+          { name: 'notes', type: 'string'},
+          { name: 'is_read', type: 'boolean'}
+      ],
+      type: 'POST',
+      dataType: "json",
+      id: 'id',
+      url: "/tasks/apk_base_task",
+      addRow: function (rowID, rowData, position, commit) {
+          commit(true);
+      },
+      updateRow: function (rowID, rowData, commit) {
+          commit(true);
+      },
+      deleteRow: function (rowID, commit) {
+          commit(true);
+      }
+  };
+  var dataAdapter = new $.jqx.dataAdapter(tasksSource,
+      {
+          formatData: function (data) {
+              $.extend(data, {
+                  token: "#{Token.generate_token_value}",
+                  issue_type: "IssueToSpecialTestResult",
+                  maxRows: 50
+              });
+              return data;
+          },
+          loadComplete: function () {
+            // data is loaded.
+          }
+      }
+  );
+
+  var cellClass = function (row, dataField, cellText, rowData) {
+      var unread = rowData.is_read == false ? 'unread' : ''
+      return unread;
+  }
+
+  table.jqxDataTable({
+      width: '100%',
+      height: 680,
+      source: dataAdapter,
+      pageable: true,
+      sortable: true,
+      altRows: true,
+      filterable: true,
+      filterMode: 'advanced',
+      localization: getLocalization(),
+      pagerButtonsCount: 8,
+      columns: [
+        { text: '#', dataField: 'id', cellsAlign: 'center', align: 'center', width: 100, cellClassName: cellClass },
+        { text: 'Apk名称', dataField: 'apk_name', cellsAlign: 'center', align: 'center', width: 350, cellClassName: cellClass },
+        { text: '集成Android平台', dataField: 'platform', cellsAlign: 'center', align: 'center', width: 150, cellClassName: cellClass },
+        { text: '归属产品', dataField: 'app_name', cellsAlign: 'center', align: 'center', width: 350, cellClassName: cellClass },
+        { text: '产品类型', dataField: 'app_category', cellsAlign: 'center', align: 'center', width: 150, cellClassName: cellClass },
+        { text: '评审结果', dataField: 'status_name', cellsAlign: 'center', align: 'center', width: 150, cellClassName: cellClass },
+        { text: '备注', dataField: 'notes', cellsAlign: 'center', align: 'center', width: 150, cellClassName: cellClass },
+        { text: 'is_read', dataField: 'is_read', hidden: true, cellClassName: 'isRead' }
+      ]
+  });
+
+  table.on('rowClick', function (event) {
+      var args = event.args;
+      var index = args.index;
+      var row = args.row;
+
+      var cur_row = $("[data-key="+ row.id +"]");
+      var $isRead = cur_row.children(".isRead");
+      if($isRead.text() == 'false'){
+        cur_row.children().removeClass("unread");
+        $isRead.text(true);
+        var rest_unread = $("span#400_100").find('.badge').text() - 1;
+        if(rest_unread == 0){
+          $("span#400_100").find('.badge').remove()
+        }else{
+          $("span#400_100").find('.badge').text(rest_unread);
+        }
+        $.post('/tasks/'+ row.id +'/handle');
+      }
+
+      var taskId = row.id;
+          
+      layer.closeAll();
+      content = "/tasks/"+taskId+"/apk_base_task_edit";    
+      layer.open({
+        type: 2,
+        title: '<b>#{l(:label_apk_base_task)}</b>',
+        area: ['90%', '80%'],
+        zIndex: 999,
+        moveType: 1,
+        maxmin: false,
+        shadeClose: false,
+        content: content
+      });
+  });

@@ -1,0 +1,111 @@
+.allchange#patch-show-tabs
+  %hr
+  %ul.nav.nav-tabs
+    %li{:class => ("active" if tab == "history") }
+      = link_to l(:label_history), patch_path(id: @patch.id, tab: "history", type: "js"), remote: true
+    %li{:class => ("active" if tab == "libraries") }
+      = link_to l(:patch_label_library), patch_path(id: @patch.id, tab: "libraries", type: "js"), remote: true
+    %li{:class => ("active" if tab == "precompile") }
+      = link_to l(:patch_label_patch_version_precompile), patch_path(id: @patch.id, tab: "precompile", type: "js"), remote: true
+    %li{:class => ("active" if tab == "library_files") }
+      = link_to l(:patch_label_library_file), patch_path(id: @patch.id, tab: "library_files", type: "js"), remote: true
+    %li{:class => ("active" if tab == "postcompile") }
+      = link_to l(:patch_label_patch_version_postcompile), patch_path(id: @patch.id, tab: "postcompile", type: "js"), remote: true
+    %li{:class => ("active" if tab == "failed_libraries") }
+      = link_to l(:patch_label_failed_library), patch_path(id: @patch.id, tab: "failed_libraries", type: "js"), remote: true
+  .tab-content
+    #history.tab-pane.fade{:class => ("in active") }
+      .history-details
+        - if tab == "library_files"
+          - if @library_files.present?
+            - @library_files.each do |lib|
+              .journal.has-notes
+                %div
+                  .note-title= library_file_title(lib)
+        - if tab == "precompile"
+          - if @precompiles.present?
+            %table.table.table-striped.table-bordered
+              %thead
+                %tr
+                  %th #
+                  %th= l(:patch_version_category)
+                  %th= l(:patch_version_name)
+                  %th= l(:patch_version_version_url)
+                  %th= l(:patch_version_version_log)
+                  %th= l(:patch_version_due_at)
+                  %th= l(:patch_version_status)
+                  %th= l(:patch_version_result)
+              %tbody
+                - @precompiles.each_with_index do |version, i|
+                  %tr
+                    %td= i+1
+                    %td= l("patch_version_category_#{version.category}")
+                    %td= load_value(version, :name)
+                    %td
+                      = popover(:trigger => "click", :content => version.version_url,:title => "详细信息") do
+                        = version.version_url.to_s[0,15]
+                    %td
+                      = popover(:trigger => "click", :content => version.version_log,:title => "详细信息") do
+                        = version.version_log.to_s[0,15]
+                    %td= format_date version.due_at
+                    %td= l("patch_label_#{version.status}")
+                    %td= load_value(version, :result) 
+        - if tab == "failed_libraries"
+          - if @faileds.present?
+            %table.table.table-striped.table-bordered
+              %thead
+                %tr
+                  %th #
+                  %th= l(:library_name)
+                  %th= l(:library_path)
+                  %th= l(:library_status)
+                  %th= l(:library_user_id)    
+              %tbody
+                - @faileds.each_with_index do |lib, i|
+                  %tr
+                    %td= i+1
+                    %td= load_value(lib, :name)
+                    %td= load_value(lib, :path)
+                    %td= l("library_status_#{lib.status}")
+                    %td= link_to_user(lib.user)
+        - if tab == "postcompile"
+          - if @postcompiles.present?
+            %table.table.table-striped.table-bordered
+              %thead
+                %tr
+                  %th #
+                  %th= l(:patch_version_category)
+                  %th= l(:patch_version_name)
+                  %th= l(:patch_version_version_url)
+                  %th= l(:patch_version_version_log)
+                  %th= l(:patch_version_due_at)
+                  %th= l(:patch_version_status)
+                  %th= l(:patch_version_result)
+              %tbody
+                - @postcompiles.each_with_index do |version, i|
+                  %tr
+                    %td= i+1
+                    %td= l("patch_version_category_#{version.category}")
+                    %td= load_value(version, :name)
+                    %td
+                      = popover(:trigger => "click", :content => version.version_url,:title => "详细信息") do
+                        = version.version_url.to_s[0,15]
+                    %td
+                      = popover(:trigger => "click", :content => version.version_log,:title => "详细信息") do
+                        = version.version_log.to_s[0,15]
+                    %td= format_date version.due_at
+                    %td= l("patch_label_#{version.status}")
+                    %td= load_value(version, :result)
+        - if tab == "libraries"
+          - if @libraries.present?
+            - @libraries.each do |lib|
+              .journal.has-notes
+                %div
+                  .note-title{id: "note-title-#{lib.id}"}= patch_lib_title(lib, true)
+                  %div{id: "library-files-#{lib.id}"}
+        - if tab == "history"
+          - if @records.present?
+            - @records.each do |record|
+              %div{:class => "#{record.css_classes}", :id => "change-#{record.id}"}
+                %div{:id => "note-#{record.id}"}
+                  = render_patch_notes(record, @patch)

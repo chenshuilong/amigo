@@ -1,0 +1,16 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+.h2= l(:label_attachment_new)
+= error_messages_for 'attachment'
+= form_tag(project_files_path(@project), :multipart => true, :class => "tabular") do
+  .box
+    - if @versions.any?
+      %p
+        %label{:for => "version_id"}= l(:field_version)
+        = select_tag "version_id", content_tag('option', '') +        |
+          options_from_collection_for_select(@versions, "id", "name") |
+    %p
+      %label= l(:label_attachment_plural)
+      = render :partial => 'attachments/form'
+  = submit_tag l(:button_add), class: "btn btn-primary"

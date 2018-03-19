@@ -1,0 +1,21 @@
+%h2= h @attachment.filename
+.attachments
+  %p
+    = "#{@attachment.description} - " unless @attachment.description.blank?
+    %span.author
+      = link_to_user(@attachment.author)
+      , #{format_time(@attachment.created_on)}
+  %p
+    - if !@attachment.remote_file? || @attachment.ftp_ip.present?
+      - if controller == "attachments"
+        = link_to_attachment @attachment, :text => l(:button_download), :download => true
+      - else
+        = link_to_upload_file @attachment, :text => l(:button_download), :download => true
+      %span.size (#{number_to_human_size @attachment.filesize})
+    - else
+      = l(:notice_file_is_merging)
+
+= yield
+- html_title @attachment.filename
+- content_for :header_tags do
+  = stylesheet_link_tag "scm"

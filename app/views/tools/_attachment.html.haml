@@ -1,0 +1,8 @@
+%span#uploader.attachment-form
+  %span.uploader-container
+    %span{id: "uploader_list_#{extra_type}"}
+    %span.attachment_area{style: "width: 100%"}
+      %span.attachment_area_content
+        = link_to void_js, class: "filePicker", id: extra_type, data: {:upload_path => uploads_path(:format => 'js', :extra_type => extra_type)} do
+          = icon "plus"
+          = l(:notice_click_to_choose_file)

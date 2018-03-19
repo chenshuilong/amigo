@@ -1,0 +1,32 @@
+:plain
+  $("#ajax-modal").html('#{j render :partial => "new", :locals => { :mokuai => @mokuai, :from => @from}}');
+  mokuai_list_new_window = layer.open({
+    type: 1,
+    title: '<b>#{l(:label_mokuai_list_new)}</b>',
+    area: ['600px', 'auto'],
+    zIndex: 666,
+    moveType: 1,
+    shadeClose: false,
+    content: $("#ajax-modal"),
+    btn: ['取消', '确定'],
+    yes: function(index, layero){
+      layer.close(mokuai_list_new_window)
+    }
+  });
+
+  $(".layui-layer-btn1").on("click", function(){
+    var form = $("#mokuaiNewForm")
+    var data = form.serialize();
+    $.ajax({
+       url: '/mokuais/#{@mokuai.id}',
+       type: "post",
+       data: data,
+       success: function (data) {
+          if(data.success == 1){
+            layer.msg("操作成功!");
+          }else{
+            layer.alert(data.messages);
+          }
+       }
+    });
+  })

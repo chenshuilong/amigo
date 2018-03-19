@@ -1,0 +1,29 @@
+= form_tag criterion, id: 'criterionForm', method: :patch do |f|
+  .row
+    - criterion.children.each_slice(criterion.children.length/2.0 + 0.5).each do |secondaries|
+      .col-xs-6
+        - secondaries.each do |secondary|
+          .form-group
+            = label_tag secondary.name
+            = text_field_tag "children[#{secondary.id}][target]", secondary.target
+  .divider
+  .row
+    .col-xs-12
+      - [:avaliable_statuses, :solved_statuses].each do |status|
+        .form-group
+          = label_tag l("criterion_settings_#{status}")
+          = select_tag "criterion[settings][#{status}]", options_from_collection_for_select(IssueStatus.all, :id, :name, criterion.settings[status]), |
+            multiple: true, style: "width: 100%"
+          = select2_for "criterion_settings_#{status}"
+      .form-group
+        = label_tag l(:criterion_settings_depts)
+        = select_tag "criterion[settings][depts]", grouped_options_for_select(IssueQuery.new.available_depts, criterion.settings[:depts]), |
+          :include_blank => true, multiple: true, style: "width: 100%"
+        = select2_for "criterion_settings_depts"
+  .divider
+  .row
+    .col-xs-12
+      - [:purpose, :dept_range, :output_time].each do |attr|
+        .form-group
+          = label_tag l("criterion_#{attr}")
+          = text_area_tag "criterion[#{attr}]", criterion[attr], class: 'form-control'

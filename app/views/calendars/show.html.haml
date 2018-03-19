@@ -1,0 +1,31 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+
+%h2= @query.new_record? ? l(:label_calendar) : @query.name
+= form_tag({:controller => 'calendars', :action => 'show', :project_id => @project}, |
+  :method => :get, :id => 'query_form') do                                           |
+  = hidden_field_tag 'set_filter', '1'
+  %fieldset#filters{:class => "collapsible #{@query.new_record? ? "" : "collapsed"}"}
+    %legend{:onclick => "toggleFieldset(this);"}= l(:label_filter_plural)
+    %div{:style => "#{@query.new_record? ? "" : "display: none;"}"}
+      = render :partial => 'queries/filters', :locals => {:query => @query}
+  %p{:style => "float:right;"}
+    = link_to_previous_month(@year, @month, :accesskey => accesskey(:previous))
+    | #{link_to_next_month(@year, @month, :accesskey => accesskey(:next))}
+  %p.buttons
+    = label_tag('month', l(:label_month))
+    = select_month(@month, :prefix => "month", :discard_type => true)
+    = label_tag('year', l(:label_year))
+    = select_year(@year, :prefix => "year", :discard_type => true)
+    = link_to_function l(:button_apply), '$("#query_form").submit()', :class => 'icon icon-checked'
+    = link_to l(:button_clear), { :project_id => @project, :set_filter => 1 }, :class => 'icon icon-reload'
+= error_messages_for 'query'
+- if @query.valid?
+  = render :partial => 'common/calendar', :locals => {:calendar => @calendar}
+  = call_hook(:view_calendars_show_bottom, :year => @year, :month => @month, :project => @project, :query => @query)
+  %p.legend.cal
+    %span.starting= l(:text_tip_issue_begin_day)
+    %span.ending= l(:text_tip_issue_end_day)
+    %span.starting.ending= l(:text_tip_issue_begin_end_day)
+- content_for :sidebar do
+  = render :partial => 'issues/sidebar'
+- html_title(l(:label_calendar))

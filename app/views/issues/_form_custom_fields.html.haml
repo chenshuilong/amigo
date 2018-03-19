@@ -1,0 +1,14 @@
+- custom_field_values = @issue.editable_custom_field_values
+- if custom_field_values.present?
+  .splitcontent.row
+    - textarea_count = custom_field_values.select{|s| s.custom_field.field_format == "text"}.count
+    - split_on = ((custom_field_values.size + textarea_count*2)/ 2.0).ceil - 1
+    .col-md-6
+      - custom_field_values.each_with_index do |value, index|
+        - if index <= split_on
+          %p= custom_field_tag_with_label :issue, value, :required => @issue.required_attribute?(value.custom_field_id)
+    .col-md-6
+      - custom_field_values.each_with_index do |value, index|
+        - if index > split_on
+          %p= custom_field_tag_with_label :issue, value, :required => @issue.required_attribute?(value.custom_field_id)
+  .clearfix

@@ -1,0 +1,9 @@
+- if @ownner.blank?
+  layer.alert("当前项目中，未查找到当前指派对象负责的模块。");
+- else
+  :plain
+    $(".mokuai-name").empty();
+    $.each(#{@mokuais}, function(i, v){$(".mokuai-name").append("<option value='"+v[0]+"'>"+v[1]+"</option>")});
+    $(".mokuai-reason").val("#{@reason}");
+    $(".mokuai-name").val("#{@name}");
+    $("#issue-form").off("change", "select.mokuai-reason").off("change", "select.mokuai-name");

@@ -1,0 +1,102 @@
+- provide :nav, "4,3"
+- provide :css, "bootstrap"
+
+- content_for :header_tags do
+  %link{:href => "/amg/rangeslider/rangeslider.css", :rel => "stylesheet"}
+  %script{:src => "/amg/rangeslider/rangeslider.js", :type => "text/javascript"}
+
+.top-action-menu.pull-right
+  - if policy(:mokuai).list?
+    = link_to l(:label_mokuai_list), list_mokuais_path, class: "btn btn-primary btn-sm"
+  - if policy(:production).records?
+    = link_to l(:label_history), app_records_path, class: "btn btn-primary btn-sm"
+  - if policy(:production).members?
+    = link_to(l(:label_export_to), app_members_path(:format =>"xlsx", params: params), :class => 'btn btn-primary btn-sm')
+
+.h2= l(:label_production_members)
+
+
+#roadmap
+  .roadmap-query
+    %ul.notification-list 
+      %li.notification-list-item
+        .notification-menu
+          %i.fa.fa-chevron-up
+        .notification-content
+          %p
+            %strong= "查询条件"
+        .clearfix
+        .notification-acton.select2-rectify{:style => "display:block;"}          
+          = form_tag({}, {method: :get, class: 'form-horizontal'}) do |f|
+            .form-group
+              = label_tag 'dev_department', l(:field_dev_department), class: "col-sm-1 control-label"
+              .col-sm-2
+                = select_tag 'dev_department', grouped_options_for_select(IssueQuery.new.available_depts, @dev_department), placeholder: l(:apk_base_name),class: "form-control", :include_blank => true, :onchange => "this.form.submit(); return false;"
+                = select2_for("dev_department")
+              = label_tag 'production_type', l(:project_production_type), class: "col-sm-1 control-label"
+              .col-sm-2
+                = select_tag 'production_type', options_for_select([[l(:label_all), ""], ["APK", 1], ["预装应用", 4]], @production_type),   |
+                  placeholder: l(:apk_base_name), class: "form-control", :onchange => "this.form.submit(); return false;"
+              = label_tag 'project_ids', l(:project_category_other), class: "col-sm-1 control-label"
+              .col-sm-2
+                = select_tag 'project_ids', options_for_select(@projects.present? ? @projects.pluck(:identifier, :id) : [], @project_ids),   |
+                  class: "form-control", :multiple => true
+                = select2_remote('project_ids', nil, "--- 请选择应用 ---", :url => search_projects_path(category: 'other', production_type: [1,4]))
+            .form-group
+              = label_tag 'apk_base_ids', "APK", class: "col-sm-1 control-label"
+              .col-sm-2
+                = select_tag 'apk_base_ids', options_for_select(@apks.present? ? @apks.map{|v| [v.name, v.id]} : [], @apk_bases_ids),    |
+                  class: "form-control", :multiple => true
+                = select2_remote('apk_base_ids', nil, "--- 请选择APK ---", :url => search_apk_bases_path)
+              .col-sm-2.col-sm-offset-1
+                = submit_tag l(:button_query), :name => nil, class: "btn btn-primary btn-sm"
+
+  %hr
+  .roadmap-table
+    - if @apps.blank?
+      %p.nodata= l(:label_no_data)
+    - else
+      .filter-right#version_publish_edit
+        .panel.panel-default
+          .panel-heading
+            .panel-body
+              .row.filter-main{:class => "filter-slide"}
+                .filter-right
+                  .issues-wrapper
+                    .issues-head
+                      .row.issues-head-function-write
+                        .col-sm-3.col-sm-offset-9
+                          %input.issues-head-function-slider{:type => "range"}
+                    .issues-body                 
+                      .autoscroll
+                        %table#issueTable{:class => "list issues table table-striped table-bordered"}
+                          %thead
+                            %tr
+                              %th #
+                              %th= l(:field_dev_department)
+                              %th= l(:project_production_type)
+                              %th= l(:project_category_other)
+                              %th= "APK"
+                              - @roles.each do |role|
+                                %th= role[1]
+                              %th= l(:project_has_adapter_report)
+                              %th= l(:label_remark)
+                          %tbody
+                            - @apps.each do |app|
+                              %tr
+                                %td= policy(:production).edit_info? ? link_to(app.id, edit_info_production_path(app.id), remote: true, style: "color: #f88829") : app.id
+                                %td= Dept.find_by(id: app.dev_department).try(:orgNm)
+                                %td= load_value(app, :production_type)
+                                %td= link_to_project(app)
+                                %td= app.apk_bases.map(&:name).join(", ")
+                                = render_app_roles(app.roles)
+                                %td{id: "adapter-report-#{app.id}edit_info.js.haml"}= load_value(app, :has_adapter_report)
+                                %td{id: "notes-#{app.id}"}= app.notes
+                      %span.pagination= pagination_links_full @pages, @count
+
+:css
+  .select2-selection {
+    min-height: 30px;
+    max-height: 60px;
+    overflow-y: auto;
+  }

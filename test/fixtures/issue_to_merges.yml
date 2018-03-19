@@ -1,0 +1,25 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  issue_id: 1
+  change_id: MyString
+  branche_ids: MyText
+  related_issue_ids: MyText
+  related_apks: MyText
+  tester_advice: MyText
+  dept_result: MyText
+  project_result: MyText
+  master_version_id: MyText
+  branch_version_ids: MyText
+
+two:
+  issue_id: 1
+  change_id: MyString
+  branche_ids: MyText
+  related_issue_ids: MyText
+  related_apks: MyText
+  tester_advice: MyText
+  dept_result: MyText
+  project_result: MyText
+  master_version_id: MyText
+  branch_version_ids: MyText

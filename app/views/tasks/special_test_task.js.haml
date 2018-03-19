@@ -1,0 +1,17 @@
+:plain
+
+  $(".nav-faster-new").removeClass('open');
+  layer.closeAll();
+
+  content = '/tasks/#{params[:id]}/edit_special_test_task';
+
+  layer.open({
+    type: 2,
+    title: '<b>#{l(:label_issue_to_special_test_task)}</b>',
+    area: ['90%', '80%'],
+    zIndex: 745,
+    moveType: 1,
+    maxmin: false,
+    shadeClose: false,
+    content: content
+  });

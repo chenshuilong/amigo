@@ -1,0 +1,25 @@
+.contextual
+  = form_tag(                                                                 |
+      {:controller => 'repositories', :action => 'revision', :id => @project, |
+       :repository_id => @repository.identifier_param},                       |
+      :method => :get                                                         |
+    ) do                                                                      |
+    = l(:label_revision)
+    \: #{text_field_tag 'rev', nil, :size => 8}
+    \#{submit_tag 'OK'}
+%h2= l(:label_revision_plural)
+= render :partial => 'revisions',     |
+  :locals => {:project   => @project, |
+  :path      => '',                   |
+  :revisions => @changesets,          |
+  :entry     => nil }                 |
+%span.pagination= pagination_links_full @changeset_pages,@changeset_count
+- content_for :header_tags do
+  = stylesheet_link_tag "scm"
+  = auto_discovery_link_tag(                                          |
+    :atom,                                                            |
+    params.merge(                                                     |
+    {:format => 'atom', :page => nil, :key => User.current.rss_key})) |
+- other_formats_links do |f|
+  = f.link_to 'Atom', :url => {:key => User.current.rss_key}
+- html_title(l(:label_revision_plural))

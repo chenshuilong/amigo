@@ -1,0 +1,4 @@
+%h2= l(:label_spent_time)
+= labelled_form_for @time_entry, :url => time_entry_path(@time_entry) do |f|
+  = render :partial => 'form', :locals => {:f => f}
+  = submit_tag l(:button_save)

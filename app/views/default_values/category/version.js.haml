@@ -1,0 +1,14 @@
+:plain
+  var json = #{@default_value.json};
+  var mail_receivers = #{mail_receivers(@default_value.json)}
+
+  // Render values
+  $.each(json, function(i,v){
+    if(i == "version[mail_receivers][]"){
+      $("#version_mail_receivers").select2({data: mail_receivers})
+    }
+    $("[name='"+i+"']").val(v)
+  });
+
+  // Refresh select2
+  $(".select2-origin").trigger('change.select2');

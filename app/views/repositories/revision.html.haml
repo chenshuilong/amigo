@@ -1,0 +1,40 @@
+.contextual
+  «
+  - unless @changeset.previous.nil?
+    = link_to_revision(@changeset.previous, @repository,               |
+      :text => l(:label_previous), :accesskey => accesskey(:previous)) |
+  - else
+    = l(:label_previous)
+  |
+  - unless @changeset.next.nil?
+    = link_to_revision(@changeset.next, @repository,           |
+      :text => l(:label_next), :accesskey => accesskey(:next)) |
+  - else
+    = l(:label_next)
+  » 
+  
+  \#{form_tag({:controller => 'repositories', :action     => 'revision', :id         => @project, :repository_id => @repository.identifier_param, :rev        => nil}, :method     => :get) do}
+    = text_field_tag 'rev', @rev, :size => 8
+    = submit_tag 'OK', :name => nil
+= render :partial => 'changeset'
+- if User.current.allowed_to?(:browse_repository, @project)
+  %h3= l(:label_attachment_plural)
+  %ul#changes-legend
+    %li.change.change-A= l(:label_added)
+    %li.change.change-M= l(:label_modified)
+    %li.change.change-C= l(:label_copied)
+    %li.change.change-R= l(:label_renamed)
+    %li.change.change-D= l(:label_deleted)
+  %p= link_to(l(:label_view_diff),                                     |
+      :action => 'diff',                                               |
+      :id     => @project,                                             |
+      :repository_id => @repository.identifier_param,                  |
+      :path   => "",                                                   |
+      :rev    => @changeset.identifier) if @changeset.filechanges.any? |
+  .changeset-changes
+    = render_changeset_changes
+- content_for :header_tags do
+  = stylesheet_link_tag "scm"
+- title = "#{l(:label_revision)} #{format_revision(@changeset)}"
+- title << " - #{@changeset.comments.truncate(80)}"
+- html_title(title)

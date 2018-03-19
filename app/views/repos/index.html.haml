@@ -1,0 +1,61 @@
+- provide :nav, "5,1"
+- provide :css, 'bootstrap'
+- content_for :header_tags do
+  %link{:href => "/amg/dataTable/datatable.css", :rel => "stylesheet"}
+  %link{:href => "/amg/dataTable/fixedColumns.bootstrap.min.css", :rel => "stylesheet"}
+
+  %script{:src => "/amg/dataTable/dataTables.fixedColumns.min.js", :type => "text/javascript"}
+  %script{:src => "/amg/dataTable/dataTables.bootstrap.min.js", :type => "text/javascript"}
+
+- if User.current.is_scm?
+  .top-action-menu.pull-right
+    = link_to(l(:repo_new), new_repo_path, :class => 'btn btn-primary btn-sm')
+.h2= l(:repo_all)
+
+.clearfix
+.issue-details
+  - unless policy(:repo).index?
+    %p.nodata= l(:notice_not_authorized)
+  - else
+    - if @repos.empty?
+      %p.nodata= l(:label_no_data)
+    - else
+      .roadmap-query
+        = form_tag({}, {method: :get, class: 'form-inline'}) do |f|
+          .form-group
+            = label_tag 'category', l(:repo_category)
+            = select_tag 'category', options_for_select(                                     |
+              list_for_select(:repo, :category).unshift([l(:label_all), '']), @category),    |
+              class: "form-control", :onchange => "this.form.submit(); return false;"
+          .form-group
+            = label_tag 'url', l(:repo_url)
+            = text_field_tag 'url', params[:url], class: "form-control"
+          = submit_tag l(:button_submit), :name => nil, class: "btn btn-primary btn-sm"
+
+      .roadmap-table
+        %table#repoTable.list.table.table-striped.table-bordered
+          %thead
+            %tr
+              = sort_header_tag('id', :caption => "#")
+              = sort_header_tag('url', :caption => l(:repo_url))
+              = sort_header_tag('category', :caption => l(:repo_category))
+              = sort_header_tag('description', :caption => l(:field_description))
+              = sort_header_tag('author_id', :caption => l(:field_author))
+          %tbody
+            - @repos.each do |r|
+              %tr
+                %td= link_to r.id, r
+                %td= r.url
+                %td= load_value(r, :category)
+                %td= r.description
+                %td= link_to_user r.author
+              = call_hook :view_projects_roadmap_version_bottom, :r => r
+      %span.pagination= pagination_links_full @pages, @count
+
+- html_title(l(:repo_all))
+
+:javascript
+
+  var appTable = initDataTable('repoTable',{
+    paging: false, ordering: true, info: false, searching: false, select: true, scrollX: true
+  });

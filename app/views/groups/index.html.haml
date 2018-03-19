@@ -1,0 +1,18 @@
+.contextual
+  = link_to l(:label_group_new), new_group_path, :class => 'icon icon-add'
+= title l(:label_group_plural)
+- if @groups.any?
+  %table.list.groups
+    %thead
+      %tr
+        %th= l(:label_group)
+        %th= l(:label_user_plural)
+        %th
+    %tbody
+      - @groups.each do |group|
+        %tr{:class => "#{cycle 'odd', 'even'} #{"builtin" if group.builtin?}", :id => "group-#{group.id}"}
+          %td.name= link_to group, edit_group_path(group)
+          %td.user_count= (@user_count_by_group_id[group.id] || 0) unless group.builtin?
+          %td.buttons= delete_link group unless group.builtin?
+- else
+  %p.nodata= l(:label_no_data)

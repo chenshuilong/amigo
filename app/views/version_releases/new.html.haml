@@ -1,0 +1,25 @@
+- provide :nav, "4,2"
+- provide :css, "bootstrap"
+
+.h2= l(:version_release_new)
+-# = labelled_form_for @release do |f|
+-#   = error_messages_for 'version_release'
+-#   #update.issue-details.version-release-form
+-#     #all_attributes
+-#       = render :partial => 'form', :locals => { :f => f }
+-#   .button-group.text-center
+-#     = submit_tag l(:button_create), class: "btn btn-primary"
+
+= labelled_form_for @release, :html => {:class => 'form-wrapper version-release-form', :multipart => true} do |f|
+  = error_messages_for 'release'
+  .box.tabular
+    #all_attributes
+      = render :partial => 'form', :locals => { :f => f }
+    %p#attachments_form
+      %label= l(:label_attachments)
+      = render :partial => 'attachments/form', :locals => {:container => @release}
+  .button-group.text-center
+    = submit_tag l(:button_create), class: "btn btn-primary"
+
+
+- html_title(l(:version_release_new))

@@ -1,0 +1,6 @@
+%h3.title= l(:label_user_new)
+= form_for(@group, :url => group_users_path(@group), :remote => true, :method => :post) do |f|
+  = render :partial => 'new_users_form'
+  %p.buttons
+    = submit_tag l(:button_add)
+    = submit_tag l(:button_cancel), :name => nil, :onclick => "hideModal(this);", :type => 'button'

@@ -1,0 +1,12 @@
+%li.notification-list-item{:id => "notifications-#{n.id}"}
+  .notification-menu
+    %span= format_time(n.created_at)
+    %i.fa.fa-chevron-down
+  .notification-flag{:class => ("unread" unless n.is_read?)}
+  .notification-content
+    %p
+      %strong= n.sender.name
+    %p.text-muted= "分享了报表筛选条件“#{n.subject}”给你。"
+  .clearfix
+  .notification-acton
+    = render_handle_result n

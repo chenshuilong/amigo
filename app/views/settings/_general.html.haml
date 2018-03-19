@@ -1,0 +1,25 @@
+= form_tag({:action => 'edit'}) do
+  .box.tabular.settings
+    %p= setting_text_field :app_title, :size => 30
+    %p= setting_text_area :welcome_text, :cols => 60, :rows => 5, :class => 'wiki-edit'
+    = wikitoolbar_for 'settings_welcome_text'
+    %p
+      = setting_text_field :per_page_options, :size => 20
+      %em.info= l(:text_comma_separated)
+    %p
+      = setting_text_field :search_results_per_page, :size => 6
+    %p
+      = setting_text_field :activity_days_default, :size => 6
+      = l(:label_day_plural)
+    %p
+      = setting_text_field :host_name, :size => 60
+      %em.info
+        = l(:label_example)
+        \: #{@guessed_host_and_path}
+    %p= setting_select :protocol, [['HTTP', 'http'], ['HTTPS', 'https']]
+    %p= setting_select :text_formatting, Redmine::WikiFormatting.formats_for_select, :blank => :label_none
+    %p= setting_check_box :cache_formatted_text
+    %p= setting_select :wiki_compression, [['Gzip', 'gzip']], :blank => :label_none
+    %p= setting_text_field :feeds_limit, :size => 6
+    = call_hook(:view_settings_general_form)
+  = submit_tag l(:button_save)

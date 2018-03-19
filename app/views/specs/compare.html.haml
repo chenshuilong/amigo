@@ -1,0 +1,68 @@
+- provide :nav, "2,2"
+- provide :css, "bootstrap"
+
+- content_for :bread do
+  %li= link_to l(:label_spec_list), specs_path
+  %li= l(:label_spec_compare)
+
+.h2= l(:label_spec_compare)
+
+.clearfix
+#roadmap.spec_compare_list
+  .roadmap-query
+    = form_tag({}, {method: :get, class: 'form-inline'}) do |f|
+      .form-group.col-sm-4
+        = label_tag 'projects', l(:field_project)
+        = select_tag 'projects', options_for_select(@all_projects, @projects),:multiple => true, style: "min-width:250px;width:80%;max-height:30px;"
+        = select2_for "projects", l(:label_all), closeOnSelect: false
+      = render :partial => params[:action], :locals => {project: @projects}
+      = hidden_field_tag 'current_action', params[:action]
+      = submit_tag "开始比较", :name => nil, class: "btn btn-primary btn-sm"
+  
+  %hr
+  - if params[:specs].blank?
+    %p.nodata= l(:label_no_spec_apps)
+  - else
+    -if @apps.blank?
+      %p.nodata= l(:label_no_data)
+    -else
+      - if @specs.length >= 5
+        %p{class: 'flash warning text-center'}= "您共选择了#{@specs.length}个规格，由于页面受限，当前只显示5个规格比较信息，点击 '导出报告' 按钮将为您导出完整数据的表格"
+
+      .filter-right#app-infos
+        .panel.panel-default
+          .panel-heading
+            .issues-head
+              .row.issues-head-title
+                .col-sm-6
+                  .h2= '比较结果'
+                .col-sm-6.issues-head-title-new.text-right
+                  - if params[:specs].present? && @apps.present? 
+                    .issues-head-title-new.pull-right
+                      %a.btn.btn-primary.btn-sm{:href => "/specs/export_compare_specs?#{{specs: params[:specs]}.to_query}"}
+                        导出报告
+
+          .panel-body
+            .roadmap-table
+              %table.list.table.table-striped.table-bordered
+                %thead
+                  %tr
+                    %th{style:"text-align:center"} 序号 
+                    %th{style:"text-align:center"} 应用
+                    - @specs.first(5).each_with_index do |v, i|
+                      - @spec = Spec.find(v)
+                      %th{style:"text-align:center"}= link_to @spec.fullname, "/projects/#{@spec.project.identifier}/specs?id=#{@spec.id}"  
+                %tbody
+                  - @apps.each_with_index do |app, index|
+                    %tr{class: compare_text_class(app, @specs), style:"text-align:center"}
+                      %td= index+1
+                      %td= link_to app.app_name, project_path(app.identifier)
+                      - @specs.first(5).each_with_index do |v, i|
+                        %td= app.version_name(v)
+
+:css
+  .select2-selection{
+    min-height: 30px;
+    max-height: 60px;
+    overflow-y: auto;
+  }

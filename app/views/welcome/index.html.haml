@@ -1,0 +1,22 @@
+= provide :css, "bootstrap"
+= provide :nav, "3,2"
+= content_for :bread do
+  %li= link_to "AAA", "#"
+  %li BBB
+  %li.active CCC
+%h2= l(:label_home)
+.splitcontentleft
+  .wiki
+    = textilizable Setting.welcome_text
+  = call_hook(:view_welcome_index_left)
+.splitcontentright
+  - if @news.any?
+    .news.box
+      %h3= l(:label_news_latest)
+      = render :partial => 'news/news', :collection => @news
+      = link_to l(:label_news_view_all), :controller => 'news'
+  = call_hook(:view_welcome_index_right)
+- content_for :header_tags do
+  = auto_discovery_link_tag(:atom, {:controller => 'news', :action => 'index', :key => User.current.rss_key, :format => 'atom'}, :title => "#{Setting.app_title}: #{l(:label_news_latest)}")
+  = auto_discovery_link_tag(:atom, {:controller => 'activities', :action => 'index', :key => User.current.rss_key, :format => 'atom'}, :title => "#{Setting.app_title}: #{l(:label_activity)}")
+

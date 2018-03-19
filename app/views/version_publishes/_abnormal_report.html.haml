@@ -1,0 +1,43 @@
+- if notes[0][:without_apk].present?
+  .h2= l(:label_apk_base_missing)  
+  #roadmap
+    %table#repoRequestTable.list.table.table-striped.table-bordered
+      %thead
+        %tr
+          %th{width: "100"} #
+          %th 涉及APK
+      %tbody
+        - notes[0][:without_apk].each_with_index do |change, index|
+          %tr
+            %td= index+1
+            %td= change_record_text(change, 'apk') 
+
+- if notes[0][:without_content].present?
+  %hr
+  .h2= l(:label_apk_base_content_missing)
+  #roadmap
+    %table#repoRequestTable.list.table.table-striped.table-bordered
+      %thead
+        %tr
+          %th{width: "100"} #
+          %th 涉及APK内容
+      %tbody
+        - notes[0][:without_content].each_with_index do |change, index|
+          %tr
+            %td= index+1
+            %td= change_record_text(change, 'content')
+
+- if notes[0][:changes].present?
+  %hr
+  .h2= l(:label_apk_list_change)
+  #roadmap
+    %table#repoRequestTable.list.table.table-striped.table-bordered
+      %thead
+        %tr
+          %th{width: "100"} #
+          %th 涉及APK
+      %tbody
+        - notes[0][:changes].each_with_index do |change, index|
+          %tr
+            %td= index+1
+            %td= change_record_text(change, 'change') 

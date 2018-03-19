@@ -1,0 +1,39 @@
+%form#formCompareModel.form-horizontal{:role => "form"}
+  .form-group
+    = label_tag nil, l(:compare_model_name), class: 'control-label col-sm-2'
+    .col-xs-6
+      = text_field_tag "compare_models[name]", nil, { class: 'form-control', style: 'width:100%'}
+      = hidden_field_tag "compare_models[user_id]", "#{User.current.id}"
+    .col-xs-2
+      = button_tag l(:compare_model_create), {id: 'btn-compare-model-create', class: "btn btn-primary"}
+  %hr
+  .roadmap-table
+    %table#compareModelTable.list.table.table-striped.table-bordered{:class => "csacsa", style: 'width:100%'}
+      %thead
+        %tr
+          %th= l(:numerical_order_all)
+          %th= l(:compare_model_name)
+          %th= l(:compare_model_author)
+          %th= l(:compare_model_created_at)
+          %th= l(:option_all)
+      %tbody
+
+:javascript
+
+  new SMValidator('#formCompareModel', {
+      focus: true,
+      required: '这是必填项',
+      rules: {
+        onlyNumber:   [/^\d*$/, '只能输入数字'],
+        onlyAlphabet: [/^[a-z]*$/, '只能输入字母'],
+      },
+      fields: {
+        "compare_models[name]":         'required'
+      },
+      submit: function(valid, form) {
+        if(valid) {
+          onCreateCompareModel(getFormParams($('#formCompareModel').get(0)), "#{@project.id}")
+        }
+      }
+  });
+

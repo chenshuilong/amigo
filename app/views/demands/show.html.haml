@@ -1,0 +1,88 @@
+- provide :nav, '6,1'
+- provide :css, 'bootstrap'
+- content_for :bread do
+  %li= link_to l(:label_demands), demands_path
+  %li 查看需求
+
+.h2 查看需求
+
+.clearfix
+  .issue-details
+    .attributes
+      %table.table.table-borderless
+        %tbody
+          %tr
+            %th.col-sm-2= l(:demand_sub_category_id)
+            %td.col-sm-10= @demand.source_category.try(:name)
+          %tr
+            %th.col-sm-2= l(:demand_category_id)
+            %td.col-sm-10= @demand.demand_category.try(:name)
+          %tr
+            %th.col-sm-2= l(:demand_status)
+            %td.col-sm-10= load_value(@demand, :status)
+          %tr
+            %th.col-sm-2= l(:demand_description)
+            %td.col-sm-10= simple_format(@demand.description)
+          %tr
+            %th.col-sm-2= l(:demand_method)
+            %td.col-sm-10= simple_format(@demand.method)
+          %tr
+            %th.col-sm-2= l(:demand_feedback_at)
+            %td.col-sm-10= format_date(@demand.feedback_at)
+          %tr
+            %th.col-sm-2= l(:demand_author_id)
+            %td.col-sm-10= link_to_user @demand.author
+          %tr
+            %th.col-sm-2= l(:demand_created_at)
+            %td.col-sm-10= @demand.created_at.strftime("%F %T")
+          %tr
+            %th.col-sm-2= l(:demand_related_ids)
+            %td.col-sm-10= related_ids_link(@demand.related_ids)
+          %tr
+            %th.col-sm-2= l(:demand_related_notes)
+            %td.col-sm-10= simple_format(@demand.related_notes)
+
+          - if @demand.attachments.any?
+            %tr 
+              %th.col-sm-2= l(:label_attachment_plural)
+              %td.col-sm-10
+                .attachments
+                  .attachments.attachments-list
+                    - @demand.attachments.preload(:author).each do |a|
+                      %p 
+                        = link_to a.filename, named_upload_files_path(id: a.id, filename: a.filename), class: "icon icon-attachment"
+                        %span.size= number_to_human_size a.filesize
+                        = #link_to l(:button_delete), upload_file_path(id: a.id), method: "delete", class: "delete icon-only icon-del"
+                        = link_to_user(a.author)
+
+    - if @notes.present? || @historys.present?
+      .attributes     
+        .allchange
+          %ul.nav.nav-tabs
+            - if @notes.present?
+              %li.active
+                %a{"data-toggle" => "tab", :href => "#notes"}= l(:field_notes)
+            - if @historys.present?
+              %li{:class => ("active" unless @notes.present?) }
+                %a{"data-toggle" => "tab", :href => "#history"}= l(:label_history)
+          .tab-content
+            #notes.tab-pane.in.active
+              .history-details
+                .journal
+                  - @notes.each_with_index do |r, idx|
+                    #note
+                      .note-title
+                        = authoring_at r.created_at, r.user, {:label => :label_updated_time_at}
+                      %ul.details
+                        - demand_details(r.details.where(prop_key: "notes")).each do |string|
+                          = string
+            #history.tab-pane{:class => ("in active" unless @notes.present?) }
+              .history-details
+                .journal
+                  - @historys.each_with_index do |r, idx|
+                    #note
+                      .note-title
+                        = authoring_at r.created_at, r.user, {:label => :label_updated_time_at}
+                      %ul.details
+                        - demand_details(r.details.where.not(prop_key: "notes")).each do |string|
+                          %li= string

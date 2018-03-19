@@ -1,0 +1,3 @@
+replaceIssueFormWith('#{escape_javascript(render :partial => 'form')}');
+$(".select2-origin").trigger('change.select2');
+if($('.new_issue .issue-switch .active').index() == 1) {$("#rom_version_p").removeClass("hidden")}

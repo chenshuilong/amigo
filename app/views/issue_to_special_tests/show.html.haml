@@ -1,0 +1,10 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+.top-action-menu.pull-right
+  = link_to l(:button_edit), edit_project_issue_to_special_test_path(project_id: @project, id: @special_test), class: "btn btn-sm btn-primary" if @special_test.status == 1 && User.current.id == @special_test.author_id
+
+.h2= l(:label_issue_to_special_test)
+
+.clearfix
+  = render :partial => 'show'

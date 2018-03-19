@@ -1,0 +1,17 @@
+- if @names.present?
+  :plain
+    $(".mokuai-name").empty();
+    $.each(#{@names}, function(i, v){$(".mokuai-name").append("<option value='"+v[1]+"'>"+v[0]+"</option>")})
+
+- if @mokuai_ownner.present?
+  :plain
+    $("#issue_assigned_to_id").select2_touch(#{@ownner});
+    $("#issue_tfde_id").select2_touch(#{@tfde});
+
+- else
+  :plain
+    $("#issue_assigned_to_id").val("").trigger('change.select2');
+
+:plain
+  $(".select2-origin").trigger('change.select2');
+  if("#{@desc}" != ""){mokuai_tips=layer.tips('说明：#{@desc}', '.mokuai-name', {tips: [2, '#337ab7'], time: 10000});}else{layer.close(mokuai_tips)}

@@ -1,0 +1,57 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+%h2 风险评估
+
+= form_for([@project, @risk]) do |f|
+  = error_messages_for 'risk'
+  = f.label "部门"
+  = f.select :department, Risk::DEPARTS, class: 'form-control'
+  - 2.times do
+    %br
+  = f.label "类别"
+  = f.select :category, Risk::CATES, class: 'form-control'
+  - 2.times do
+    %br
+  = f.label "风险说明"
+  = f.text_area :description, class: 'form-control'
+  %h4
+    风险措施
+    %a{:href => "javascript:;", :id => "add_measure"} 增加一条
+  .measures
+    = f.fields_for :risk_measures do |m|
+      .measure
+        = m.label "风险措施"
+        = m.text_area :content, class: 'form-control'
+        = m.label "预计导入时间"
+        = m.text_field :finish_at, class: 'form-control plan-date'
+        :javascript
+          $(".plan-date").datetimepicker({format:'Y-m-d', lang:'ch', timepicker:false, scrollInput : false})
+  - if User.current.admin?
+    = f.label "责任人"
+    = select_tag "risk[user_id]", [], {class: 'form-control'}
+    = select2_remote "risk_user_id"
+  = f.submit l(:button_submit), class: "btn btn-primary"
+
+:css
+  form {
+    display: block;
+    margin-top: 40px;
+  }
+  input, textarea {
+    margin-bottom: 20px;
+  }
+  .measures{
+    padding: 20px;
+  }
+  .measure{
+    padding-left: 20px;
+    border-left: 5px solid #2996cc;
+  }
+
+:javascript
+  $("#add_measure").click(function(){
+    m = $(".measures textarea").length
+    html = $(".measure").prop("outerHTML").replace(/0/g, m)
+    $(".measures").append(html)
+  });

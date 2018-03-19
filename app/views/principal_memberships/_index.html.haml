@@ -1,0 +1,44 @@
+- roles = Role.find_all_givable
+%p= link_to l(:label_add_projects), new_principal_membership_path(principal), :remote => true, :class => "icon icon-add"
+- if principal.memberships.any?
+  %table.list.memberships
+    %thead
+      %tr
+        %th= l(:label_project)
+        %th= l(:label_role_plural)
+        %th{:style => "width:15%"}
+        = call_table_header_hook principal
+    %tbody
+      - principal.memberships.preload(:member_roles => :role).each do |membership|
+        - next if membership.new_record?
+        %tr{:class => "#{cycle 'odd', 'even'} class", :id => "member-#{membership.id}"}
+          %td.project.name
+            = link_to_project membership.project
+          %td.roles
+            %span{:id => "member-#{membership.id}-roles"}= h membership.roles.sort.collect(&:to_s).join(', ')
+            = form_for(:membership, :remote => true,                                     |
+              :url => principal_membership_path(principal, membership), :method => :put, |
+              :html => {:id => "member-#{membership.id}-roles-form",                     |
+              :style => 'display:none;'}) do                                             |
+              %p
+                - roles.each do |role|
+                  %label
+                    = check_box_tag 'membership[role_ids][]', role.id, membership.roles.include?(role),                    |
+                      :disabled => membership.member_roles.detect {|mr| mr.role_id == role.id && !mr.inherited_from.nil?}, |
+                      :id => nil                                                                                           |
+                    = h role
+                  %br/
+              = hidden_field_tag 'membership[role_ids][]', '', :id => nil
+              %p
+                = submit_tag l(:button_change)
+                = link_to_function l(:button_cancel),                                                                          |
+                  "$('#member-#{membership.id}-roles').show(); $('#member-#{membership.id}-roles-form').hide(); return false;" |
+          %td.buttons
+            = link_to_function l(:button_edit),                                                                             |
+              "$('#member-#{membership.id}-roles').hide(); $('#member-#{membership.id}-roles-form').show(); return false;", |
+              :class => 'icon icon-edit'                                                                                    |
+            = delete_link principal_membership_path(principal, membership), :remote => true if membership.deletable?
+          = call_table_row_hook principal, membership
+      - end; reset_cycle
+- else
+  %p.nodata= l(:label_no_data)

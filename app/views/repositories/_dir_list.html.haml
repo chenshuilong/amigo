@@ -1,0 +1,13 @@
+.autoscroll
+  %table#browser.list.entries
+    %thead
+      %tr#root
+        %th= l(:field_name)
+        %th= l(:field_filesize)
+        - if @repository.report_last_commit
+          %th= l(:label_revision)
+          %th= l(:label_age)
+          %th= l(:field_author)
+          %th= l(:field_comments)
+    %tbody
+      = render :partial => 'dir_list_content'

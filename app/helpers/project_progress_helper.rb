@@ -1,0 +1,2 @@
+module ProjectProgressHelper
+end

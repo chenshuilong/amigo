@@ -1,0 +1,6 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+.h2= l(:label_settings)
+= render_tabs project_settings_tabs
+- html_title(l(:label_settings))

@@ -1,0 +1,4 @@
+= title [l(:label_group_plural), groups_path], @group.name
+%ul
+  - @group.users.each do |user|
+    %li= user

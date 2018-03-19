@@ -1,0 +1,61 @@
+= title l(:label_plugins)
+- if @plugins.any?
+  %table.list.plugins
+    - @plugins.each do |plugin|
+      %tr{:class => "#{cycle('odd', 'even')}", :id => "plugin-#{plugin.id}"}
+        %td.name
+          %span.name= plugin.name
+          = content_tag('span', plugin.description, :class => 'description') unless plugin.description.blank?
+          = content_tag('span', link_to(plugin.url, plugin.url), :class => 'url') unless plugin.url.blank?
+        %td.author= plugin.author_url.blank? ? plugin.author : link_to(plugin.author, plugin.author_url)
+        %td.version
+          %span.icon= plugin.version
+        %td.configure= link_to(l(:button_configure), plugin_settings_path(plugin)) if plugin.configurable?
+  %p
+    %a#check-for-updates{:href => "#"}= l(:label_check_for_updates)
+- else
+  %p.nodata= l(:label_no_data)
+= javascript_tag do
+  $(document).ready(function(){
+  $("#check-for-updates").click(function(e){
+  e.preventDefault();
+  $.ajax({
+  dataType: "jsonp",
+  url: "https://www.redmine.org/plugins/check_updates",
+  data: #{raw_json plugin_data_for_updates(@plugins)},
+  timeout: 3000,
+  beforeSend: function(){
+  $('#ajax-indicator').show();
+  },
+  success: function(data){
+  $('#ajax-indicator').hide();
+  $("table.plugins td.version span").addClass("unknown");
+  $.each(data, function(plugin_id, plugin_data){
+  var s = $("tr#plugin-"+plugin_id+" td.version span");
+  s.removeClass("icon-ok icon-warning unknown");
+  if (plugin_data.url) {
+  if (s.parent("a").length>0) {
+  s.unwrap();
+  }
+  s.addClass("found");
+  s.wrap($("
+  %a>
+  ").attr("href", plugin_data.url).attr("target", "_blank"));
+  }
+  if (plugin_data.c == s.text()) {
+  s.addClass("icon-ok");
+  } else if (plugin_data.c) {
+  s.addClass("icon-warning");
+  s.attr("title", "#{escape_javascript l(:label_latest_compatible_version)}: "+plugin_data.c);
+  }
+  });
+  $("table.plugins td.version span.unknown").addClass("icon-help").attr("title", "#{escape_javascript l(:label_unknown_plugin)}");
+  },
+  error: function(){
+  $('#ajax-indicator').hide();
+  alert("Unable to retrieve plugin informations from www.redmine.org");
+  }
+  });
+  });
+  });
+- end if @plugins.any?

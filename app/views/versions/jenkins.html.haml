@@ -1,0 +1,117 @@
+- provide :nav, "5,4"
+- provide :css, "bootstrap"
+
+.top-action-menu.pull-right
+  - if policy(:version).app_infos?
+    = link_to('应用集成信息', app_infos_versions_path, :class => 'btn btn-primary btn-sm')
+  = link_to('版本比较', choose_versions_path(category: "terminal"), :class => 'btn btn-primary btn-sm', :id => "version_compare", remote: true)
+.h2= l(:label_roadmap)
+
+#roadmap.version_searchs
+  - if @versions.empty? && params[:utf8].blank?
+    %p.nodata= l(:label_no_data)
+  - else
+    .roadmap-query
+      %ul.notification-list 
+        %li.notification-list-item
+          .notification-menu
+            %i.fa.fa-chevron-up
+          .notification-content
+            %p
+              %strong= "查询条件"
+          .clearfix
+          .notification-acton.select2-rectify{:style => "display:block;"}          
+            = form_tag({}, {method: :get, class: 'form-horizontal'}) do |f|
+              .form-group
+                = label_tag 'project_category', l(:version_project_category), class: "col-sm-2 control-label"
+                .col-sm-2
+                  = select_tag 'project_category', options_for_select(                                                                               |
+                    [[l(:project_category_terminal), 'terminal'], [l(:project_category_other), 'other']].unshift([l(:label_all), '']),               |
+                    params[:project_category]), class: "form-control", :onchange => "$('#project_name').val(''); this.form.submit(); return false;"
+                = label_tag 'project_name', l(:field_version_project_name), class: "col-sm-2 control-label"
+                .col-sm-2
+                  = select_tag 'project_name', options_for_select(@select_projects.pluck(:name, :id), params[:project_name]),                        |
+                    :multiple => true, class: 'form-control', :tabindex => "-1", style:"max-height: 30px"
+                  = select2_for "project_name", l(:label_all), closeOnSelect: false
+                = label_tag 'author', l(:field_author), class: "col-sm-2 control-label"
+                .col-sm-2
+                  = select_tag 'author', options_for_select([[User.find_by(:id => @author), @author]], @author),                                     |
+                    class: "form-control", :style => "width: 150px;", :onchange => "this.form.submit(); return false;"
+                  = select2_remote 'author'
+              .form-group
+                = render :partial => 'specs', :locals => {project_name: @project_name}
+                = label_tag 'compile_status', l(:version_compile_status), class: "col-sm-2 control-label"
+                .col-sm-2
+                  = select_tag 'compile_status', options_for_select(list_for_select(:version, :compile_status).unshift([l(:label_all), '']),         |
+                  params[:compile_status]), class: "form-control", :onchange => "this.form.submit(); return false;"
+                = label_tag 'as_increase_version', l(:version_as_increase_version), class: "col-sm-2 control-label"
+                .col-sm-2
+                  = select_tag 'as_increase_version', options_for_select(bool_for_select(true, false).unshift([l(:label_all), '']),                  |
+                    params[:as_increase_version]), class: "form-control", :onchange => "this.form.submit(); return false;"
+              .form-group
+                = label_tag 'signature', l(:version_signature), class: "col-sm-2 control-label"
+                .col-sm-2
+                  = select_tag 'signature', options_for_select(bool_for_select(true, false).unshift([l(:label_all), '']), params[:signature]),
+                    class: "form-control", :onchange => "this.form.submit(); return false;"
+                = label_tag 'ota_whole_compile', l(:version_ota_whole_compile), class: "col-sm-2 control-label"
+                .col-sm-2
+                  = select_tag 'ota_whole_compile', options_for_select(bool_for_select(true, false).unshift([l(:label_all), '']), params[:ota_whole_compile]),
+                    class: "form-control", :onchange => "this.form.submit(); return false;"
+                = label_tag 'ota_increase_compile', l(:version_ota_increase_compile), class: "col-sm-2 control-label"
+                .col-sm-2
+                  = select_tag 'ota_increase_compile', options_for_select(bool_for_select(true, false).unshift([l(:label_all), '']), params[:ota_increase_compile]),
+                    class: "form-control", :onchange => "this.form.submit(); return false;"
+              .form-group
+                = label_tag 'name', l(:version_name_tag), class: "col-sm-2 control-label"
+                .col-sm-2
+                  = text_field_tag 'name', params[:name], class: "form-control"
+                = label_tag 'created_at', l(:field_created_on), class: "col-sm-2 control-label"
+                .col-sm-2
+                  = text_field_tag 'created_at_start', params[:created_at_start], class: "form-control", :id => 'version_release_created_at_start'
+                  = hidden_field_tag 'created_at_end', params[:created_at_end], class: "form-control", :id => 'version_release_created_at_end'
+                  = calendar_range_for 'version_release_created_at_start', 'version_release_created_at_end'
+                .col-sm-2.col-sm-offset-2
+                  = submit_tag l(:button_submit), :name => nil, class: "btn btn-primary btn-sm"
+
+    .roadmap-table
+      %table#versionTable.list.table.table-striped.table-bordered{:class => "csacsa"}
+        %thead
+          %tr
+            = sort_header_tag('id', :caption => "#")
+            = sort_header_tag('name', :caption => l(:version_name))
+            = sort_header_tag('priority', :caption => l(:version_priority))
+            = sort_header_tag('compile_machine', :caption => l(:version_compile_machine))
+            = sort_header_tag('compile_status', :caption => l(:version_compile_status))
+            = sort_header_tag('compile_due_on', :caption => l(:version_compile_due_on))
+            = sort_header_tag('compile_start_on', :caption => l(:version_compile_start_on))
+            = sort_header_tag('compile_end_on', :caption => l(:version_compile_end_on))
+            %th= l(:version_compile_total)
+            = sort_header_tag('author_id', :caption => l(:field_author))
+            = sort_header_tag('signature', :caption => l(:version_signature))
+            = sort_header_tag('ota_increase_compile', :caption => l(:version_ota_increase_compile))
+            = sort_header_tag('compile_type', :caption => l(:version_compile_type))
+        %tbody
+          - @versions.each do |version|
+            %tr
+              %td= link_to version.id, version
+              %td= link_to_version version
+              %td= load_value(version, :priority)
+              %td= version.compile_machine
+              %td{class: compile_status_class(version)}= load_value(version, :compile_status)
+              %td= format_time version.compile_due_on
+              %td= format_time version.compile_start_on
+              %td= format_time version.compile_end_on
+              %td= version.compile_total_hours
+              %td= link_to_user version.author
+              %td= load_value(version, :signature)
+              %td= load_value(version, :ota_increase_compile)
+              %td= load_value(version, :compile_type)
+            = call_hook :view_projects_roadmap_version_bottom, :version => version
+    %span.pagination= pagination_links_full @pages, @count
+
+:css
+  .select2-selection {
+    min-height: 30px;
+    max-height: 60px;
+    overflow-y: auto;
+  }

@@ -1,0 +1,47 @@
+- if @systems.present? && @category == "terminal" && @type == 'system'
+  .version-issues
+    .label= l(:version_system_space)
+    .wiki
+      - if @systems.size > 15
+        = data_table_for 'compareSystems',
+          dom: '<"data-table-top"f>rt<"data-table-bottom"pil><"clear">',
+          lengthMenu: [[-1, 10, 25, 50, 100], ["#{l(:label_all)}", 10, 25, 50, 100]]
+      = fields_table :class => 'list data-table', :id => 'compareSystems' do |t|
+        - t.title '#'
+        - t.title l(:label_directory)
+        - t.title link_to @va.fullname, version_path(@version_ida)
+        - t.title link_to @vb.fullname, version_path(@version_idb)
+        - t.title l(:label_difference)
+        - @systems.each_with_index do |sys, i|
+          - t.row do
+            - t.data i+1
+            - t.data sys[:dir]
+            - t.data sys[:va] == '-' ? sys[:va] : sys[:va].to_i.try(:to_s, :human_size)
+            - t.data sys[:vb] == '-' ? sys[:vb] : sys[:vb].to_i.try(:to_s, :human_size)
+            - t.data sys[:diff].to_i >= 0 ? sys[:diff].to_i.try(:to_s, :human_size) : "-#{sys[:diff].to_i.abs.try(:to_s, :human_size)}"
+
+%hr
+- if @apklists.present?
+  .version-issues
+    .label= '系统分区APK大小比较'
+    .wiki
+      - if @apklists.size > 15
+        = data_table_for 'compareApklists',
+          dom: '<"data-table-top"f>rt<"data-table-bottom"pil><"clear">',
+          lengthMenu: [[-1, 10, 25, 50, 100], ["#{l(:label_all)}", 10, 25, 50, 100]]
+      = fields_table :class => 'list data-table', :id => 'compareApklists' do |t|
+        - t.title '#'
+        - t.title 'APK'
+        - t.title link_to @va.fullname, version_path(@version_ida)
+        - t.title link_to @vb.fullname, version_path(@version_idb)
+        - t.title l(:field_filesize)
+        - @apklists.each_with_index do |apk, i|
+          - t.row do
+            - t.data i+1
+            - t.data apk[:apk_name]
+            - t.data apk[:va] != '-' ? apk[:va].to_i.try(:to_s, :human_size) : apk[:va]
+            - t.data apk[:vb] != '-' ? apk[:vb].to_i.try(:to_s, :human_size) : apk[:vb]
+            - t.data apk[:diff].to_i >= 0 ? apk[:diff].to_i.try(:to_s, :human_size) : "-#{apk[:diff].to_i.abs.try(:to_s, :human_size)}"
+
+- if @systems.blank? && @apklists.blank?
+  %p.nodata= l(:label_no_data)

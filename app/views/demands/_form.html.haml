@@ -1,0 +1,33 @@
+= error_messages_for @demand
+#update.issue-details
+  #all_attributes
+    %p= f.select :sub_category_id, options_for_select(@source_categories, @demand.sub_category_id), required: true, label: :demand_sub_category_id
+    %p= f.select :category_id,options_for_select(@demand_categories, @demand.category_id), required: true, label: :demand_category_id
+    %p= f.select :status, list_for_select(:demand, :status), required: true, label: :demand_status
+    %p= f.text_area :description, required: true, label: :demand_description, :style => "width: 80%; height: 100px"
+    %p= f.text_area :method, required: true, label: :demand_method, :style => "width: 80%; height: 100px"
+    %p
+      = f.text_field :feedback_at, required: true, label: :demand_feedback_at, disabled: !@demand.new_record?
+      = calendar_for("demand_feedback_at") if @demand.new_record?
+    %p= f.text_field :related_ids, required: false, label: :demand_related_ids
+    %p= f.text_area :related_notes, required: false, label: :demand_related_notes, :style => "width: 80%; height: 100px"
+    - unless @demand.new_record?
+      %p
+        = label_tag l(:spec_version_notes)
+        = text_area_tag "notes", '', :style => "width: 80%; height: 100px"
+    - if @demand.attachments.any?
+      %p
+        %label= l(:label_attachment_plural)
+        .attachments
+          .attachments.attachments-list
+            - @demand.attachments.preload(:author).each do |a|
+              %p 
+                = link_to a.filename, named_upload_files_path(id: a.id, filename: a.filename), class: "icon icon-attachment"
+                %span.size= number_to_human_size a.filesize
+                = link_to l(:button_delete), upload_file_path(id: a.id), method: "delete", class: "delete icon-only icon-del" if policy(@demand).edit?
+                = link_to_user(a.author)
+
+    .box.tabular
+      %p#attachments_form
+        %label= l(:label_attachment_plural)
+        = render :partial => 'attachments/form', :locals => {:container => @demand}

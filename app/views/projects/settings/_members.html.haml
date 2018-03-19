@@ -1,0 +1,23 @@
+- members = @project.memberships.active.includes(:member_roles, :roles, :principal).joins(:member_roles).where(member_roles: {inherited_from: nil}).to_a.sort
+
+
+.top-action-menu.text-right
+  = link_to l(:label_member_new), new_project_membership_path(@project), :remote => true
+
+.issue-details
+  - if members.any?
+    %table#memberTable.list.members.table.table-striped
+      %thead
+        %tr
+          %th{:style => "width:15%"}
+            = l(:label_user)+ " / " + l(:label_group)
+          %th= l(:label_role_plural)
+          %th{:style => "width:15%"}
+          = call_hook(:view_projects_settings_members_table_header, :project => @project)
+      %tbody
+        - members.each do |member|
+          - next if member.new_record?
+          = render :partial => 'members/member_list', :locals => {:member => member}
+        - end; reset_cycle
+  - else
+    %p.nodata= l(:label_no_data)

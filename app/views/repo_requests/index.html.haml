@@ -1,0 +1,56 @@
+- provide :nav, "5,1"
+- provide :css, "bootstrap"
+
+.top-action-menu.pull-right
+  = link_to(l(:button_repo_request_create), new_repo_request_path(category: params[:category]), :class => 'btn btn-primary btn-sm') if User.current.can_do?("apply", params[:category])
+
+.h2= l("label_repo_request_#{params[:category]}".to_sym)
+
+#roadmap.repo_request_index
+  - if @repo_requests.empty?
+    %p.nodata= l(:label_no_data)
+  - else
+    %table#repoRequestTable.list.table.table-striped.table-bordered
+      %thead
+        %tr
+          %th #
+          %th= l(:repo_request_project_id)
+          - if params[:category] == 'production_repo'
+            %th= l(:repo_request_repo_name)
+          - if %w(project_branch production_branch).include?(params[:category])
+            %th= l(:repo_request_version_id)
+          - if params[:category] == 'project_branch'
+            %th= l(:repo_request_android_repo) 
+            %th= l(:repo_request_use)
+          - if params[:category] != 'production_repo'
+            %th= l(:repo_request_branch)
+          - if params[:category] == 'production_repo'
+            %th= l(:repo_request_notes)
+          %th= l(:repo_request_author_id)
+          %th= l(:repo_request_created_at)
+          %th= l(:field_status)
+          - if %w(project_branch production_repo).include?(params[:category])
+            %th= l(:option_all)
+      %tbody
+        - @repo_requests.each do |r|
+          %tr
+            %td= link_to r.id, r
+            %td= (r.category == 3 && r.production_type == 'other') ? '' : link_to_project(r.project) 
+            - if params[:category] == 'production_repo'
+              %td= r.repo_name
+            - if %w(project_branch production_branch).include?(params[:category])
+              %td= r.version_id.blank? ?  r.tag_number : link_to(r.try(:version).try(:name), version_path(r.version))
+            - if params[:category] == 'project_branch'
+              %td= r.android_repo
+              %td= load_value(r, :use)
+            - if params[:category] != 'production_repo'
+              %td= r.branch
+            - if params[:category] == 'production_repo'
+              %td= r.notes 
+            %td= link_to_user r.author
+            %td= r.created_at.strftime("%F %T")
+            %td= load_value(r, :status)
+            - if %w(project_branch production_repo).include?(params[:category])
+              %td= repo_request_links(r)
+
+  %span.pagination= pagination_links_full @pages, @count

@@ -1,0 +1,22 @@
+= form_tag('', method: :post, class: 'form-horizontal', remote: true, id: "editBatchMokuaiForm") do |f|
+  .form-group
+    %label.control-label.col-sm-3= l(:field_mokuai_reason)
+    .col-xs-8= mokuai.reason
+  .form-group
+    %label.control-label.col-sm-3= l(:field_mokuai_name)
+    .col-xs-8= mokuai.name
+  .form-group
+    = label_tag 'users[tfde]', 'TFDE', class: 'control-label col-sm-3'
+    .col-xs-8
+      = select_tag 'users[tfde]', options_for_select([]), class: "form-control", prompt: "请选择", style: "width: 100%"
+      = select2_remote("users_tfde", nil, nil, {withme: false})
+  .form-group
+    = label_tag 'users[ownner]', 'OWNER', class: 'control-label col-sm-3'
+    .col-xs-8
+      = select_tag 'users[ownner]', options_for_select([]), class: "form-control", prompt: "请选择", style: "width: 100%"
+      = select2_remote("users_ownner", nil, nil, {withme: false})
+  .form-group
+    = label_tag 'project_ids', '需同步项目范围', class: 'control-label col-sm-3'
+    .col-xs-8
+      = select_tag 'project_ids', options_for_select([]), class: "form-control", prompt: "请选择", style: "width: 100%", multiple: true
+      = select2_remote('project_ids', nil, "--- 请选择项目 ---", :url => search_projects_path(category: 'terminal', mokuai_id: mokuai.id))

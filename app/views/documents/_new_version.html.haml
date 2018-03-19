@@ -1,0 +1,13 @@
+= form_tag("#{new_version_project_documents_path @project}",method: "put",remote:true,:class => "form-horizontal") do
+  .form-group
+    = label_tag :title,'版本名称', class: 'control-label col-sm-2'
+    .col-xs-10
+      = text_field :document, :title, class: 'form-control'
+  .form-group
+    = label_tag :description, "备注", class: "control-label col-sm-2"
+    .col-xs-10
+      = text_area :document, :description, class: 'form-control', rows: 5
+  .form-group
+    .col-xs-12.text-center
+      = hidden_field_tag "document[category_id]", DocumentCategory.first.id
+      = hidden_field_tag "document[id]", 0

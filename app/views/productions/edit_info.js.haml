@@ -1,0 +1,34 @@
+:plain
+  $("#ajax-modal").html('#{j render :partial => "edit_info", :locals => { :project => @project}}');
+  production_edit_info_window = layer.open({
+    type: 1,
+    title: '<b>编辑</b>',
+    area: ['600px', 'auto'],
+    zIndex: 666,
+    moveType: 1,
+    shadeClose: false,
+    content: $("#ajax-modal"),
+    btn: ['取消', '确定'],
+    yes: function(index, layero){
+      layer.close(production_edit_info_window)
+    }
+  });
+
+  $(".layui-layer-btn1").on("click", function(){
+    var form = $("#editInfoForm")
+    var data = form.serialize();
+    $.ajax({
+       url: '/productions/#{@project.id}/update_info',
+       type: "post",
+       data: data,
+       success: function (data) {
+          if(data){
+            $("#adapter-report-#{@project.id}").html(data.has_adapter_report);
+            $("#notes-#{@project.id}").html(data.notes);
+            layer.msg("操作成功!");
+          }else{
+            layer.msg("操作失败!");
+          }
+       }
+    });
+  })

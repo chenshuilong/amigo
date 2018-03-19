@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  product_definitions_id: 
+  users_id: 
+  record_type: 1
+  prop_key: MyString
+  old_value: MyText
+  value: MyText
+
+two:
+  product_definitions_id: 
+  users_id: 
+  record_type: 1
+  prop_key: MyString
+  old_value: MyText
+  value: MyText

@@ -1,0 +1,44 @@
+.issue-details
+  .attributes
+    %table.table.table-borderless
+      %tbody
+        %tr
+          %th.col-sm-2= l(:repo_request_status)
+          %td.col-sm-10= load_value(@special_test, :status)
+        %tr
+          %th.col-sm-2= l(:issue_to_special_test_category)
+          %td.col-sm-10= load_value(@special_test, :category)
+        %tr
+          %th.col-sm-2= l(:issue_to_special_test_author_id)
+          %td.col-sm-10= link_to_user @special_test.author
+        %tr
+          %th.col-sm-2= l(:issue_to_special_test_subject)
+          %td.col-sm-10= load_value(@special_test, :subject)
+        %tr
+          %th.col-sm-2= l(:issue_to_special_test_related_issues)
+          %td.col-sm-10= related_issues(@special_test.related_issues)
+        %tr
+          %th.col-sm-2= l(:issue_to_special_test_precondition)
+          %td.col-sm-10= simple_format(@special_test.precondition)  
+        %tr
+          %th.col-sm-2= l(:issue_to_special_test_test_times)
+          %td.col-sm-10= load_value(@special_test, :test_times)
+        %tr
+          %th.col-sm-2= l(:issue_to_special_test_log_from_com)
+          %td.col-sm-10= load_value(@special_test, :log_from_com)       
+        %tr
+          %th.col-sm-2= l(:issue_to_special_test_machine_num)
+          %td.col-sm-10= load_value(@special_test, :machine_num) 
+        %tr
+          %th.col-sm-2= l(:issue_to_special_test_test_method)
+          %td.col-sm-10= simple_format(@special_test.test_method)  
+        %tr
+          %th.col-sm-2= l(:issue_to_special_test_attentions)
+          %td.col-sm-10= simple_format(@special_test.attentions)    
+        %tr
+          %th.col-sm-2= l(:issue_to_special_test_test_version)
+          %td.col-sm-10= load_value(@special_test, :test_version) 
+        - if @special_test.status == "agreed"
+          %tr
+            %th.col-sm-2= l(:issue_to_special_test_approval_result)
+            %td.col-sm-10= simple_format(@special_test.approval_result) 

@@ -1,0 +1,99 @@
+- provide :nav, "2,4"
+- provide :css, "bootstrap"
+- content_for :header_tags do
+  %link{:href => "/amg/dataTable/datatable.css", :rel => "stylesheet"}
+  %link{:href => "/amg/dataTable/fixedColumns.bootstrap.min.css", :rel => "stylesheet"}
+
+  %script{:src => "/amg/dataTable/dataTables.fixedColumns.min.js", :type => "text/javascript"}
+  %script{:src => "/amg/dataTable/dataTables.bootstrap.min.js", :type => "text/javascript"}
+
+- content_for :bread do
+  %li= link_to @version_publish.spec.fullname, preview_version_publishes_path(spec_id: @version_publish.spec_id, version_id: @version_publish.version_id)
+  %li= [@version_publish.spec.fullname, @version_publish.version.name].join("_")
+
+.filter-right#version_publish_edit{style:"display:none"}
+  .panel.panel-default
+    .panel-heading
+      .issues-head
+        .row.issues-head-title
+          .col-sm-6
+            .h2= [@version_publish.spec.fullname, @version_publish.version.name].join("_")
+          .col-sm-6.issues-head-title-new.text-right
+            %a.btn.btn-primary.btn-sm{"@click"=>"refreshApplist()"}
+              刷新
+
+      .panel-body
+        %table#publishEditTable.list.table.table-bordered
+          %thead
+            %tr
+              %th{style: 'min-width: 80px; max-width: 80px'} 序号 
+              %th{class: "table-row-gray", style: 'min-width: 200px; max-width: 200px'} APK名称
+              %th{style: 'min-width: 200px; max-width: 200px'}= l(:spec_version_cn_name)
+              %th{style: 'min-width: 200px; max-width: 200px'}= l(:spec_version_desktop_name)
+              %th{style: 'min-width: 200px; max-width: 200px'}= l(:spec_version_description)
+              %th{style: 'min-width: 200px; max-width: 200px'}= l(:spec_version_developer)
+              %th{style: 'min-width: 200px; max-width: 200px'}= l(:version_name_tag)
+              %th{style: 'min-width: 200px; max-width: 200px'}= l(:version_applist_apk_permission)
+              %th{style: 'min-width: 60px; max-width: 60px'}= l(:version_applist_apk_removable)
+          %tbody
+            %tr{"v-for" => "(row, key, index) in rows", "v-bind:class" => "[!row.exist ? 'table-row-deleted' : [ row.missing ? 'table-row-missing' : '']]"}
+              %td {{index+1}}
+              %td{"v-bind:class"=>"[!row.exist ? 'table-row-deleted' : [ row.missing ? 'table-row-missing' : 'table-row-gray']]"} {{row.apk_name}}
+              %td {{row.cn_name}}
+              %td {{row.desktop_name}}
+              %td {{row.description}}
+              %td {{row.developer}}
+              %td {{row.apk_version}}
+              %td {{row.apk_permission}}
+              %td {{row.apk_removable}}
+        %hr
+        %table.table.table-striped.table-bordered.table-hover
+          %thead
+            %tr
+              %th 应用卸载及恢复方法说明 
+          %tbody
+            %tr
+              %td{"v-html"=>"remove_note"}
+
+        %a.btn.btn-primary.btn-sm{"@click"=>"updateRows()"}= l(:button_save)
+
+:javascript
+  var all_rows = new Vue({
+    el: '#version_publish_edit',
+    data: {
+      rows: #{@rows.to_json},
+      old_rows: #{@rows.to_json},
+      remove_note: #{@remove_note_hash.to_json},
+      old_remove_note: #{@remove_note_hash.to_json}
+    },
+    methods: {
+      refreshApplist: function (){
+        var version_publish_id = #{@version_publish.id};
+        $.get("/version_publishes/refresh?id="+version_publish_id, function(data){
+          all_rows.$data.rows = data.rows;
+          all_rows.$data.remove_note = data.remove_note;
+        })
+      },
+      updateRows: function (){
+        var data = JSON.stringify({"rows": this.rows, 
+                                   "old_rows": this.old_rows, 
+                                   "remove_note": this.remove_note,
+                                   "old_remove_note": this.old_remove_note})
+        $.ajax({
+             type: "POST",
+             url: "/version_publishes/save_change?id=#{params[:id]}",
+             contentType: "application/json",
+             data: data
+        }).done(function(data) {
+            location.href = "/version_publishes/preview?spec_id="+data.spec_id+"&version_id="+data.version_id;
+        });;
+      }
+    },
+    mounted:function () {
+      $("#version_publish_edit").css("display", "block");
+    }
+  })
+
+  var publishEditTable = initDataTable('publishEditTable',{
+    paging: false, ordering: true, info: false, searching: false, select: true, scrollX: true
+  });

@@ -1,0 +1,64 @@
+%br
+.h2= l(:field_top_notices)
+-# = link_to l(:label_new), void_js, :class => "pull-right icon icon-add"
+
+%hr
+%h3= l(:label_new)
+= labelled_form_for @top_notice  do |f|
+  = error_messages_for 'top_notice'
+  .row{:style => "height: 150px;"}
+    .col-sm-2{:style => "padding-top: 8px;"}= l(:top_notices_receivers)
+    .col-sm-10.form-inline{:style => "margin-bottom: 10px;"}
+      = f.select :receiver_type, TopNotice::RECEIVER_TYPE.invert, no_label: true , class: "form-control"
+      = f.select :receivers, [], { no_label: true}, class: "form-control hidden", multiple: "multiple", style: "width: 200px"
+    .col-sm-2{:style => "padding-top: 8px;"}= l(:top_notices_message)
+    .col-sm-10{:style => "margin-bottom: 10px;"}
+      = f.text_area :message, no_label: true , class: "form-control", "data-max-input-length": 255
+      %small.form-text.text-muted 若需标题，标题格式：【标题】
+    .col-sm-2{:style => "padding-top: 8px;"}= l(:top_notices_expired)
+    .col-sm-10
+      = f.text_field :expired, no_label: true, class: "form-control"
+      = calendar_for "top_notice_expired"
+  = submit_tag l(:button_submit)
+
+%hr
+%h3= l(:top_notices_history)
+
+%table.table.table-striped.table-bordered
+  %thead
+    %tr
+      %th ID
+      %th= l(:top_notices_message)
+      %th= l(:top_notices_receiver_type)
+      %th= l(:top_notices_receivers)
+      %th= l(:top_notices_expired)
+  %tbody
+    - @top_notices.each do |top_notice|
+      %tr
+        %td= top_notice.id
+        %td= top_notice.message
+        %td= TopNotice::RECEIVER_TYPE[top_notice.receiver_type.to_s]
+        %td= top_notice.receivers_content
+        %td= top_notice.expired
+
+:javascript
+  $("#top_notice_receiver_type").change(function(){
+    $receivers = $("#top_notice_receivers");
+    $receivers.empty().val("");
+    switch(~~$(this).val()) {
+      case 1:
+        $receivers.addClass("hidden")
+        $receivers.select2('destroy');
+        break;
+      case 2:
+        $receivers.removeClass("hidden");
+        $receivers.select2_remote();
+        break;
+      case 3:
+        $receivers.removeClass("hidden");
+        $receivers.select2({data: #{Dept.select2_available_depts.to_json}});
+        break;
+    }
+  })
+
+

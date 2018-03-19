@@ -1,0 +1,211 @@
+= back_url_hidden_field_tag
+= error_messages_for 'version'
+#update.issue-details
+  #all_attributes
+    - if params[:controller] == "faster_new"
+      %p
+        = f.select :project_id, options_for_select(@projects.pluck(:name, :identifier), @project.identifier), {:required => true, label: :field_project}
+        = select2_for("version_project_id")
+    - if  @project.show_by(4) # Production
+      - if @project.production_type == Project.consts[:production_type][:modem] # Modem
+        %p
+          = f.select :spec_id, specs_options_for_select(@project), {:required => true, label: :version_spec_id}, {multiple: true, :disabled => !@version.new_record?}
+          = select2_for("version_spec_id")
+        %p= f.text_field :name, :required => true, label: :version_name
+        %p
+          = f.text_area :description, :rows => 5, :class => 'wiki-edit'
+          = wikitoolbar_for 'version_description'
+        %p= f.select :repo_one_id, project_repo_one_options_for_select(@project, @version), :required => true, label: :version_repo_one_of_modem
+        %p
+          = f.select :priority, list_for_select(@version, :priority), :required => true, label: :version_priority
+          = remove_select_option("version_priority") unless User.current.is_scm?  
+      - elsif @project.production_type == Project.consts[:production_type][:framework] # Framework
+        %p
+          = f.select :spec_id, specs_options_for_select(@project), {:required => true, label: :version_spec_id}, {multiple: true, :disabled => !@version.new_record?}
+          = select2_for("version_spec_id")
+        %p= f.text_field :name, :required => true, label: :version_name
+        %p
+          = f.text_area :description, :rows => 5, :class => 'wiki-edit'
+          = wikitoolbar_for 'version_description'
+        %p= f.select :repo_one_id, project_repo_one_options_for_select(@project, @version), :required => true, label: :version_repo_one_of_framework
+        %p= f.select :repo_two_id, project_repo_two_options_for_select(@project, @version), :required => true, label: :version_repo_two_of_framework
+        %p
+          = f.select :priority, list_for_select(@version, :priority), :required => true, label: :version_priority
+          = remove_select_option("version_priority") unless User.current.is_scm?  
+      - else # APP
+        %p= f.select :spec_id, specs_options_for_select(@project), {:required => true, label: :version_spec_id}, :disabled => !@version.new_record?
+        %p
+          = f.text_field :name, :required => true, label: :version_name, :value => (@version.name || @project.specs.first.try(:versions).try(:first).try(:prefix) || "V0.0.1")
+          = link_to l(:version_generate_name), generate_name_project_versions_path(@project), |
+            class: "btn btn-primary btn-sm", remote: true, :onclick => 'this.search = "spec_id=" + $("#version_spec_id").val() + "&prefix=" + $("#version_name").val()'
+          = popover :span, :title =>l(:version_generate_name), :content => l(:version_generate_name_tips) do
+            = icon 'info-circle'
+        %p
+          = f.text_area :description, :rows => 5, :class => 'wiki-edit'
+          = wikitoolbar_for 'version_description'
+        %p= f.select :repo_one_id, project_repo_one_options_for_select(@project, @version), :required => true, label: :version_repo_one_of_app
+        %p= f.select :repo_two_id, project_repo_two_options_for_select(@project, @version), :required => true, label: :version_repo_two_of_app
+        %p#apkGradleVersion{style: 'display: none'}= f.select :gradle_version, options_for_select(GradleCategory.active.map(&:name), @version.gradle_version), {:required => false, label: :version_gradle_version}
+        %p
+          = f.select :priority, list_for_select(@version, :priority), :required => true, label: :version_priority
+          = remove_select_option("version_priority") unless User.current.is_scm?
+        %p#apkArm
+          = f.select :arm, list_for_select(@version, :arm), :required => true, include_blank: true, label: :version_arm
+          %small.form-text.text-muted 应用编译版本是32位还是64位
+        %p
+          = f.select :strengthen, bool_for_select, :required => true, label: :version_strengthen
+          %small.form-text.text-muted 同BuildRobot中IsReinforce选项
+        %p= f.select :unit_test, bool_for_select, :required => true, label: :version_unit_test
+        %p= f.select :auto_test, bool_for_select, :required => true, label: :version_auto_test
+        %p
+          = f.select :auto_test_projects, unit_test_project_options, {label: :version_auto_test_projects},  |
+            {:multiple => true, disabled: !@version.auto_test }
+          = select2_for "version_auto_test_projects"
+        %p= f.select :sonar_test, bool_for_select, :required => true, label: :version_sonar_test  
+    - else # Project
+      - if @project.android_platform.to_i == 2
+        %p
+          = label_tag "version_rule_id", l(:version_name_rule)
+          = select_tag "version[rule_id]", options_for_select(@version.name_rules.map{|rule| [rule.name, rule.id]}), label: :version_name_rule,
+            :data => { :json => @version.name_rules.pluck(:id, :range).to_h.to_json }, :onchange => "$(this).siblings('small').text($(this).data('json')[this.value])"
+          %small.form-text.text-muted= @version.name_rules.pluck(:id, :range).first[1] || l(:periodic_version_rule_range_timestamp)
+      %p= f.select :spec_id, specs_options_for_select(@project), {:required => true, label: :version_spec_id}, :disabled => !@version.new_record?
+      - unless @project.android_platform.to_i == 2
+        %p= f.text_field :name, :required => true
+      %p
+        = f.text_area :description, :rows => 5, :class => 'wiki-edit'
+        = wikitoolbar_for 'version_description'
+      %p= f.select :repo_one_id, project_repo_one_options_for_select(@project, @version), :required => true, label: :version_repo_one_of_project
+      %p= f.select :repo_two_id, project_repo_two_options_for_select(@project, @version), include_blank: true, label: :version_repo_two_of_project
+      %p
+        = f.select :priority, list_for_select(@version, :priority), :required => true, label: :version_priority
+        = remove_select_option("version_priority") unless User.current.is_scm?
+      %p= f.select :compile_type, list_for_select(@version, :compile_type), :required => true, label: :version_compile_type
+      %p= f.select :ota_whole_compile, bool_for_select, :required => true, label: :version_ota_whole_compile
+      %p
+        = f.select :ota_increase_compile, bool_for_select, {:required => true, label: :version_ota_increase_compile}, |
+          {disabled: !@version.ota_whole_compile, :data => {:json => all_increase_versions(@version)}}
+        %span.inline
+      %p= f.select :continue_integration, bool_for_select, :required => true, label: :version_continue_integration
+      %p= f.select :coverity, bool_for_select, :required => true, label: 'Coverity'  
+      -# %p
+      -#   = f.select :ota_increase_versions, options_from_collection_for_select(@version.find_increase_versions,  |
+      -#     "id", "name", @version.ota_increase_version_ids), {label: :version_ota_increase_versions},            |
+      -#     {:disabled => !@version.ota_increase_compile, :multiple => "multiple"}                                |
+      -#   = select2_for("version_ota_increase_versions")
+      %p= f.select :signature, bool_for_select, :required => true, label: :version_signature
+      %p= f.select :timezone, options_for_select([[l(:version_timezone_east_8), '8'], [l(:version_timezone_east_7), '7']], @version.try(:timezone)), :required => true, label: :version_timezone  
+    / Public
+    %p
+      = f.select :mail_receivers, mail_receiver_options, {}, {:multiple => "multiple"}
+      %small.form-text.text-muted 版本编译完成后，邮件同时抄送给对方
+      = select2_remote "version_mail_receivers", @project
+    %p
+      = f.text_field :compile_due_on, label: :version_compile_due_on
+      = calendar_for("version_compile_due_on", true, :minDate => Date.current)
+    - @version.custom_field_values.each do |value|
+      %p= custom_field_tag_with_label :version, value
+
+
+:javascript
+  var rules = #{raw_json @version.name_rules}
+
+  $(document).ready(function(){
+    disableGradle();
+  })
+
+  $("#version_spec_id, #version_ota_whole_compile, #version_ota_increase_compile, #version_auto_test, #version_unit_test").change(function(){
+    if(this.id == "version_ota_whole_compile") {
+      if($(this).val() == "false"){
+        $("#version_ota_increase_compile").val("false").prop("disabled", true).trigger("change");
+      } else {
+        $("#version_ota_increase_compile").prop("disabled", false).trigger("change");
+      }
+    } else if (this.id == "version_ota_increase_compile" || this.id == "version_spec_id") {
+      $ota_increase_compile = $("#version_ota_increase_compile");
+      if(!~~$ota_increase_compile.length) {return}
+      $inline = $ota_increase_compile.siblings(".inline");
+      if($ota_increase_compile.val() == "false"){
+        $inline.text('');
+      } else {
+        var spec = $("#version_spec_id option:selected").text().split('(')[0];
+        var versions = $ota_increase_compile.data("json")[spec];
+        if(!!versions){
+          var html = "差分版本：" + versions.map(function(el){ return el.name; }).join(", ");
+          $inline.text(html);
+        } else {
+          $inline.text('');
+          $ota_increase_compile.val("false").prop("disabled", true);
+          layer.alert("该规格下未设定可用的差分版本！");
+        }
+      }
+    } else if (this.id == "version_auto_test" || this.id == "version_unit_test"){
+      if($(this).val() == "false"){
+        $("#version_auto_test_projects").val("").prop({'required': false, 'disabled': true});
+      } else {
+        $("#version_auto_test_projects").prop({'required': true, 'disabled': false});
+      }
+    }
+  })
+
+  $("#version_repo_two_id").change(function(){
+    disableGradle()
+  })
+
+  function disableGradle(){
+    var hasGradle = $('#version_repo_two_id').find("option:selected").text().includes('gradle');
+    var $gv = $("#apkGradleVersion");
+    if($gv.length > 0){
+      if(hasGradle){
+        $gv.css('display', 'block')
+        $("#version_gradle_version").attr('disabled', false)
+
+        $('#apkArm').css('display', 'none')
+        $('#version_arm').val("32")
+        // $("#version_arm").find("option[text='32']").attr("selected",true);
+      }else{
+        $gv.css('display', 'none')
+        $("#version_gradle_version").attr('disabled', true)
+
+        $('#apkArm').css('display', 'block')
+        $('#version_arm').val("")
+      }
+    }
+  }
+
+-# $("#version_ota_whole_compile, #version_auto_test, #version_unit_test").change(function(){
+-#   if(this.id == "version_ota_whole_compile") {
+-#     if($(this).val() == "false"){
+-#       $("#version_ota_increase_compile").val("false").prop("disabled", true).trigger("change");
+-#     } else {
+-#       $("#version_ota_increase_compile").prop("disabled", false).trigger("change");
+-#     }
+-#   } else if (this.id == "version_auto_test" || this.id == "version_unit_test"){
+-#     if($(this).val() == "false"){
+-#       $("#version_auto_test_projects").val("").prop({'required': false, 'disabled': true});
+-#     } else {
+-#       $("#version_auto_test_projects").prop({'required': true, 'disabled': false});
+-#     }
+-#   }
+-# });
+
+-# // Load ota increase versions
+-# $("#version_spec_id, #version_repo_one_id, #version_repo_two_id, #version_ota_increase_compile").change(function(){
+-#   if(!~~$('#version_ota_increase_compile').length) {return;}
+-#   var $ota_compile = $('#version_ota_increase_compile');
+-#   var $ota_increase_versions = $('#ota_increase_versions');
+-#   var ota_compile_val = $ota_compile.val();
+-#   var url = $ota_compile.data('url');
+-#   if(ota_compile_val == 'false'){
+-#     $ota_increase_versions.empty();
+-#   } else {
+-#     $.get(url, $(this).closest('form').serialize()).done(function(result){
+-#       if(result.length){
+-#         $ota_increase_versions.text(result.join(', '))
+-#       } else {
+-#         $('#version_ota_increase_compile').val("false")
+-#         $ota_increase_versions.text('当前条件下，无任何可差分版本！');
+-#       }
+-#     })
+-#   }
+-# });

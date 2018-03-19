@@ -1,0 +1,51 @@
+- provide :nav, "2,1"
+- provide :css, "bootstrap"
+
+.h2= l(:label_issue_to_special_test_result)
+
+.filter-right
+  .panel.panel-default{:style => "margin-top:20px;"}
+    .panel-body
+      .issues-body
+        - if @results.blank?
+          %p.nodata= l(:label_no_data)
+        - else
+          %table#specTable.table.table-striped.table-bordered.table-hover
+            %thead
+              %tr
+                %th{width: 150} #
+                %th{width: 150}= l(:issue_to_special_test_result_special_test_id)
+                %th{width: 150}= l(:issue_to_special_test_subject)
+                %th{width: 80}= l(:issue_to_special_test_result_sample_num)
+                %th{width: 100}= l(:issue_to_special_test_result_designer_id)
+                %th{width: 100}= l(:issue_to_special_test_result_assigned_to_id)
+                %th{width: 70} 状态(专项结果)
+                %th 专项发现的其他问题
+                %th{width: 100}= l(:issue_to_special_test_result_start_date)
+                %th{width: 100}= l(:issue_to_special_test_result_due_date)
+            %tbody
+              - @results.each do |r|
+                %tr
+                  %td= result_link(r)
+                  %td= special_link(r.special_test)
+                  %td
+                    = popover(:trigger => "click", :content => simple_format(r.special_test.subject),:title => "详细信息", :placement => 'bottom') do
+                      = r.special_test.subject.to_s[0,10]
+                  %td
+                    - if r.task.present? && r.task.finished?
+                      = popover(:trigger => "click", :content => simple_format(r.sample_num),:title => "详细信息", :placement => 'bottom') do
+                        = r.sample_num.to_s[0,10]
+                  %td= link_to_user r.designer
+                  %td= link_to_user r.assigner
+                  %td= load_value(r.special_test, :status)
+                  %td
+                    - if r.task.present? && r.task.finished?
+                      = popover(:trigger => "click", :content => simple_format(r.notes),:title => "详细信息", :placement => 'bottom') do
+                        = r.notes.to_s[0,10]
+                  %td
+                    - if r.task.present? && r.task.finished?
+                      = r.start_date.try(:strftime, "%F %T")
+                  %td
+                    - if r.task.present? && r.task.finished?
+                      = r.due_date.try(:strftime, "%F %T")
+          %span.pagination= pagination_links_full @pages, @count

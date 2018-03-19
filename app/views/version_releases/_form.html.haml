@@ -1,0 +1,165 @@
+= labelled_fields_for :version_release, @release do |f|
+  / Basic info
+  .label= l(:version_release_basic_info)
+  %p= f.select :category, list_for_select(@release, :category), label: :version_release_category
+  %p#apks-notice
+  .splitcontent.row.basic-info
+    .col-md-6
+      %p
+        = f.select :project_id, app_production_options_for_select(@release), label: :version_release_production
+        = select2_for "version_release_project_id"
+      %p= f.select :spec_id, app_spec_options_for_select(@release), label: :version_release_spec
+      %p
+        = f.select :version_id, app_version_options_for_select(@release), :required => true, label: :version_release_version_id
+        = select2_for 'version_release_version_id'
+      - if @release.show_by(2)
+        %p#adapt-notice
+    .col-md-6
+      %p= f.text_field :version_applicable_to, label: :version_release_version_applicable_to
+      %p
+        = f.select :tested_mobile, project_options_for_select,  |
+          {label: :version_release_tested_mobile, required: true, include_blank: true}, {:multiple => !@release.flow?}
+        %small.form-text.text-muted 测试项目不再影响发布范围
+        = select2_for 'version_release_tested_mobile'
+      %p
+        = f.text_field :test_finished_on, label: :version_release_test_finished_on
+        = calendar_for "version_release_test_finished_on"
+      %p
+        = f.select :mail_receivers, {}, {}, {:multiple => "multiple"}
+        %small.form-text.text-muted 版本发布完成后，邮件同时抄送给对方
+        = select2_remote "version_release_mail_receivers", @project
+  %p.description
+    = f.text_area :description, :rows => 8, :value => (@release.description || "- 功能变更及风险说明（新增和删减）：\n\n- 修改问题说明：")
+    = wikitoolbar_for 'version_release_description'
+  / Test info
+  .label= l(:version_release_test_info)
+  .splitcontent.row.test-info
+    .col-md-6
+      %p
+        = f.select :test_type, list_for_select(@release, :test_type), label: :version_release_test_type
+        = add_note_area :test_type, placeholder: '非全面测试时，在测试补充说明中写明原因'
+      - if @release.show_by(3)
+        %p= f.select :bvt_test, list_for_select(@release, :bvt_test), label: :version_release_bvt_test
+      - if @release.show_by(1, 2)
+        %p
+          = f.select :fluency_test, list_for_select(@release, :fluency_test), label: :version_release_fluency_test
+          = add_note_area :fluency_test, placeholder: '若不用测试，请注明原因'
+        %p
+          = f.select :response_time_test, list_for_select(@release, :response_time_test), label: :version_release_response_time_test
+          = add_note_area :response_time_test, placeholder: '若不用测试，请注明原因'
+        %p
+          = f.select :app_standby_test, list_for_select(@release, :app_standby_test), label: :version_release_app_standby_test
+          = add_note_area :app_standby_test, placeholder: '若不用测试，请注明原因'
+      - if @release.show_by(1)
+        %p
+          = f.select :sonar_codes_check, list_for_select(@release, :sonar_codes_check), label: :version_release_sonar_codes_check
+          = add_note_area :sonar_codes_check, placeholder: '若未执行，请注明原因'
+      - if @release.show_by(1, 2)
+        %p
+          = f.select :translate_sync, list_for_select(@release, :translate_sync), label: :version_release_translate_sync
+          = add_note_area :translate_sync, placeholder: '各种语言翻译是否同步记录'
+        %p
+          = f.select :output_record_sync, list_for_select(@release, :output_record_sync), label: :version_release_output_record_sync
+          = add_note_area :output_record_sync, placeholder: '是否同步输出记录表'
+        %p
+          = f.select :translate_autocheck_result, list_for_select(@release, :translate_autocheck_result), label: :version_release_translate_autocheck_result
+          = add_note_area :translate_autocheck_result, placeholder: '翻译自检结果'
+    .col-md-6
+      - if @release.show_by(1,2)
+        %p
+          = f.select :monkey_72_test, list_for_select(@release, :monkey_72_test), label: :version_release_monkey_24_test
+          = add_note_area :monkey_72_test, placeholder: '若不用测试，请注明原因'
+      - if @release.show_by(1,2,3)
+        %p
+          = f.select :cts_test, list_for_select(@release, :cts_test), label: :version_release_cts_test
+          = add_note_area :cts_test, placeholder: '若不用测试，请注明原因'
+      - if @release.show_by(1, 2)
+        %p
+          = f.select :memory_leak_test, list_for_select(@release, :memory_leak_test), label: :version_release_memory_leak_test
+          = add_note_area :memory_leak_test, placeholder: '若不用测试，请注明原因'
+        %p
+          = f.select :cts_verifier_test, list_for_select(@release, :cts_verifier_test), label: :version_release_cts_verifier_test
+          = add_note_area :cts_verifier_test, placeholder: '若不用测试，请注明原因'
+      - if @release.show_by(1, 2)
+        %p
+          = f.select :interior_invoke_warning, list_for_select(@release, :interior_invoke_warning), label: :version_release_interior_invoke_warning
+          = add_note_area :interior_invoke_warning, placeholder: '应用调用使用权限提示'
+        %p
+          = f.select :related_invoke_warning, list_for_select(@release, :related_invoke_warning), label: :version_release_related_invoke_warning
+          = add_note_area :related_invoke_warning, placeholder: '关联应用调用使用权限提示'
+      - if @release.show_by(1, 2)
+        %p
+          = f.select :app_data_test, list_for_select(@release, :app_data_test), label: :version_release_app_data_test
+          = add_note_area :app_data_test, placeholder: '应用流量测试'
+        %p
+          = f.select :app_launch_test, list_for_select(@release, :app_launch_test), label: :version_release_app_launch_test
+          = add_note_area :app_launch_test, placeholder: '应用自启测试'
+  / Additional info
+  .label= l(:version_release_additional_info)
+  .splitcontent.row.additional-info
+    .col-md-6
+      %p= f.select :codes_reviewed, bool_for_select, label: :version_release_codes_reviewed
+      -# %p= f.select :cases_sync_updated, bool_for_select, label: :version_release_cases_sync_updated
+      - if @release.show_by(3)
+        %p= f.select :code_walkthrough_well, bool_for_select, label: :version_release_code_walkthrough_well
+        %p= f.select :mode, list_for_select(@release, :mode), label: :version_release_mode
+      %p= f.text_area :relative_objects, label: :version_release_relative_objects
+      %p= f.text_area :issues_for_platform, label: :version_release_issues_for_platform
+    .col-md-6
+      - if @release.show_by(1, 2)
+        %p
+          = f.select :sdk_review, list_for_select(@release, :sdk_review), label: :version_release_sdk_review
+          = add_note_area :sdk_review, placeholder: '不用评审时，注明原因'
+        -# %p= f.select :ued_confirm, list_for_select(@release, :ued_confirm), label: :version_release_ued_confirm
+      %p
+        = f.text_area :remaining_issues, label: :version_release_remaining_issues
+        %small.form-text.text-muted 测试项目不再影响发布范围 '因关联模块未完成或依赖平台，器件无联调环境的严重等级为S1的问题
+      %p= f.text_area :new_issues, label: :version_release_new_issues
+      -# %p= f.text_area :note, label: :version_release_note
+  / Data upload
+  .label= l(:version_release_data_upload)
+  - if @release.show_by(1, 2)
+    %p
+      = f.select :uir_upload_to_svn, bool_for_select, label: :version_release_uir_upload_to_svn
+      = add_note_area :uir_upload_to_svn, placeholder: '若未上传脑图，请注明原因'
+
+  - if @release.show_by(1)
+    %p
+      %label 附件内容
+      %span.vcenter 脑图、SDK通过附件、全功能测试报告、发布自检表、流畅度测试报告、响应时间报告、Sonar代码检查结果截图、应用待机功耗测试截图、Monkey24小时测试及内存泄露报告、CTS测试结果报告
+
+  - elsif @release.show_by(2)
+    %p
+      %label 附件内容
+      %span.vcenter BVT测试报告、脑图、Monkey12小时报告、CTS测试结果报告
+
+:javascript
+  new SMValidator('form', {
+    fields: {
+      'version_release[version_applicable_to]' : 'required',
+      'version_release[version_id]'            : 'required',
+      'version_release[tested_mobile]'         : 'required',
+      'version_release[relative_objects]'      : 'required',
+      'version_release[issues_for_platform]'   : 'required',
+      'version_release[remaining_issues]'      : 'required',
+      'version_release[new_issues]'            : 'required',
+      'version_release[tested_mobile]'         : 'required'
+    },
+    submit: function(valid, form) {
+      var $adapt = $('input[name="acceptAdaptNotice"]')
+      var $apks = $('input[name="acceptApks"]')
+      if(~~$adapt.length && !$adapt.is(':checked')){
+        layer.alert('请先勾选: 我已经知晓');
+        return false;
+      }
+      if(~~$apks.length && !$apks.is(':checked')){
+        layer.alert('请先勾选: APK信息确认提醒');
+        return false;
+      }
+      if(valid) form.submit();
+    }
+  });
+
+  $('#version_release_version_id').on('change', function() {
+    versionApks($(this).val())
+  })

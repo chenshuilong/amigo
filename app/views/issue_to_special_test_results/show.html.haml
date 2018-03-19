@@ -1,0 +1,26 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+.h2= l(:label_issue_to_special_test_result)
+
+= render_task_tips(@task)
+
+.clearfix
+  .issue-details
+    = render :partial => 'issue_to_special_test_results/show'
+
+//Still can update attachment after task finished
+- if @task.present? && @task.finished? && @result.owners.include?(User.current.id)
+  .issue-details#update
+    = labelled_form_for @result, :url => project_issue_to_special_test_result_path(project_id: @project, id: @result), :html => {:multipart => true} do |f|
+      %p
+        %label.col-sm-2= "补充"
+        %p.col-sm-10
+          = text_area_tag "supplement", '', :style => "width: 80%; height: 100px"
+      .box.tabular
+        %p#attachments_form
+          %label.col-sm-2= "附件补充"
+          %p.col-sm-10
+            = render :partial => 'attachments/form', :locals => {:container => @result}
+      .text-center
+        = submit_tag l(:button_save), class: "btn btn-primary btn-sm"

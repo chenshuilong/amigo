@@ -1,0 +1,22 @@
+.issue-details#update
+  #all_attributes
+    %p= f.text_field :name, :required => true, label: :tool_name#, :style => "width: 80%"
+    %p
+      = f.select :provider_id, user_option_for_select(@tool.provider_id), :required => true, label: :tool_provider_id
+      = select2_remote("tool_provider_id", nil, nil, {withme: false})
+    %p= f.text_area :description, value: @tool.description, :required => true, label: :tool_description, :style => "width: 80%; height: 100px"
+    .box.tabular
+      %p#attachments_form
+        %label.col-sm-2
+          = l(:tool_tool_url_new)
+          %span.required *
+        %p.col-sm-10
+          = render :partial => 'attachment', :locals => {:container => @tool, :extra_type => 'tool_url'}
+    .box.tabular
+      %p#attachments_form
+        %label.col-sm-2= l(:tool_tool_note_new)
+        %p.col-sm-10
+          = render :partial => 'attachment', :locals => {:container => @tool, :extra_type => 'tool_note'}
+
+- content_for :header_tags do
+  = javascript_include_tag 'attachments2'

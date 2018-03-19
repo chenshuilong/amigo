@@ -1,0 +1,35 @@
+- provide :nav, '6,1'
+- provide :css, "bootstrap"
+
+.container
+  .row.seamless.notification
+    .col-md-2.notification-left
+      %p.title
+      = criterion_sidebar
+    .col-md-10.notification-right
+      %p.h2= l(:criterion_index)
+
+      %table#criterionTable.list.table.table-striped.table-bordered
+        %thead
+          %tr
+            %td #
+            %td= l(:criterion_primary_target)
+            %td= l(:criterion_secondary_target)
+            %td= l(:criterion_purpose)
+            %td= l(:criterion_description)
+            %td= l(:criterion_dept_range)
+            %td= l(:criterion_output_time)
+            %td= l(:field_operation)
+        %tbody
+          - @criterions.each do |criterion|
+            %tr
+              %td= criterion.id
+              %td= criterion.name
+              %td= render_criterion_children(criterion)
+              %td= criterion.purpose
+              %td= simple_format criterion.description
+              %td= criterion.dept_range
+              %td= criterion.output_time
+              %td= link_to l(:button_edit), edit_criterion_path(criterion.id, format: :js), remote: true
+
+

@@ -1,0 +1,30 @@
+%p
+  %hr
+  %table
+    %tbody
+      %tr
+        %td.talbe-col-md-2
+          %p.label Name
+        %td.talbe-col-md-4= @library.try(:name)
+      %tr
+        %td.talbe-col-md-2
+          %p.label Path
+        %td.talbe-col-md-4= @library.try(:path)
+      %tr
+        %td.talbe-col-md-2
+          %p.label 状态
+        %td.talbe-col-md-4= l("library_status_#{@library.status}")
+      %tr
+        %td.talbe-col-md-2
+          %p.label 计划完成日期
+        %td.talbe-col-md-4= @library.container.due_at.try(:strftime, '%F')
+
+
+/ Public
+%hr
+%table.button.small
+  %tr
+    %td
+      %table
+        %tr
+          %td= link_to '查看详情', my_tasks_url(type: 'library_task')

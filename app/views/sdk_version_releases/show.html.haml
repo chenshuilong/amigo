@@ -1,0 +1,54 @@
+- provide :nav, "4,2"
+- provide :css, "bootstrap"
+- content_for :header_tags do
+  %link{:href => "/amg/dataTable/datatable.css", :rel => "stylesheet"}
+  %script{:src => "/amg/dataTable/dataTables.bootstrap.min.js", :type => "text/javascript"}
+
+.row
+  .col-sm-6
+    .h2= @sdk.version.fullname
+  .col-sm-6.text-right
+    .top-action-menu
+      - if User.current.allowed_to?({:controller=>"sdk_version_releases", :action=>"rerelease"}, @sdk.version.project)
+        - if @sdk.completed?
+          = link_to l(:version_release_rerelease), void_js,
+            :onclick => "layer.confirm('确定重新发布吗？', function(){$.post('#{rerelease_sdk_version_release_path(@sdk)}')})"
+
+.issue-details
+  .description
+    .label= l(:sdk_version_release_note)
+    - if @sdk.note
+      .wiki= textilizable @sdk, :note
+    - else
+      .wiki= l(:label_no_description)
+
+  %hr
+  .attributes
+    = fields_rows do |rows|
+      - rows.left l(:sdk_version_release_project_name), link_to_project(@sdk.version.project)
+      - rows.right l(:sdk_version_release_type), render_sdk_type(@sdk)
+      - if @sdk.is_system?
+        - rows.line l(:sdk_version_release_projects), render_release_projects(@sdk)
+      - rows.line l(:sdk_version_release_version_name), link_to_version(@sdk.version)
+
+      - rows.line l(:thirdparty_version_release_status), @sdk.status_name
+      - rows.line l(:field_author), link_to_user(@sdk.author)
+      - rows.line l(:field_created_on), @sdk.created_at.to_s(:db)
+
+  - if @sdk.is_system? && @sdk.release_project_ids.present?
+    %hr
+    .release-results
+      .label= l(:version_release_result)
+      .release-results-list= render_release_result(@sdk)
+
+  - if @sdk.is_app?
+    %hr
+    .release-results
+      .label= l(:sdk_version_release_maven_result)
+      .release-results-list= render_maven_release_result(@sdk)
+
+= production_submenu_by_type(5)
+= javascript_tag "$('#tab-productions').find('li').eq(1).removeAttr('class');"
+= javascript_tag "$('#tab-productions').find('li').eq(2).attr('class', 'active');"
+
+- html_title(l(:project_production_type_sdk_version_release))

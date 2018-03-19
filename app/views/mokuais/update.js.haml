@@ -1,0 +1,7 @@
+:plain
+  mokuai_tr = $('[data-id="#{@mokuai.id}"]')
+  mokuai_tr.children().eq(1).text("#{@mokuai.category}")
+                .end().eq(2).text("#{@mokuai.reason}")
+                .end().eq(3).text("#{@mokuai.name}")
+                .end().eq(4).text("#{@mokuai.desc}")
+                .end().eq(5).text("#{@mokuai.package_name}")

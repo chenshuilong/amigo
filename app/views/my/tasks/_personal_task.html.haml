@@ -1,0 +1,138 @@
+- if params[:person_type] == "author_id"
+  .top-action-menu.pull-right
+    %a{:href => "#{void_js}", class: "btn btn-sm btn-primary", id: "newPersonalTask"}= l(:label_new_task) 
+
+#personalTaskTable
+:css
+  .unread{
+    font-weight: 700;
+    color: #f88829;
+  } 
+
+:javascript
+
+  var table = $("#personalTaskTable");
+
+  var tasksSource =
+  {
+      dataFields: [
+          { name: 'id', type: 'int' },
+          { name: 'name', type: 'string' },
+          { name: 'author_name', type: 'string'},
+          { name: 'firstname', type: 'int' },
+          { name: 'status_name', type: 'string' },
+          { name: 'start_date', type: 'date' },
+          { name: 'due_date', type: 'date' },
+          { name: 'actual_start_date', type: 'date'},
+          { name: 'actual_due_date', type: 'date'},
+          { name: 'is_read', type: 'boolean'}
+      ],
+      type: 'POST',
+      dataType: "json",
+      id: 'id',
+      url: "/tasks/personal_task?person_type=#{params[:person_type]}",
+      addRow: function (rowID, rowData, position, commit) {
+          commit(true);
+      },
+      updateRow: function (rowID, rowData, commit) {
+          commit(true);
+      },
+      deleteRow: function (rowID, commit) {
+          commit(true);
+      }
+  };
+  var dataAdapter = new $.jqx.dataAdapter(tasksSource,
+      {
+          formatData: function (data) {
+              $.extend(data, {
+                  token: "#{Token.generate_token_value}",
+                  issue_type: "IssueToSpecialTestResult",
+                  maxRows: 50
+              });
+              return data;
+          },
+          loadComplete: function () {
+            // data is loaded.
+          }
+      }
+  );
+
+  var cellClass = function (row, dataField, cellText, rowData) {
+      var unread = rowData.is_read == false ? 'unread' : ''
+      return unread;
+  }
+
+  table.jqxDataTable({
+      width: '100%',
+      height: 680,
+      source: dataAdapter,
+      pageable: true,
+      sortable: true,
+      altRows: true,
+      filterable: true,
+      filterMode: 'advanced',
+      localization: getLocalization(),
+      pagerButtonsCount: 8,
+      columns: [
+        { text: '#', dataField: 'id', cellsAlign: 'center', align: 'center', width: 100, cellClassName: cellClass },
+        { text: '任务名', dataField: 'name', cellsAlign: 'center', align: 'center', width: 350, cellClassName: cellClass },
+        { text: '作者', dataField: 'author_name', cellsAlign: 'center', align: 'center', width: 150, cellClassName: cellClass},
+        { text: '责任人', dataField: 'firstname', cellsAlign: 'center', align: 'center', width: 150, cellClassName: cellClass },
+        { text: '状态', dataField: 'status_name', cellsAlign: 'center', align: 'center', width: 150, cellClassName: cellClass },
+        { text: '计划开始时间', dataField: 'start_date', cellsAlign: 'center', align: 'center', width: 150, cellsFormat: 'yyyy-MM-dd HH:mm:ss', cellClassName: cellClass },
+        { text: '计划完成时间', dataField: 'due_date', cellsAlign: 'center', align: 'center', width: 150, cellsFormat: 'yyyy-MM-dd HH:mm:ss', cellClassName: cellClass },
+        { text: '实际开始时间', dataField: 'actual_start_date', cellsAlign: 'center', align: 'center', width: 150, cellsFormat: 'yyyy-MM-dd HH:mm:ss', cellClassName: cellClass }, 
+        { text: '实际结束时间', dataField: 'actual_due_date', cellsAlign: 'center', align: 'center', width: 150, cellsFormat: 'yyyy-MM-dd HH:mm:ss', cellClassName: cellClass },
+        { text: 'is_read', dataField: 'is_read', hidden: true, cellClassName: 'isRead' }
+      ]
+  });
+
+  table.on('rowClick', function (event) {
+      var args = event.args;
+      var index = args.index;
+      var row = args.row;
+
+      var cur_row = $("[data-key="+ row.id +"]");
+      var $isRead = cur_row.children(".isRead");
+      if($isRead.text() == 'false'){
+        cur_row.children().removeClass("unread");
+        $isRead.text(true);
+        var rest_unread = $("span#300_101").find('.badge').text() - 1;
+        if(rest_unread == 0){
+          $("span#300_101").find('.badge').remove()
+        }else{
+          $("span#300_101").find('.badge').text(rest_unread);
+        }
+        $.post('/tasks/'+ row.id +'/handle');
+      }
+
+      var taskId = row.id;
+          
+      layer.closeAll();
+      content = "/tasks/"+taskId+"/personal_task_edit?person_type=#{params[:person_type]}";    
+      layer.open({
+        type: 2,
+        title: '<b>#{l(:label_personal_task)}</b>',
+        area: ['90%', '80%'],
+        zIndex: 999,
+        moveType: 1,
+        maxmin: false,
+        shadeClose: false,
+        content: content
+      });
+  });
+
+  $("#newPersonalTask").click(function() {
+    layer.closeAll();
+    content = '/tasks/personal_task_new';    
+    layer.open({
+      type: 2,
+      title: '<b>#{l(:label_personal_task)}</b>',
+      area: ['90%', '80%'],
+      zIndex: 999,
+      moveType: 1,
+      maxmin: false,
+      shadeClose: false,
+      content: content
+    });
+  })

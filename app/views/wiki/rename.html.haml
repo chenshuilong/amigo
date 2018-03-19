@@ -1,0 +1,21 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+= wiki_page_breadcrumb(@page)
+%h2= @original_title
+= error_messages_for 'page'
+= labelled_form_for :wiki_page, @page, |
+  :url => { :action => 'rename' },     |
+  :html => { :method => :post } do |f| |
+  .box.tabular
+    %p= f.text_field :title, :required => true, :size => 100
+    %p= f.check_box :redirect_existing_links
+    %p= f.select :parent_id,                                                 |
+        content_tag('option', '', :value => '') +                            |
+          wiki_page_options_for_select(                                      |
+            @wiki.pages.includes(:parent).to_a - @page.self_and_descendants, |
+            @page.parent),                                                   |
+        :label => :field_parent_title                                        |
+    - if @page.safe_attribute? 'wiki_id'
+      %p= f.select :wiki_id, wiki_page_wiki_options_for_select(@page), :label => :label_project
+  = submit_tag l(:button_rename)

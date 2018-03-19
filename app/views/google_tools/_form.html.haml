@@ -1,0 +1,34 @@
+.issue-details#update
+  #all_attributes
+    - if @tool.new_record?
+      - unless @tool.category.to_i == 30
+        %p= f.text_field :android_version, :required => true, label: :google_tool_android_version#, :style => "width: 80%"
+      %p= f.text_field :tool_version, :required => true, label: @title + l(:field_version)
+    - else
+      - unless @tool.category.to_i == 30
+        %p
+          %label
+            = l(:google_tool_android_version)
+            %span.required *
+          = @tool.android_version
+      %p
+        %label
+          = @title + l(:field_version)
+          %span.required *
+        = @tool.tool_version
+
+    %p
+      = f.text_field :closed_at, :required => false, label: :google_tool_closed_at
+      = calendar_for("google_tool_closed_at")
+    %p= f.text_area :notes, value: @tool.notes, :required => false, label: :label_remark, :style => "width: 80%; height: 100px"
+    - @extra_types.each do |extra_type|
+      .box.tabular
+        %p#attachments_form
+          %label.col-sm-2
+            = extra_type.upcase + l(:google_tool_tool_url_upload)
+            %span.required *
+          %p.col-sm-10
+            = render :partial => 'attachment', :locals => {:container => @tool, :extra_type => extra_type}
+
+- content_for :header_tags do
+  = javascript_include_tag 'attachments2'

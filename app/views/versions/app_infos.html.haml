@@ -1,0 +1,76 @@
+- provide :nav, "5,4"
+- provide :css, "bootstrap"
+
+- content_for :bread do
+  %li= link_to l(:label_roadmap), all_versions_path
+  %li= l(:label_version_app_infos)
+
+#roadmap.version_searchs
+  .roadmap-query
+    %ul.notification-list 
+      %li.notification-list-item
+        .notification-menu
+          %i.fa.fa-chevron-up
+        .notification-content
+          %p
+            %strong= "查询条件"
+        .clearfix
+        .notification-acton.select2-rectify{:style => "display:block;"}          
+          = form_tag({}, {method: :get, class: 'form-horizontal'}) do |f|
+            .form-group
+              = label_tag 'app_ids', l(:alter_record_app_name), class: "col-sm-2 control-label"
+              .col-sm-2
+                = select_tag 'app_ids', options_for_select(@apps.present? ? @apps.pluck(:name, :id) : [], @app_ids), class: "form-control", :multiple => true
+                = select2_remote('app_ids', nil, "--- 请选择应用 ---", :url => search_projects_path(category: 'other', production_type: [1,3,4]))
+            .form-group
+              = label_tag 'version_ids', l(:label_project_version), class: "col-sm-2 control-label"
+              .col-sm-2
+                = select_tag 'version_ids', options_for_select(@versions.present? ? @versions.map{|v| [v.name, v.id]} : [], @version_ids), class: "form-control", :multiple => true
+                = select2_remote('version_ids', nil, "--- 请选择版本 ---", :url => search_versions_path)
+            .form-group
+              .col-sm-2.col-sm-offset-2
+                = submit_tag l(:button_query), :name => nil, class: "btn btn-primary btn-sm"
+
+- if @app_infos.present?
+  %hr
+  - if @versions.length >= 5
+    #errorExplanation
+      %ul
+        %li= "您共选择了#{@versions.length}个版本，由于页面受限，当前只显示4个版本比较信息，点击 '导出信息' 按钮将为您导出完整数据的表格"
+
+
+  .filter-right#app-infos
+    .panel.panel-default
+      .panel-heading
+        .issues-head
+          .row.issues-head-title
+            .col-sm-6
+              .h2= '查询结果'
+            .col-sm-6.issues-head-title-new.text-right
+              %a.btn.btn-primary.btn-sm{:href => app_infos_versions_path(app_ids: @app_ids, version_ids: @version_ids, export: true)} 导出信息
+
+      .panel-body
+        .roadmap-table#appInfos
+          %table#appInfoTable.list.table.table-striped.table-bordered{:class => "csacsa"}
+            %thead
+              %tr
+                %th{width: 100}= "#"
+                %th= "应用名称"
+                - @versions.limit(4).each do |version|
+                  %th= link_to version.name, version_path(version.id)
+            %tbody
+              - @app_infos.each_with_index do |item, i|
+                %tr
+                  %td= i+1
+                  %td= item[0]
+                  - @versions.limit(4).each do |version|
+                    %td= item[1][version.name.to_sym]
+
+
+
+:css
+  .select2-selection {
+    min-height: 30px;
+    max-height: 60px;
+    overflow-y: auto;
+  }

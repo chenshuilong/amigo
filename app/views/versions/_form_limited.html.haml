@@ -1,0 +1,18 @@
+= labelled_form_for @version, html: {class: 'editVersionForm'} do |f|
+  = back_url_hidden_field_tag
+  = error_messages_for 'version'
+  #update.issue-details
+    #all_attributes
+      %p
+        = f.text_area :description, :rows => 5, :class => 'wiki-edit'
+        = wikitoolbar_for 'version_description'
+      - if @version.compiled_successfully? && User.current.is_spm?(@project)
+        %p= f.select :status, avaliable_status_of_versions(@version), {:required => true}, :onchange => "versionChangeInfos();"
+        - if !@project.show_by(4) && @version.ota_whole_compile?
+          %p= f.select :as_increase_version, bool_for_select, {:required => true}, :onchange => "versionChangeInfos();"
+        - if @version.status == 7
+          %p
+            = f.text_field :sendtest_at, :required => true, label: :version_sendtest_at
+            = calendar_for("version_sendtest_at", {timepicker: true})
+  .button-group.text-center
+    = submit_tag l(:button_update), class: "btn btn-primary"

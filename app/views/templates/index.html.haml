@@ -1,0 +1,78 @@
+%h2= l(:label_templates)
+
+.filter-right
+  .panel.panel-default{:style => "margin-top:20px;"}
+    .panel-heading 项目角色
+    .panel-body
+      .issues-head
+        .row.issues-head-title
+          .col-sm-12.text-right
+            .contextual
+              = link_to '新增角色', new_template_path(type: 'project_none'), :class => 'icon icon-add'
+        %hr
+        .issues-body
+          - if @project_nones.blank?
+            %p.nodata= l(:label_no_data)
+          - else
+            %table#specTable.table.table-bordered.table-hover
+              %thead
+                %tr
+                  %th 角色
+                  %th{width: 100}
+              %tbody
+                - @project_nones.each do |temp|
+                  %tr
+                    %td= link_to temp.name, edit_template_path(temp)
+                    %td= delete_link template_path(temp)
+
+  .panel.panel-default{:style => "margin-top:20px;"}
+    .panel-heading 项目默认配置角色群组
+    .panel-body
+      .issues-head
+        .row.issues-head-title
+          .col-sm-12.issues-head-title-new.text-right
+            .contextual
+              = link_to '新增角色群组', new_template_path(type: 'project_group'), :class => 'icon icon-add'
+        %hr
+        .issues-body
+          - if @project_groups.blank?
+            %p.nodata= l(:label_no_data)
+          - else
+            %table#specTable.table.table-bordered.table-hover
+              %thead
+                %tr
+                  %th 角色
+                  %th 组
+                  %th{width: 100}
+              %tbody
+                - @project_groups.each do |temp|
+                  %tr
+                    %td= link_to temp.name, edit_template_path(temp)
+                    %td= temp.group_names
+                    %td= delete_link template_path(temp)
+
+  .panel.panel-default{:style => "margin-top:20px;"}
+    .panel-heading 产品角色
+    .panel-body
+      .issues-head
+        .row.issues-head-title
+          .col-sm-12.issues-head-title-new.text-right
+            .contextual
+              = link_to '新增角色', new_template_path(type: 'app_none'), :class => 'icon icon-add'
+        %hr
+        .issues-body
+          - if @app_nones.blank?
+            %p.nodata= l(:label_no_data)
+          - else
+            %table#specTable.table.table-bordered.table-hover
+              %thead
+                %tr
+                  %th 角色
+                  %th{width: 100}
+              %tbody
+                - @app_nones.each do |temp|
+                  %tr
+                    %td= link_to temp.name, edit_template_path(temp)
+                    %td= delete_link template_path(temp)
+
+- html_title(l(:label_templates))

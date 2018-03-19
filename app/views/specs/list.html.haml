@@ -1,0 +1,71 @@
+- provide :nav, "2,2"
+- provide :css, "bootstrap"
+
+.h2= l(:label_spec_list)
+
+.clearfix
+- if @all_projects.blank?
+  %p.nodata= l(:label_no_data)
+- else
+  #roadmap.spec_compare_list
+    - if @specs.empty? && params[:utf8].blank?
+      %p.nodata= l(:label_no_data)
+    - else
+      .roadmap-query
+        = form_tag({}, {method: :get, class: 'form-inline'}) do |f|
+          .form-group
+            = label_tag 'projects', l(:field_project)
+            = select_tag 'projects', options_for_select(@all_projects, @projects),  |
+              :multiple => true, class: 'form-control', style:"min-width: 250px;max-height:30px"
+            = select2_for "projects", l(:label_all) , closeOnSelect: false
+          = render :partial => params[:action], :locals => {project: @projects}
+          .form-group
+            = label_tag 'created_at', l(:field_created_on)
+            = text_field_tag 'created_at_start', params[:created_at_start], class: "form-control", :id => 'version_release_created_at_start'
+            = hidden_field_tag 'created_at_end', params[:created_at_end], class: "form-control", :id => 'version_release_created_at_end'
+            = calendar_range_for 'version_release_created_at_start', 'version_release_created_at_end'
+          .form-group
+            = label_tag 'author', l(:field_author)
+            = select_tag 'author', options_for_select([[User.find_by(:id => params[:author]), params[:author]]], params[:author]),              |
+              class: "form-control", :style => "width: 150px;", :onchange => "this.form.submit(); return false;"
+            = select2_remote 'author'
+          = hidden_field_tag 'current_action', params[:action]
+          = submit_tag l(:button_submit), :name => nil, class: "btn btn-primary btn-sm"
+      %hr
+      .roadmap-query
+        = form_tag(specs_compare_path, {method: :get, class: 'form-inline'}) do |f|
+          .container
+            .col-sm-4
+              = "当前比对版本个数:"
+              %span#current_check_count 0
+              = "个"
+              %span.text-danger (*最多比较5个不同规格)
+            .col-sm-2
+              = submit_tag l(:label_spec_compare), :name => nil, :class => 'btn btn-primary btn-sm pull-right'
+          .roadmap-table
+            %table#versionTable.list.table.table-striped.table-bordered
+              %thead
+                %tr
+                  %th
+                  = sort_header_tag('project_name', :caption => l(:field_project))
+                  = sort_header_tag('name', :caption => l(:spec_name))
+                  %th= l(:spec_note)
+                  = sort_header_tag('created_at', :caption => l(:field_created_on))
+                  %th= l(:field_author)
+              %tbody
+                - @specs.each do |spec|
+                  %tr
+                    %td= check_box_tag("specs[]", spec.id, false, class:"check-specs")
+                    %td= spec.project.try(:name)
+                    %td= spec.name
+                    %td= spec.note
+                    %td= format_time spec.created_at
+                    %td= spec.spec_alter_records.reorder("created_at asc").first.try(:user).try(:firstname)
+          %span.pagination= pagination_links_full @pages, @count
+
+:css
+  .select2-selection{
+    min-height: 30px;
+    max-height: 60px;
+    overflow-y: auto;
+  }

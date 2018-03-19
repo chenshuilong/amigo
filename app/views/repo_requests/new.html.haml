@@ -1,0 +1,9 @@
+- provide :nav, "5,1"
+- provide :css, "bootstrap"
+
+%span.h2= l("label_repo_request_#{RepoRequest::REPO_REQUEST_CATEGORY.index(@repo_request.category).to_s}".to_sym)
+
+= labelled_form_for :repo_request, @repo_request do |f|
+  = render :partial => 'repo_requests/form', :locals => { :f => f }
+  .text-center
+    = submit_tag l(:button_save), class: "btn btn-primary"

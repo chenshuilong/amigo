@@ -1,0 +1,104 @@
+- provide :nav, "3,2"
+- provide :css, "bootstrap"
+- content_for :header_tags do
+  %link{:href => "/amg/easytree/skin-win8/ui.easytree.css", :rel => "stylesheet"}
+  %link{:href => "/amg/rangeslider/rangeslider.css", :rel => "stylesheet"}
+
+  %script{:src => "/amg/easytree/jquery.easytree.js", :type => "text/javascript"}
+  %script{:src => "/amg/rangeslider/rangeslider.js", :type => "text/javascript"}
+
+.row.filter-main
+  .filter-left
+    = render :partial => 'left'
+
+  .filter-right
+    %div{:style => "width:100%;"}
+      .panel.panel-default.reports{:style => "height: 680px;"}
+        .panel-heading 个人平均解决时长排名
+        .panel-body
+          .content{:style => "height: 580px;"}
+            = select_tag "project_solved_personal", project_tree_options_for_select(Project.all), class: 'form-control'
+            -#%select.relation.form-control{:title => "Choose a item",:onchange=>"changReportData(this.options[this.options.selectedIndex].value,'solved_personal')"}
+              -# %option{:value => "0"}= l(:label_jump_to_a_project)
+              - @projects.each do |p|
+                %option{:value => "#{p.id}"}= p.name
+
+            %table#solved_personal{:class => "list issues sort-by-id sort-desc  table table-striped table-bordered"}
+          %a{:href => report_more_url << "?type=solved_personal",:style => "float:right;"} 更多>>
+
+      .panel.panel-default.reports{:style => "height: 680px;"}
+        .panel-heading 部门平均解决时长排名
+        .panel-body
+          .content{:style => "height: 580px;"}
+            = select_tag "project_solved_department", project_tree_options_for_select(Project.all), class: 'form-control'
+            -#%select.relation.form-control{:title => "Choose a item",:onchange=>"changReportData(this.options[this.options.selectedIndex].value,'solved_department')"}
+              -# %option{:value => "0"}= l(:label_jump_to_a_project)
+              - @projects.each do |p|
+                %option{:value => "#{p.id}"}= p.name
+
+            %table#solved_department{:class => "list issues sort-by-id sort-desc  table table-striped table-bordered"}
+          %a{:href => report_more_url << "?type=solved_department",:style => "float:right;"} 更多>>
+
+      .panel.panel-default.reports{:style => "height: 680px;"}
+        .panel-heading 个人平均未处理时长排名
+        .panel-body
+          .content{:style => "height: 580px;"}
+            = select_tag "project_unsolved_personal", project_tree_options_for_select(Project.all), class: 'form-control'
+            -#%select.relation.form-control{:title => "Choose a item",:onchange=>"changReportData(this.options[this.options.selectedIndex].value,'unsolved_personal')"}
+              -# %option{:value => "0"}= l(:label_jump_to_a_project)
+              - @projects.each do |p|
+                %option{:value => "#{p.id}"}= p.name
+
+            %table#unsolved_personal{:class => "list issues sort-by-id sort-desc  table table-striped table-bordered"}
+          %a{:href => report_more_url << "?type=unsolved_personal",:style => "float:right;"} 更多>>
+
+      .panel.panel-default.reports{:style => "height: 680px;"}
+        .panel-heading 部门平均未处理时长排名
+        .panel-body
+          .content{:style => "height: 580px;"}
+            = select_tag "project_unsolved_department", project_tree_options_for_select(Project.all), class: 'form-control'
+            -#%select.relation.form-control{:title => "Choose a item",:onchange=>"changReportData(this.options[this.options.selectedIndex].value,'unsolved_department')"}
+              -# %option{:value => "0"}= l(:label_jump_to_a_project)
+              - @projects.each do |p|
+                %option{:value => "#{p.id}"}= p.name
+
+            %table#unsolved_department{:class => "list issues sort-by-id sort-desc  table table-striped table-bordered"}
+          %a{:href => report_more_url << "?type=unsolved_department",:style => "float:right;"} 更多>>
+
+.filter-slide-button{:href => "javascript:;"}
+  %i.fa.fa-chevron-left
+
+:javascript
+  // Filter pane collapse
+  var availableFilters = #{raw_json @query.available_filters_as_json};
+
+  // Filter pane collapse
+  var filterCollapseID = localStorage.getItem("filterCollapseID") || "filterStar";
+  $("#"+filterCollapseID).addClass("in");
+  $('#filterStar, #filterClock, #filterCog').on('show.bs.collapse', function () {
+    localStorage.setItem("filterCollapseID", this.id);
+  })
+  // Filter Slide
+  if(localStorage.getItem("filterSlideStatus") == "true"){
+    $(".filter-slide-button i").addClass("fa-chevron-right");
+    $(".filter-main").addClass("filter-slide");
+  }
+
+  // Fix Filter left panel
+  $(".filter-left").fixedBlock();
+
+  $.grep(["solved_department","unsolved_department","solved_personal","unsolved_personal"],function(value) {
+    changReportData(#{@projects.first.id},value);
+  });
+
+  $('#project_solved_personal,#project_solved_department,#project_unsolved_personal,#project_unsolved_department').on("change", function (e) {
+    changReportData($(this).val(),$(this).attr("id").toString().replace("project_",""));
+  });
+
+  initSelect("project_solved_personal");
+  initSelect("project_solved_department");
+  initSelect("project_unsolved_personal");
+  initSelect("project_unsolved_department");
+
+:css
+  .select2-drop-active {border-top: 1px solid #5897fb !important;}

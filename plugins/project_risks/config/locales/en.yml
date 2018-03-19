@@ -1,0 +1,6 @@
+# English strings go here for Rails i18n
+"en":
+  permission_view_risks: View Risks
+  permission_add_risks: Add Risks
+  project_module_risks: Risks
+  label_risks: Risks

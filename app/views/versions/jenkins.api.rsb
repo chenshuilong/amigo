@@ -1,0 +1,61 @@
+api.array :versions, api_meta(:total_count => @versions.length) do
+  @versions.each do |version|
+    api.version do
+      api.id                    version.id
+      api.name                  version.name
+      api.fullname              version.fullname
+
+      api.project(
+        :id => version.project_id,
+        :name => version.project.name,
+        :identifier => version.project.identifier,
+        :ownership => load_value(version.project, :ownership, :api => true)
+      ) unless version.project.nil?
+
+      api.timezone              version.timezone
+      api.description           version.description
+      api.status                load_value(version, :status, :api => true)
+      api.compile_status        load_value(version, :compile_status, :api => true)
+      api.spec(:id => version.spec_id, :name => version.spec.name) unless version.spec.nil?
+      api.production_list       version.production_list
+      # api.due_date            version.effective_date
+      # api.sharing             version.sharing
+
+      api.repo_one(:id => version.repo_one_id, :url => version.repo_one.url) unless version.repo_one.nil?
+      api.repo_two(:id => version.repo_two_id, :url => version.repo_two.url) unless version.repo_two.nil?
+      api.last_version          version.last_version.try(:name)
+      api.baseline              version.baseline
+      api.path                  version.path
+      api.priority              load_value(version, :priority, :api => true)
+      api.label                 version.label
+      api.log_url               version.log_url
+
+      api.compile_type          "-opt=TARGET_BUILD_VARIANT=#{load_value(version, :compile_type, :api => true)}" unless version.compile_type.nil?
+      api.ota_whole_compile     version.ota_whole_compile.to_s
+      api.ota_increase_compile  version.ota_increase_compile.to_s
+      api.ota_increase_versions version.find_increase_versions(true) unless version.ota_increase_versions.nil?
+      api.as_increase_version   version.as_increase_version.to_s
+      api.signature             version.signature.to_s
+      api.coverity              version.coverity.to_s
+      api.continue_integration  version.continue_integration.to_s
+
+      api.arm                   version.arm
+      api.reinforce             version.strengthen.to_s
+      api.auto_test             version.auto_test.to_s
+      api.unit_test             version.unit_test.to_s
+      api.auto_test_projects    version.auto_test_projects.try(:join, ',')
+      api.sonar_test            version.sonar_test.to_s
+      api.compile_machine       version.compile_machine
+      api.author(:id => version.author_id, :name => version.author.name) unless version.author.nil?
+
+      render_api_custom_values  version.custom_field_values, api
+
+      api.compile_due_on        version.compile_due_on
+      api.compile_start_on      version.compile_start_on
+      api.compile_end_on        version.compile_end_on
+      api.created_on            version.created_on
+      api.updated_on            version.updated_on
+      api.gradle_version        version.gradle_version
+    end
+  end
+end

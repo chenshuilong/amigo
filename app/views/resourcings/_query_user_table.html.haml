@@ -1,0 +1,23 @@
+%table#queryUserTable.list.table.table-striped.table-bordered
+  %thead
+    %tr
+      %th
+      %th= l(:field_num_order)
+      %th= l(:user_contact_name)
+      %th= l(:field_dept)
+      %th= l(:field_created_on)
+      %th= l(:field_operation)
+  %tbody
+    - @users.each_with_index do |user, index|
+      %tr
+        %td= check_box_tag("user_ids[]", user.id, false, :id => nil)
+        %td= index + 1
+        %td= user.firstname
+        %td= user.dept_name
+        %td= format_time(user.created_on)
+        %td= link_to l(:resourcing_edit_permission), edit_permission_resourcings_path(:user_id => user)
+    - if @rest_count.to_i > 0
+      %tr{:id => "viewRestUser"}
+        %td{:colspan => 10}
+          = link_to l(:resoucing_view_rest, :num => @rest_count), |
+            resourcings_path({:format => :js}.merge(request.GET.merge(:per_page => "all"))), :remote => true

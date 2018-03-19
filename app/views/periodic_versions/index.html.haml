@@ -1,0 +1,66 @@
+- provide :nav, "5,3"
+- provide :css, "bootstrap"
+
+.top-action-menu.pull-right
+  = link_to l(:periodic_version_rules), rules_periodic_versions_path, :class => 'btn btn-primary btn-sm'
+  - if VersionNameRule.permit?
+    = link_to l(:periodic_version_rule_new), rules_new_periodic_versions_path, :class => 'btn btn-primary btn-sm'
+  - if VersionPeriodicTask.permit?
+    = link_to l(:periodic_version_new), new_periodic_version_path, :class => 'btn btn-primary btn-sm'
+.h2= l(:periodic_versions)
+
+.clearfix
+#roadmap
+  - if @tasks.empty? && params[:utf8].blank?
+    %p.nodata= l(:label_no_data)
+  - else
+    .roadmap-query
+      = form_tag({}, {method: :get, class: 'form-inline'}) do |f|
+        .form-group
+          = label_tag 'name', l(:field_name)
+          = text_field_tag 'name', @name, class: "form-control"
+        .form-group
+          = label_tag 'status', l(:field_status)
+          = select_tag 'status', options_for_select(                                                 |
+            list_for_select(:version_periodic_task, :status).unshift([l(:label_all), '']), @status), |
+            class: "form-control", :onchange => "this.form.submit(); return false;"
+        .form-group
+          = label_tag 'author', l(:field_author)
+          = select_tag 'author', options_for_select([[User.find_by(:id => @author), @author]], @author) ,  |
+            class: "form-control", :id => 'periodic_version_author', :style => "width: 150px;"
+          = select2_remote 'periodic_version_author'
+        .form-group
+          = label_tag 'created_at', l(:field_created_on)
+          = text_field_tag 'created_at_start', @created_at_start, class: "form-control", :id => 'periodic_version_created_at_start'
+          = hidden_field_tag 'created_at_end', @created_at_end, class: "form-control", :id => 'periodic_version_created_at_end'
+          = calendar_range_for 'periodic_version_created_at_start', 'periodic_version_created_at_end'
+        = submit_tag l(:button_submit), :name => nil, class: "btn btn-primary btn-sm"
+    .roadmap-table
+      %table.list.table.table-striped.table-bordered
+        %thead
+          %tr
+            = sort_header_tag('id', :caption => "#")
+            = sort_header_tag('name', :caption => l(:field_name))
+            %th= l(:periodic_version_weekday)
+            = sort_header_tag('time', :caption => l(:periodic_version_time))
+            = sort_header_tag('status', :caption => l(:field_status))
+            = sort_header_tag('running_count', :caption => l(:periodic_version_running_count))
+            = sort_header_tag('last_running_on', :caption => l(:periodic_version_last_running_on))
+            = sort_header_tag('created_at', :caption => l(:field_created_on))
+            = sort_header_tag('author_id', :caption => l(:field_author))
+        %tbody
+          - @tasks.each do |task|
+            %tr
+              %td= link_to task.id, periodic_version_path(task)
+              %td= link_to task.name, periodic_version_path(task)
+              %td= running_days_every_week(task)
+              %td= task.time.to_s(:time)
+              %td= load_value(task, :status)
+              %td= task.running_count
+              %td= format_time task.last_running_on
+              %td= format_time task.created_at
+              %td= link_to_user task.author
+    %span.pagination= pagination_links_full @task_pages, @task_count
+
+
+- html_title(l(:periodic_versions))

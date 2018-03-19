@@ -1,0 +1,15 @@
+:plain
+  $("#ajax-modal").html('#{j render :partial => "conflict_files", :locals => {:files => @files}}');
+  patch_library_files_window = layer.open({
+    type: 1,
+    title: '<b>库 #{@lib.name} #{@lib.path} 冲突文件清单</b>',
+    area: ['70%', '600px'],
+    zIndex: 666,
+    moveType: 1,
+    shadeClose: false,
+    content: $("#ajax-modal"),
+    btn: ['关闭'],
+    yes: function(index, layero){
+      layer.close(index)
+    }
+  });

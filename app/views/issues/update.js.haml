@@ -1,0 +1,13 @@
+- if @issue.errors.any?
+  layer.alert("#{@issue.errors.to_a.join('，')}")
+- else
+  $("#issue-preview").remove();
+  - IssueCustomField.where(:name => %w(优先级 修改阶段 解决版本 验证版本 研发分析结论 现象类型 品质评分 品质分类 问题导入范围 品质意见 评审意见)).each do |cf|
+    $("#issue-#{@issue.id}").find(".cf_#{cf.id}").text("#{@issue.custom_values.find_by(:custom_field_id => cf).value.to_s}")
+  :plain
+    $("#issue-#{@issue.id}")
+      .find(".status").text("#{@issue.status.name}").end()
+      .find(".assigned_to").text("#{@issue.assigned_to.present?? @issue.assigned_to.name : ''}").end()
+      .find(".mokuai_name").text("#{@issue.mokuai_name.present?? @issue.mokuai.name : '' }").end()
+      .find(".mokuai_reason").text("#{@issue.mokuai_reason.to_s}").end()
+      .find(".priority").text("#{@issue.priority.present?? @issue.priority.name : '' }");

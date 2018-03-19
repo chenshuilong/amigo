@@ -1,0 +1,19 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+
+= title l(:label_confirmation)
+.warning
+  %p
+    %strong= h @project_to_destroy
+    %br/
+    = l(:text_project_destroy_confirmation)
+    - if @project_to_destroy.descendants.any?
+      %br/
+      = l(:text_subprojects_destroy_warning,                                                             |
+        content_tag('strong', @project_to_destroy.descendants.collect{|p| p.to_s}.join(', '))).html_safe |
+  %p
+    = form_tag(project_path(@project_to_destroy), :method => :delete) do
+      %label
+        = check_box_tag 'confirm', 1
+        = l(:general_text_Yes)
+      = submit_tag l(:button_delete)
+      = link_to l(:button_cancel), :controller => 'admin', :action => 'projects'

@@ -1,0 +1,25 @@
+.issue-details#update
+  #all_attributes
+    - if @task.author_edit?
+      %p
+        = f.text_field :name, required: true, label: :task_name, :style => "width: 80%;"
+        %small.form-text.text-danger * 最长为 50 个字符
+      %p= f.text_area :description, required: true, label: :task_description, :style => "width: 80%; height: 100px"
+    - if @task.new_record?
+      %p
+        = f.select :assigned_to_id, [[@task.author, @task.author_id]], :required => true, label: :task_assigned_to_id
+        = select2_remote("task_assigned_to_id", nil, nil, {withme: false})
+    - if @task.author_edit?
+      %p
+        = f.text_field :start_date, required: true, label: :plan_start_date
+        = calendar_for("task_start_date", timepicker = true, options = {})
+      %p
+        = f.text_field :due_date, required: true, label: :plan_due_date
+        = calendar_for("task_due_date", timepicker = true, options = {})
+    - unless @task.new_record?
+      %p= f.text_area :notes, required: false, label: :spec_note, :style => "width: 80%; height: 100px"
+      %p= f.select :status, task_status_options(@task),required: true, label: "状态"
+    .box.tabular
+      %p#attachments_form
+        %label= l(:label_attachment_plural)
+        = render :partial => 'attachments/form', :locals => {:container => @task}

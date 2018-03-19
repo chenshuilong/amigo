@@ -1,0 +1,6 @@
+# Chinese strings go here for Rails i18n
+"zh":
+  permission_view_risks: 查看项目风险
+  permission_add_risks: 新增项目风险
+  project_module_risks: 项目风险
+  label_risks: 项目风险

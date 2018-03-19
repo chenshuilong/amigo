@@ -1,0 +1,22 @@
+= error_messages_for @result
+.issue-details#update
+  #all_attributes
+    - if @result.new_record?
+      %p
+        = f.select :designer_id, [], :required => true, label: :issue_to_special_test_result_designer_id
+        = select2_remote("issue_to_special_test_result_designer_id", nil, nil, {withme: false})
+      %p
+        = f.select :assigned_to_id, [], :required => true, label: :issue_to_special_test_result_assigned_to_id
+        = select2_remote("issue_to_special_test_result_assigned_to_id", nil, nil, {withme: false})
+    - if @result.task.present?
+      - if @result.task.assigned_to_id == @result.designer_id
+        - options = IssueToSpecialTestTask.consts[:status].values.delete_if{|e| e[0] == 4}.collect{|e| [e[1], e[0]]}
+      - elsif @result.task.assigned_to_id == @result.assigned_to_id
+        - options = IssueToSpecialTestTask.consts[:status].values.delete_if{|e| e[0] == 9}.collect{|e| [e[1], e[0]]}
+      %p
+        = label_tag l(:issue_to_special_test_task_status)
+        = select_tag "task[status]", options_for_select(options)
+    = f.hidden_field :special_test_id, value: @result.special_test_id
+
+.text-center
+  = submit_tag l(:button_save), class: "btn btn-primary"

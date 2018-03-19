@@ -1,0 +1,20 @@
+:plain
+  $('#ajax-modal').html('#{escape_javascript(render :partial => 'members/new_modal')}');
+  new_member_window = layer.open({
+    type: 1,
+    title: '<b>新建成员</b>',
+    area: ['80%', '80%'],
+    zIndex: 666,
+    moveType: 1,
+    shadeClose: false,
+    content: $("#ajax-modal"),
+    btn: ['取消', '确定'],
+    yes: function(index, layero){
+      layer.close(new_member_window)
+    },
+    btn2: function(index, layero){
+      $("#new_membership").submit();
+      return false;
+    }
+  });
+

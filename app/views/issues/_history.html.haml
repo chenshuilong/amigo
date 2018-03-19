@@ -1,0 +1,25 @@
+- reply_links = issue.notes_addable?
+- for journal in journals
+  %div{:class => "#{journal.css_classes}", :id => "change-#{journal.id}"}
+    %div{:id => "note-#{journal.indice}"}
+      -# %span
+        -# %a.journal-link{:href => "#note-#{journal.indice}"}
+        -#   \##{journal.indice}
+        -#   = icon "pencil"
+        -# = avatar(journal.user, :size => "24")
+      .note-title
+        = authoring_at journal.created_on, journal.user, :label => :label_updated_time_at
+        = content_tag('span', l(:field_is_private), :class => 'private') if journal.private_notes?
+      - if journal.notes.present?
+        .note-content
+          = render_notes(issue, journal, :reply_links => reply_links) unless journal.notes.blank?
+      - if journal.details.any?
+        %ul.details
+          - details_to_strings(journal.visible_details).each do |string|
+            %li= string
+        - if Setting.thumbnails_enabled? && (thumbnail_attachments = journal_thumbnail_attachments(journal)).any?
+          .thumbnails
+            - thumbnail_attachments.each do |attachment|
+              %div= thumbnail_tag(attachment)
+  = call_hook(:view_issues_history_journal_bottom, { :journal => journal })
+- heads_for_wiki_formatter if User.current.allowed_to?(:edit_issue_notes, issue.project) || User.current.allowed_to?(:edit_own_issue_notes, issue.project)

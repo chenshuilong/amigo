@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  alter_record_id: 1
+  property: MyString
+  old_value: MyText
+  value: MyText
+
+two:
+  alter_record_id: 1
+  property: MyString
+  old_value: MyText
+  value: MyText

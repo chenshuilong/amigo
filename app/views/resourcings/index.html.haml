@@ -1,0 +1,32 @@
+.h2= l(:label_role_and_permissions)
+
+.tabs
+  %ul
+    %li= link_to l(:label_role_plural),roles_path
+    %li= link_to l(:label_global_permission), resourcings_path, :class => 'selected'
+
+= form_tag({}, {method: :get}) do |f|
+  = label_tag 'category', l(:field_category)
+  = select_tag 'category', list_for_user_category
+  = label_tag 'dept_no', l(:field_dept)
+  = select_tag "dept_no", [], :name => "dept_no"
+  = label_tag 'name', l(:user_contact_name)
+  = text_field_tag 'name', @name
+  = hidden_field_tag 'per_page', @per_page
+  = submit_tag l(:button_query), :name => nil
+
+
+.resourcing-user-table
+  = form_tag(edit_permission_resourcings_path, {method: :get}) do |f|
+    - current_get_params.each do |key, value|
+      = hidden_field_tag key, value
+    = submit_tag l(:resourcing_bulk_set_permission), :name => nil, class: "pull-right"
+    .clearfix
+    %br
+    = render "query_user_table"
+
+:javascript
+
+  $('#dept_no').empty().append(#{list_for_depts});
+  $('#dept_no').select2();
+  $("#dept_no").val(#{@dept_no}).trigger("change");

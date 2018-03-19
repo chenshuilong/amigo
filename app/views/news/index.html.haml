@@ -1,0 +1,42 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+
+%body
+  .contextual
+    = link_to(l(:label_news_new),                                                                                                             |
+      new_project_news_path(@project),                                                                                                        |
+      :class => 'icon icon-add',                                                                                                              |
+      :onclick => 'showAndScrollTo("add-news", "news_title"); return false;') if @project && User.current.allowed_to?(:manage_news, @project) |
+    = watcher_link(@project.enabled_module('news'), User.current) if @project && User.current.logged?
+  #add-news{:style => "display:none;"}
+    %h2= l(:label_news_new)
+    = labelled_form_for @news, :url => project_news_index_path(@project), |
+      :html => { :id => 'news-form', :multipart => true } do |f|          |
+      = render :partial => 'news/form', :locals => { :f => f }
+      = submit_tag l(:button_create)
+      = preview_link preview_news_path(:project_id => @project), 'news-form'
+      |
+      = link_to l(:button_cancel), "#", :onclick => '$("#add-news").hide()'
+    - end if @project
+    #preview.wiki
+  %h2= l(:label_news_plural)
+  - if @newss.empty?
+    %p.nodata= l(:label_no_data)
+  - else
+    - @newss.each do |news|
+      %article.news-article
+        %header
+          %h3
+            = avatar(news.author, :size => "24")
+            = link_to_project(news.project) + ': ' unless news.project == @project
+            = link_to h(news.title), news_path(news)
+            = "(#{l(:label_x_comments, :count => news.comments_count)})" if news.comments_count > 0
+          %p.author= authoring news.created_on, news.author
+        .wiki
+          = textilizable(news, :description)
+  %span.pagination= pagination_links_full @news_pages
+  - other_formats_links do |f|
+    = f.link_to 'Atom', :url => {:project_id => @project, :key => User.current.rss_key}
+  - content_for :header_tags do
+    = auto_discovery_link_tag(:atom, params.merge({:format => 'atom', :page => nil, :key => User.current.rss_key}))
+    = stylesheet_link_tag 'scm'
+  - html_title(l(:label_news_plural))

@@ -1,0 +1,105 @@
+- content_for :header_tags do
+  %script{:src => "/javascripts/echarts.min.js", :type => "text/javascript"}
+  %script{:src => "/javascripts/infographic.js", :type => "text/javascript"}
+
+- if @lines.blank?
+  %p.nodata= l(:label_no_data)
+- else
+  .row
+    .col-sm-4.text-left
+      .h4= "项目进展"
+    .col-sm-4.text-center
+      %input{:id => "jqxSlider", :type => "range", :value => 5, :min => 0, :max => 10}
+    .col-sm-4.text-right
+      = link_to(l(:plan_edit_progress), void_js, id: "edit_progress", :class => 'btn btn-primary btn-sm')
+  %hr
+  .clearfix
+  #roadmap
+    .roadmap-query{:style => "width:100%;"}
+      %ul.notification-list
+        %li.notification-list-item
+          .notification-content
+            %p
+              %strong= "参数配置"
+          .clearfix
+          .notification-acton.select2-rectify{:style => "display:block;"}
+            = form_tag("/projects/#{@project.identifier}/plans", method: 'GET',id: 'queryForm', class: 'form-horizontal') do
+              .form-group
+                = label_tag 'x_distance', "点间距", class: "col-sm-2 control-label"
+                .col-sm-2
+                  #xDistanceInput
+                    = text_field_tag("x_distance", nil, {:type => "text", :class => "form-control"})
+                    %div
+                = label_tag 'y_distance', "线间距", class: "col-sm-2 control-label"
+                .col-sm-2
+                  #yDistanceInput
+                    = text_field_tag("y_distance", nil, {:type => "text", :class => "form-control"})
+                    %div
+                .col-sm-1
+                  = hidden_field_tag "menuid", "key_point"
+                .col-sm-2
+                  = submit_tag l(:button_configure), :name => nil, class: "btn btn-primary btn-sm"
+
+  #timelines
+    #mainSplitter
+      .splitter-panel
+        - @lines.each do |line, points|
+          %div{:id =>"line_#{line}", :style => "width:100%; height:#{(points.group_by(&:line_name).count + 1) * 100}px;"}
+          = javascript_tag draw_init("line_#{line}")
+          = javascript_tag draw_line(0, 100, 1000, 100)
+          - line_hight = 0
+          - points.each_with_index do |p, idx|
+            - if p.parent_id.nil?
+              - days = (Date.parse(points[0].plan_date.strftime('%Y-%m-%d'))..Date.parse(points[idx].plan_date.strftime('%Y-%m-%d'))).count
+              = javascript_tag draw_text(p.plan_name, 50 + @x_distance*days - 10, idx%2 == 0 ? 100 - 30 : 100 - 50)
+              = javascript_tag Time.now.to_s(:db) > p.plan_date ? draw_die_point(50 + @x_distance*days, 100) : draw_active_point(50 + @x_distance*days, 100)
+              = javascript_tag draw_text(p.plan_date.strftime('%m.%d'), 50 + @x_distance*days - 15, 100 + 20)
+              - if child_points(p.id).group_by(&:line_name).present?
+                - line_hight += 1
+                = javascript_tag draw_line(50 + @x_distance*days, (line_hight + 1)*@y_distance, 50 + @x_distance*days, @y_distance)
+                = javascript_tag draw_line(50 + @x_distance*days, (line_hight + 1)*@y_distance, 1000, (line_hight + 1)*@y_distance)
+                - child_points(p.id).group_by(&:line_name).each do |name ,children|
+                  - children.each_with_index do |point, nm|
+                    - days = (Date.parse(children[0].plan_date.strftime('%Y-%m-%d'))..Date.parse(children[nm].plan_date.strftime('%Y-%m-%d'))).count
+                    = javascript_tag draw_text(point.plan_name, (50 + @x_distance*days - 10) + @x_distance*days, nm%2 == 0 ? (line_hight + 1)*@y_distance - 30 : (line_hight + 1)*@y_distance - 50)
+                    = javascript_tag Time.now.to_s(:db) > point.plan_date ? draw_die_point((50 + @x_distance*days) + @x_distance*days, (line_hight + 1)*@y_distance) : draw_active_point((50 + @x_distance*days) + @x_distance*days, (line_hight + 1)*@y_distance)
+                    = javascript_tag draw_text(point.plan_date.strftime('%m.%d'), (50 + @x_distance*days - 10) + @x_distance*days, (line_hight + 1)*@y_distance + 20)
+          = javascript_tag draw_refresh
+      .splitter-panel
+
+  .sortLine{:style => "display:none;width:800px;padding:20px;"}
+    - @lines.each do |line, points|
+      .sortable-container
+        %span= "#{line}(拖动进行排序)"
+        %div{:id => "sortable_#{line}", :class => "sortable"}
+          = sortable_js "sortable_#{line}"
+          - points.group_by(&:line_name).each do |name, pos|
+            %div
+              %table{:style => "min-width: 300px;"}
+                %tr
+                  %td{:rowspan => "#{pos.size + 1}"}= name
+                - pos.each_with_index do |pot|
+                  %tr
+                    %td= pot.plan_name
+                    %td= pot.plan_date.strftime('%Y-%m-%d')
+
+:javascript
+  $(document).ready(function () {
+     $('#jqxSlider').jqxSlider({ width: '100%', height: 60, mode: "fixed", ticksFrequency: 5, showMinorTicks: true, minorTicksFrequency: 1, showTickLabels: true });
+     $('#jqxSlider').jqxSlider('setValue', 1);
+
+     $('#jqxSlider').on('change', function (event) {
+        var widthSlider = event.args.value*100 + 800;
+        $('#mainSplitter').jqxSplitter({ width: widthSlider, height: 400, orientation: 'horizontal',  panels: [{ size: 1000, collapsible: false }, { size: 0, collapsible: false}] });
+     });
+
+     $("#xDistanceInput").jqxFormattedInput({ width: '100%', height: 35, radix: "decimal", value: "#{@x_distance}", min: "0", max: "100", spinButtons: true });
+     $("#yDistanceInput").jqxFormattedInput({ width: '100%', height: 35, radix: "decimal", value: "#{@y_distance}", min: "0", max: "200", spinButtons: true });
+     $('#mainSplitter').jqxSplitter({ width: '100%', height: 1000, orientation: 'horizontal',  panels: [{ size: 1000, collapsible: false }, { size: 0, collapsible: false}] });
+
+     $('#edit_progress').click(function(){
+      openLayer("#{l(:plan_edit_progress)}", '880px', $(".sortLine"),function() {
+        $('#queryForm').submit();
+      })
+     })
+  });

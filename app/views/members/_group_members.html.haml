@@ -1,0 +1,12 @@
+- if members.present?
+  .version-issues
+    .wiki
+      - if members.size > 15
+        = data_table_for 'membershipGroupMember',
+          dom: '<"data-table-top"f>rt<"data-table-bottom"pil><"clear">',
+          lengthMenu: [[-1, 10, 25, 50, 100], ["#{l(:label_all)}", 10, 25, 50, 100]]
+      = fields_table :class => 'list data-table', :id => 'membershipGroupMember' do |t|
+        - t.title :label_user
+        - members.each_with_index do |m|
+          - t.row do
+            - t.data m.principal.name

@@ -1,0 +1,49 @@
+- if @applists.present? && params[:category] == "terminal"
+  .version-issues
+    .label 应用版本信息
+    .wiki
+      - if @applists.size > 15
+        = data_table_for 'compareApplists',
+          dom: '<"data-table-top"f>rt<"data-table-bottom"pil><"clear">',
+          lengthMenu: [[-1, 10, 25, 50, 100], ["#{l(:label_all)}", 10, 25, 50, 100]]
+      = fields_table :class => 'list data-table', :id => 'compareApplists' do |t|
+        - t.title '#'
+        - t.title '应用'
+        - t.title link_to @va.fullname, version_path(@va.id)
+        - t.title link_to @vb.fullname, version_path(@vb.id)
+        - t.title :option_all
+        - @applists.each_with_index do |app, i|
+          - t.row do
+            - t.data i+1
+            - t.data link_to app[:p_name], project_path(app[:p_identifier])
+            - t.data app[:list][@va.id.to_s].present? ? link_to(app[:list][@va.id.to_s].try(:[], :app_version_name), version_path(app[:list][@va.id.to_s][:app_version_id])) : '-'
+            - t.data app[:list][@vb.id.to_s].present? ? link_to(app[:list][@vb.id.to_s].try(:[], :app_version_name), version_path(app[:list][@vb.id.to_s][:app_version_id])) : '-'
+            - t.data link_to_version_compare(app)
+
+%hr
+- if @issues.present?
+  .version-issues
+    .label= l(:version_related_issues)
+    .wiki
+      - if @issues.size > 15
+        = data_table_for 'compareIssues',
+          dom: '<"data-table-top"f>rt<"data-table-bottom"pil><"clear">',
+          lengthMenu: [[-1, 10, 25, 50, 100], ["#{l(:label_all)}", 10, 25, 50, 100]]
+      = fields_table :class => 'list data-table', :id => 'compareIssues' do |t|
+        - t.title :field_type
+        - t.title '#'
+        - t.title :field_subject
+        - t.title :field_assigned_to
+        - if params[:category] == "terminal"
+          - t.title :label_tracker
+        - @issues.each do |vi|
+          - t.row do
+            - t.data load_value(vi, :issue_type)
+            - t.data vi.issue.is_a?(Issue) ? (link_to vi.issue.id, vi.issue) : vi.issue.id
+            - t.data vi.issue.subject, class: 'subject'
+            - t.data link_to_user vi.issue.assigned_to  
+            - if params[:category] == "terminal"
+              - t.data vi.issue.is_a?(Issue) ? vi.issue.tracker : '-'      
+
+- if @applists.blank? && @issues.blank?
+  %p.nodata= l(:label_no_data)

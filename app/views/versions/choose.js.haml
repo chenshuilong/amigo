@@ -1,0 +1,12 @@
+:plain
+  var content = '/versions/choose?category=#{params[:category]}&from=#{params[:from]}&project_1=#{params[:project_1]}&project_2=#{params[:project_2]}'
+  layer.open({
+    type: 2,
+    title: '<b>版本比较</b>',
+    area: ['80%', '80%'],
+    zIndex: 666,
+    moveType: 1,
+    maxmin: false,
+    shadeClose: false,
+    content: content
+  });

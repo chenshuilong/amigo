@@ -1,0 +1,24 @@
+- provide :nav, "8,1"
+- provide :css, "bootstrap"
+
+.top-action-menu.pull-right
+  - if policy(:google_tool).category?
+    = link_to l(:google_tool_category_cts_ctsv) + l(:label_google_tool_manage), category_google_tools_path(category: 10), :class => 'btn btn-primary btn-sm'
+    = link_to l(:google_tool_category_vts_gsi) + l(:label_google_tool_manage), category_google_tools_path(category: 20), :class => 'btn btn-primary btn-sm'
+    = link_to l(:google_tool_category_gts) + l(:label_google_tool_manage), category_google_tools_path(category: 30), :class => 'btn btn-primary btn-sm'
+.h2= l(:label_google_tool)
+
+- if @cts_ctsv_tools.present?
+  %hr
+  .h2= "CTS/CTSV"
+  = render :partial => 'tool_list', :locals => { :tools => @cts_ctsv_tools, :category => "cts_ctsv" }
+
+- if @vts_gsi_tools.present?
+  %hr
+  .h2= "VTS/GSI"
+  = render :partial => 'tool_list', :locals => { :tools => @vts_gsi_tools, :category => "vts_gsi" }
+
+- if @gts_tools.present?
+  %hr
+  .h2= "GTS"
+  = render :partial => 'tool_list', :locals => { :tools => @gts_tools, :category => "gts" }

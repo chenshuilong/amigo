@@ -1,0 +1,29 @@
+%h2= l(:label_repository)
+= simple_format(l(:text_repository_usernames_mapping))
+- if @committers.empty?
+  %p.nodata= l(:label_no_data)
+- else
+  = form_tag({}) do
+    %table.list
+      %thead
+        %tr
+          %th= l(:field_login)
+          %th= l(:label_user)
+      %tbody
+        - i = 0
+        - @committers.each do |committer, user_id|
+          %tr{:class => "#{cycle 'odd', 'even'}"}
+            %td= committer
+            %td
+              = hidden_field_tag "committers[#{i}][]", committer, :id => nil
+              = select_tag "committers[#{i}][]",                     |
+                content_tag(                                         |
+                  'option',                                          |
+                  "-- #{l :actionview_instancetag_blank_option} --", |
+                  :value => ''                                       |
+                ) +                                                  |
+                options_from_collection_for_select(                  |
+                  @users, 'id', 'name', user_id.to_i                 |
+                )                                                    |
+          - i += 1
+    %p= submit_tag(l(:button_save))

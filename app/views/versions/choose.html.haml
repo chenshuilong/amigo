@@ -1,0 +1,108 @@
+- provide :css, "bootstrap"
+
+#roadmap{style: "margin:50px 0 100px 0"}
+  .roadmap-table
+    .row
+      .col-sm-12
+        = form_tag({}, {method: :get, class: 'form-horizontal', id: "VersionChooseForm"}) do |f|
+          .form-group
+            = label_tag 'category', l(:version_project_category), class: 'control-label col-sm-1'
+            .col-sm-2
+              = select_tag 'category', options_for_select([[l(:project_category_terminal), 'terminal'], [l(:project_category_other), 'other']], params[:category]), class: "form-control", disabled: params[:from].present?
+              = hidden_field_tag 'category', params[:category] if params[:from].present?
+              = hidden_field_tag 'from', params[:from]
+          .form-group
+            = label_tag 'project_1', l(:field_project)+(params[:category] != "other" ? "1" : ""), class: 'control-label col-sm-1'
+            .col-sm-2
+              = select_tag 'project_1', options_for_select(@projects.collect{|p| [p.name, p.id]}.unshift([]), params[:project_1]), :tabindex => "-1", style:"width:100%", class: "form-control", :onchange => "this.form.submit(); return false;"
+              = select2_for 'project_1', '请选择'
+            = label_tag 'spec_1', l(:version_spec_id)+(params[:category] != "other" ? "1" : ""), class: 'control-label col-sm-1'
+            .col-sm-2
+              = select_tag 'spec_1', options_for_select((@specs_1.present? ? @specs_1.unshift([]) : []), params[:spec_1]), style:"width:100%", class: "form-control", :onchange => "this.form.submit(); return false;"
+              = select2_for 'spec_1', '', placeholder: '请先选择项目'  
+            = label_tag 'version_1', l(:label_version)+(params[:category] != "other" ? "1" : ""), class: 'control-label col-sm-1'
+            .col-sm-2
+              = select_tag 'version_1', options_for_select((@versions_1.present? ? @versions_1 : []), params[:version_1]), style:"max-height:30px;width:100%", class: "form-control", multiple: params[:category] == 'other'
+              = select2_for 'version_1', '', placeholder: '请先选择规格', closeOnSelect: true, maximumSelectionLength: 2
+            - if params[:category] != 'other'
+              .col-sm-2
+                %label
+                  = check_box_tag "same_project", true, (params[:same_project] && params[:project_1].to_i == params[:project_2].to_i)
+                  = '项目1和项目2是否相同'
+          - if params[:category] != 'other'
+            .form-group
+              = label_tag 'project_2', l(:field_project)+'2', class: 'control-label col-sm-1'
+              .col-sm-2
+                = select_tag 'project_2', options_for_select(@projects.collect{|p| [p.name, p.id]}.unshift([]), params[:project_2]), :tabindex => "-1", style:"width:100%", class: "form-control", :onchange => "this.form.submit(); return false;"
+                = select2_for 'project_2', '请选择'   
+
+              = label_tag 'spec_2', l(:version_spec_id)+'2', class: 'control-label col-sm-1'
+              .col-sm-2
+                = select_tag 'spec_2', options_for_select((@specs_2.present? ? @specs_2.unshift([]) : []), params[:spec_2]), style:"width:100%", class: "form-control", :onchange => "this.form.submit(); return false;"
+                = select2_for 'spec_2', '', placeholder: '请先选择项目'  
+
+              = label_tag 'version_2', l(:label_version)+'2', class: 'control-label col-sm-1'
+              .col-sm-2
+                = select_tag 'version_2', options_for_select((@versions_2.present? ? @versions_2 : []), params[:version_2]), style:"width:100%", class: "form-control"
+                = select2_for 'version_2', '', placeholder: '请先选择规格'
+
+.bottom-button-group.text-center.navbar-fixed-bottom
+  %a.btn.btn-primary.btn-md{id:"goToCompare", remote: true}= l(:label_confirmation)
+  %a.btn.btn-default.btn-md{id:"cancelChoose"}= l(:button_cancel)
+
+
+:css
+  .select2-container--bootstrap .select2-results > .select2-results__options{
+    max-height: 120px;
+  }
+
+:javascript
+  $('#category').change(function(){
+    $("#project_1").val('');
+    $("#project_2").val('');
+    $("#spec_1").val('');
+    $("#spec_2").val('');
+    $("#version_1").val('');
+    $("#version_2").val('');
+    $("#same_project").val('');
+
+    $("form").submit()
+  })
+
+  $('#same_project').on('click', function(){
+    var project1 = $("#project_1").val();
+    var project2 = $("#project_2").val();
+
+    if(project1 == '' && project2 != ''){
+      $("#project_1").val(project2);
+      $("form#VersionChooseForm").submit()
+    }else if(project2 == '' && project1 != ''){
+      $("#project_2").val(project1);
+      $("form#VersionChooseForm").submit()
+    }else{
+      return false
+    }
+  })
+
+  $("#goToCompare").on("click", function(){
+    window.onbeforeunload = null;
+    
+    var category = '#{params[:category]}';
+    var $Form = $("form#VersionChooseForm")
+
+    if(category == 'terminal'){
+      var data1 = $Form.find("#version_1").val();
+      var data2 = $Form.find("#version_2").val();
+      if(data1 == null || data2 == null || data1 === data2){return false}
+      url = "/versions/compare?category="+category+"&version_ida="+data1+"&version_idb="+data2;
+    }else if(category == 'other'){
+      var data = $Form.find("#version_1").val();
+      if(data == null || data.length < 2){return false}
+      url = "/versions/compare?category="+category+"&version_ida="+data[0]+"&version_idb="+data[1]
+    }
+    window.parent.location.href = url
+  })
+
+  $("#cancelChoose").on("click", function(){
+    window.parent.layer.closeAll();
+  })

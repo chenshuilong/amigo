@@ -1,0 +1,16 @@
+- if @addresses.present?
+  %table.list.email_addresses.table.table-striped.table-bordered
+    - @addresses.each do |address|
+      %tr
+        %td.email= address.address
+        %td.buttons
+          = toggle_email_address_notify_link(address)
+          = delete_link user_email_address_path(@user, address), :remote => true
+- unless @addresses.size >= Setting.max_additional_emails.to_i
+  %div
+    = form_for @address, :url => user_email_addresses_path(@user), :remote => true do |f|
+      %p= l(:label_email_address_add)
+      = error_messages_for @address
+      %p
+        = f.text_field :address, :size => 40, :required => true
+        = submit_tag l(:button_add)

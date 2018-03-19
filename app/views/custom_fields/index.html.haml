@@ -1,0 +1,11 @@
+- provide :nav, "9,1"
+
+.contextual
+  = link_to l(:label_custom_field_new), new_custom_field_path, :class => 'icon icon-add'
+= title l(:label_custom_field_plural)
+- if @custom_fields_by_type.present?
+  = render_custom_fields_tabs(@custom_fields_by_type.keys)
+- else
+  %p.nodata= l(:label_no_data)
+= javascript_tag do
+  $(function() { $("table.custom_fields tbody").positionedItems(); });

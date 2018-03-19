@@ -1,0 +1,113 @@
+%form#formVirtualVersion.form-horizontal{:role => "form"}
+  .form-group
+    = label_tag nil, project.show_by(4) ? "产品" : "项目", class: 'control-label col-sm-2'
+    .col-xs-10
+      = select_tag "app_name", options_for_select((project.show_by(4) ? Production.active : Project.default.active).map{|v| [v.name,v.id]}.unshift(["",""])), { class: 'form-control', style: 'width:100%'}
+      = select2_tag("app_name")
+  .form-group
+    = label_tag nil, "规格", class: 'control-label col-sm-2'
+    .col-xs-10
+      = select_tag "spec_name", options_for_select(project.specs.map{|spec| [spec.name, spec.id]}.unshift(["",""])), { class: 'form-control', style: 'width:100%'}
+  - unless project.show_by(4)
+    .form-group
+      = label_tag nil, "安卓代码仓", class: 'control-label col-sm-2'
+      .col-xs-10
+        = select_tag "repo_one_id", nil, { class: 'form-control', style: 'width:100%'}
+    .form-group
+      = label_tag nil, "包代码仓", class: 'control-label col-sm-2'
+      .col-xs-10
+        = select_tag "repo_two_id", nil, { class: 'form-control', style: 'width:100%'}
+  .form-group
+    = label_tag nil, "版本", class: 'control-label col-sm-2'
+    - if project.show_by(4)
+      .col-xs-7
+        = select_tag "version_name", options_for_select([]), { class: 'form-control', style: 'width:100%'}
+      .col-xs-3
+        = text_field_tag "min_version_name", "", { class: 'form-control' }
+        = "*请输入字母后缀,如:a"
+    - else
+      .col-xs-10
+        = text_field_tag "version_name", "", { class: 'form-control', style: 'width:100%'}
+  .button-group.text-center
+    = button_tag "生成版本", {id: 'btn-generate-version', class: "btn btn-primary"}
+
+:javascript
+  $(function () {
+    var project_flag = #{project.show_by(4)};
+
+    if(!project_flag){
+      $("#version_name").onlyNum();
+      new SMValidator('#formVirtualVersion', {
+        focus: true,
+        required: '这是必填项',
+        rules: {
+          onlyNumber:   [/^T\d*$/, '项目版本不正确'],
+        },
+        fields: {
+          app_name:         'required',
+          spec_name:        'required',
+          version_name:     'required|onlyNumber'
+        },
+        submit: function(valid, form) {
+          // if(valid) form.submit();
+        }
+      });
+    } else {
+      $("#min_version_name").onlyAlpha();
+      new SMValidator('#formVirtualVersion', {
+        focus: true,
+        required: '这是必填项',
+        rules: {
+          onlyNumber:   [/^V\d*.\d*.\d*.$/, '产品版本不正确'],
+          onlyAlphabet: [/^[a-z]*$/, '只能输入字母'],
+        },
+        fields: {
+          app_name:         'required',
+          spec_name:        'required',
+          version_name:     'required',
+          min_version_name: 'required|onlyAlphabet'
+        },
+        submit: function(valid, form) {
+          // if(valid) form.submit();
+        }
+      });
+    }
+
+    $('#app_name').val('#{project.id}').trigger("change");
+    getRepos(10, #{project.id}, "repo_one_id");
+    getRepos(20, #{project.id}, "repo_two_id");
+  });
+
+  $('#app_name').on("change", function (e) {
+    var project_flag = #{project.show_by(4)};
+    fillSpecs('#{project.id}', $(this).val(), 'spec_name');
+    if (project_flag){
+      $('#version_name').siblings(".select2-container").remove();
+      $('#version_name').val('').trigger("change");
+      $('#version_name').empty().append('');
+      $('#version_name').select2();
+    } else {
+      $('#version_name').val('');
+      getRepos(10, $(this).val(), "repo_one_id");
+      getRepos(20, $(this).val(), "repo_two_id");
+    }
+  });
+
+  $('#spec_name').on("change", function (e) {
+    var project_flag = #{project.show_by(4)};
+    if (project_flag){
+      fillVersions('#{project.id}', $(this).val(), 'version_name');
+    } else {
+      if ($('#spec_name').val() > 0) {
+       $('#version_name').val("T");
+      }
+    }
+  });
+
+  $('#btn-generate-version').click(function() {
+    if (SMValidator.validate('#formVirtualVersion')) {
+      openConfirmDiaiog("", function() {
+        onGenerateVersion(getFormParams($('#formVirtualVersion').get(0)))
+      });
+    }
+  })

@@ -1,0 +1,32 @@
+%p
+  %span 版本 #{@release.version.fullname} 正计划发布，需要您进行审核，请及时处理！
+
+%hr
+%table
+  %tbody
+    %tr
+      %td.talbe-col-md-2
+        %p.label 产品
+      %td.talbe-col-md-4= @release.project.try(:name)
+      %td.talbe-col-md-2
+        %p.label 发布类型
+      %td.talbe-col-md-4= load_value(@release, :category)
+    %tr
+      %td.talbe-col-md-2
+        %p.label 测试项目
+      %td.talbe-col-md-4= @release.aimed_project.try(:name)
+      %td.talbe-col-md-2
+        %p.label 作者
+      %td.talbe-col-md-4= @release.author.try(:name)
+
+
+%hr
+%table.button.small
+  %tr
+    %td
+      %table
+        %tr
+          %td= link_to '立即处理', @release
+
+
+

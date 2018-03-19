@@ -1,0 +1,71 @@
+- provide :nav, "2,4"
+- provide :css, "bootstrap"
+- content_for :header_tags do
+  %link{:href => "/amg/dataTable/datatable.css", :rel => "stylesheet"}
+  %link{:href => "/amg/dataTable/fixedColumns.bootstrap.min.css", :rel => "stylesheet"}
+
+  %script{:src => "/amg/dataTable/dataTables.fixedColumns.min.js", :type => "text/javascript"}
+  %script{:src => "/amg/dataTable/dataTables.bootstrap.min.js", :type => "text/javascript"}
+
+- content_for :bread do
+  %li= link_to l(:label_version_publish), version_publishes_path
+  %li= [@version_publish.spec.fullname, @version_publish.version.name].join("_")
+
+.filter-right#version_publish_edit{style:"display:none"}
+  .panel.panel-default
+    .panel-heading
+      .issues-head
+        .row.issues-head-title
+          .col-sm-6
+            .h2= [@version_publish.spec.fullname, @version_publish.version.name].join("_")
+          .col-sm-6.text-right
+            %a.btn.btn-primary.btn-sm{:href => export_version_publish_path(@version_publish)} 导出信息
+    .panel-body
+      .roadmap-table
+        %table#publishShowTable.list.table.table-striped.table-bordered
+          %thead
+            %tr
+              %th 序号
+              %th{style:"background:#ccc"}= "APK名称"
+              %th= l(:spec_version_cn_name)
+              %th= l(:spec_version_desktop_name)
+              %th= l(:spec_version_description)
+              %th= l(:spec_version_developer)
+              %th= l(:version_name_tag)
+              %th= l(:version_applist_apk_permission)
+              %th= l(:version_applist_apk_removable)
+          %tbody
+            %tr{"v-for" => "(row, key, index) in rows"}
+              %td {{index+1}}
+              %td{style:"background:#ccc"} {{row.apk_name}}
+              %td {{row.cn_name}}
+              %td {{row.desktop_name}}
+              %td {{row.description}}
+              %td {{row.developer}}
+              %td {{row.apk_version}}
+              %td {{row.apk_permission}}
+              %td {{row.apk_removable}}
+
+        %hr
+        %table.table.table-striped.table-bordered.table-hover
+          %thead
+            %tr
+              %th 应用卸载及恢复方法说明 
+          %tbody
+            %tr
+              %td= simple_format(@remove_note) 
+
+:javascript
+  var all_rows = new Vue({
+    el: '#version_publish_edit',
+    data: {
+      rows: #{@rows.to_json}
+    },
+    mounted:function () {
+      $("#version_publish_edit").css("display", "block");
+    }
+  })
+
+  var publishShowTable = initDataTable('publishShowTable',{
+    paging: false, ordering: true, info: false, searching: false, select: true, scrollX: true, fixedColumns: {leftColumns: 2,rightColumns: 0}
+  });

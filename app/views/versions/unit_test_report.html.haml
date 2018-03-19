@@ -1,0 +1,19 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+- content_for :bread do
+  %li= link_to l(:label_roadmap), project_versions_path(@project, @version)
+  %li= link_to_version(@version)
+
+.h2= l(:version_unit_test_report)
+.issue-details.unit-test-report-page
+  = render_safe_html_content(@version)
+
+:javascript
+  $(".unit-test-report-page h3").before($("<hr/>"));
+  (function(){
+    this.first().remove();
+    this.last().parent().siblings().prepend(this.last());
+    this.show();
+  }.bind($("td.nv")))();
+

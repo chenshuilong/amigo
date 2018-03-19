@@ -1,0 +1,4 @@
+%h4= l(:label_calendar)
+- calendar = Redmine::Helpers::Calendar.new(User.current.today, current_language, :week)
+-# - calendar.events = calendar_items(calendar.startdt, calendar.enddt)
+= render :partial => 'common/calendar', :locals => {:calendar => calendar }

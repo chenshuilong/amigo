@@ -1,0 +1,20 @@
+SELECT
+	`users`.`firstname`,
+	`users`.`empId`,
+	`users`.`mobile`,
+    `p_depts`.`orgNm`,
+    `depts`.`orgNm`
+FROM
+	`users`
+INNER JOIN `depts` ON
+	`depts`.`orgNo` = `users`.`orgNo`
+INNER JOIN `depts` as `p_depts` ON
+    `p_depts`.orgNo = `depts`.`parentNo`
+WHERE
+	`users`.`type` IN(
+		'User',
+		'AnonymousUser'
+	)
+	AND(
+		`users`.`empId` IS NOT NULL
+	)

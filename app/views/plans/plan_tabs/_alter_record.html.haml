@@ -1,0 +1,32 @@
+- content_for :header_tags do
+  %script{:src => "/javascripts/echarts.min.js", :type => "text/javascript"}
+  %script{:src => "/javascripts/infographic.js", :type => "text/javascript"}
+
+- if @records.blank?
+  %p.nodata= l(:label_no_data)
+- else
+  %table#recordsTable.table.table-bordered.table-hover
+    %thead
+      %tr
+        %th= l(:numerical_order_all)
+        %th= l(:alter_record_type)
+        %th= l(:alter_record_prop_key)
+        %th= l(:alter_record_old_value)
+        %th= l(:alter_record_value)
+        %th= l(:alter_record_created_at)
+        %th= l(:alter_record_user)
+
+    %tbody
+      - @records.each_with_index do |record, idx|
+        - record.details.each_with_index do |detail|
+          %tr
+            %th= idx + 1
+            %th= to_record_type detail.record_type
+            %th= to_prop_key detail.prop_key
+            %th= to_old_value(detail.prop_key, detail.old_value)
+            %th= to_old_value(detail.prop_key, detail.value)
+            %th= format_date record.created_at
+            %th= link_to_user to_user(record.user_id)
+
+:javascript
+  var recordsTable = initDataTable('recordsTable', {});

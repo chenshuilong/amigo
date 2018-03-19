@@ -1,0 +1,26 @@
+:plain
+  $("#ajax-modal").html('#{j render :partial => "add_app"}')
+  app_window = layer.open({
+      type: 1,
+      title: '<b>新增官网信息</b>',
+      area: ['70%', '500px'],
+      zIndex: 666,
+      moveType: 1,
+      shadeClose: false,
+      content: $("#ajax-modal"),
+      btn: ['取消', '确定'],
+      yes: function(index, layero){
+        layer.close(app_window)
+      }
+  });
+
+  //确定按钮绑定赋值时间
+  $(".layui-layer-btn1").on("click", function(){
+    var selected = $("#spec_version_id").val();
+    var row = add_app_row.$data.row
+    var apk_info = add_app_row.$data.apk_info
+    if(selected != ""){
+      Vue.set(all_rows.$data.apk_infos, selected, {app_name: apk_info.app_name, app_version: apk_info.app_version, apk_permission: apk_info.apk_permission, apk_removable: apk_info.apk_removable});
+      Vue.set(all_rows.$data.rows, selected, {cn_name: row.cn_name, desktop_name: row.desktop_name, description: row.description, developer: row.developer, type: row.type})
+    }
+  })

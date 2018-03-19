@@ -1,0 +1,19 @@
+= form_for(mokuai, :html => {:id => "mokuaiNewForm", :class => "form-horizontal"}, remote: true) do |f|
+  .form-group
+    = f.label :reason, "归属", class: "control-label col-sm-2"
+    .col-xs-9
+      = f.text_field :reason, class: 'form-control'
+  .form-group
+    = f.label :name, "模块", class: "control-label col-sm-2"
+    .col-xs-9
+      = f.text_field :name, class: 'form-control'
+  .form-group
+    = f.label :description, "备注", class: "control-label col-sm-2"
+    .col-xs-9
+      = f.text_area :description, class: 'form-control', style: "width: 90%;height: 120px"
+  .form-group
+    = f.label :package_name, "包名", class: "control-label col-sm-2"
+    .col-xs-9
+      = f.text_field :package_name, class: 'form-control'
+    = f.hidden_field :category, value: 1
+    = hidden_field_tag :from, from

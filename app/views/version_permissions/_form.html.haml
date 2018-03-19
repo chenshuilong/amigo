@@ -1,0 +1,15 @@
+#version-permission-change
+  = form_for(@version_permission, url: '', html: {class: 'form-horizontal', remote: true, id:"version-permission-form", method: "post"}) do |f|
+    .form-group
+      = label_tag :name, @version_permission.new_record? ? l(:version_permission_name) : 'Notes', class: "control-label col-sm-2"
+      .col-xs-9
+        = f.text_field :name, value: @version_permission.new_record? ? '' : "备注", class: 'form-control', style: 'width:100%', disabled: @version_permission.name == "remove_notes"
+    .form-group
+      = label_tag :meaning, @version_permission.new_record? ? l(:version_permission_meaning) : '卸载方法说明',  class: "control-label col-sm-2"
+      .col-xs-9
+        - if @version_permission.new_record?
+          = f.text_field :meaning, class: 'form-control', style: 'width:100%'
+        - else  
+          = f.text_area :meaning, class: 'form-control', style: 'width:100%;min-height: 150px'
+      = f.hidden_field :author_id, value: User.current.id
+      = hidden_field_tag :id, @version_permission.id

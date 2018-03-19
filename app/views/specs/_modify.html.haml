@@ -1,0 +1,82 @@
+= form_tag("/projects/#{@project_id}/specs/#{spec.id.to_i}",method: "put",remote:true,:class => "form-horizontal") do
+  - unless @project.show_by(4)
+    .form-group
+      = label_tag :name, "发布类型", class: "control-label col-sm-2"
+      .col-xs-10
+        %label.radio-inline
+          %input#release_type_one{:name => "specs[for_new]", :type => "radio", :value => "1"} 发布方式1
+        %label.radio-inline
+          %input#release_type_two{:name => "specs[for_new]", :type => "radio", :value => "2"} 发布方式2
+        %label.radio-inline
+          %input#release_type_three{:name => "specs[for_new]", :type => "radio", :value => "3", :checked => "checked"} 发布方式3
+        %label.radio-inline
+          = popover(:trigger => "click", :content => release_type_description, :title => l(:field_description)) do
+            = icon 'question-circle'
+
+  .form-group
+    = label_tag :name, "名称", class: "control-label col-sm-2"
+    .col-xs-10
+      - if spec.new_record?
+        - if @project.show_by(4)
+          = text_area_tag "specs[name]", spec.name, class: 'form-control', rows: 5
+          %small.form-text.text-muted 多个规格名以换行隔开
+        - else
+          = text_field_tag "specs[name]", spec.name, class: 'form-control'
+      - else
+        = text_field_tag "specs[name]", spec.name, class: 'form-control', disabled: !(User.current.is_spm?(@project) || User.current.allowed_to?(:add_specs, @project))
+
+  - unless @project.show_by(4)
+    .form-group
+      = label_tag :jh_collect_finish_dt, "计划收集完成时间", class: "control-label col-sm-2"
+      .col-xs-10
+        = text_field_tag "specs[jh_collect_finish_dt]", format_date(spec.jh_collect_finish_dt), class: 'form-control'
+
+  .form-group
+    = label_tag :note, "#{@project.show_by(4) ? '用途' : '备注'}", class: "control-label col-sm-2"
+    .col-xs-10
+      = text_area_tag "specs[note]", spec.note, class: 'form-control'
+
+  - if !@project.show_by(4) && spec.id.to_i == 0
+    .form-group
+      = label_tag :name, "复制规格类型", class: "control-label col-sm-2"
+      .col-xs-10
+        %label.radio-inline
+          %input#copy_type_one{:name => "specs[copy_type]", :type => "radio", :value => "1"} 完全复制
+        %label.radio-inline
+          %input#copy_type_two{:name => "specs[copy_type]", :type => "radio", :value => "2"} 仅复制应用
+        %label.radio-inline
+          = popover(:trigger => "click", :content => copy_type_description, :title => l(:field_description)) do
+            = icon 'question-circle'
+
+    .form-group
+      = label_tag :spec_project, "复制规格", class: "control-label col-sm-2"
+      .col-xs-6
+        - projects = @project.show_by(4) ? Production.all : Project.default
+        = select_tag "specs[copy_project_id]", options_for_select(projects.map{|v| [v.name,v.id]}.unshift(['--- 请选择 ---', ''])), { class: 'form-control', style: 'width:100%', disabled: true}
+        = select2_tag("specs_copy_project_id")
+      .col-xs-4
+        = select_tag "specs[copy_spec_id]", options_for_select([]), { class: 'form-control', style: 'width:100%'}
+
+:javascript
+
+  initDateTimePicker("specs_jh_collect_finish_dt","Y-m-d",false);
+
+  changeGroupRadiosSelected("#{spec.new_record? ? 0 : spec.for_new}");
+
+  if("#{@project.show_by(4)}" == "false"){
+    if("#{spec.id.to_i}" == "0"){
+      // $("#specs_name").prop({'disabled': false});
+      $("#specs_jh_collect_finish_dt").prop({'disabled': false});
+    } else {
+      // $("#specs_name").prop({'disabled': true});
+      $("#specs_jh_collect_finish_dt").prop({'disabled': true});
+    }
+  }
+
+  $('#specs_copy_project_id').on("change", function (e) {
+    fillSpecs("#{@project_id}", $(this).val(), 'specs_copy_spec_id');
+  });
+
+  $('#copy_type_one, #copy_type_two').on('click', function() {
+    $("#specs_copy_project_id").prop({'disabled': false});
+  });

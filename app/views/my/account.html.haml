@@ -1,0 +1,29 @@
+- provide :nav, "1,4"
+- provide :css, "bootstrap"
+- provide :sidebar, 'none'
+
+- user_tabs = %w(info pass notification preference token)
+- @tab = user_tabs.include?(params[:tab]) ? params[:tab] : user_tabs.first
+- hide_save_button = %w(token).exclude?(@tab)
+
+.container
+  .row.seamless.notification
+    .col-md-2.notification-left
+      %p.title= l(:label_my_account)
+      %ul.tab-group
+        - user_tabs.each do |tab|
+          %li.tab-group-item{:class => (tab == @tab ? "active" : nil), :id => "user-#{tab}"}
+            = link_to l("user_tab_#{tab}"), {:tab => tab}
+    .col-md-10.notification-right
+      = render_flash_messages
+      .top-action-menu
+      = labelled_form_for :user, @user,  :url => { :action => "account" },                        |
+        :html => { :id => 'my_account_form', :method => :post, :class => 'form-wrapper' } do |f|  |
+        = error_messages_for 'user'
+        = hidden_field_tag 'tab', @tab
+        .box.tabular
+          #all_attributes
+            = render_user_tab_content
+        .button-group.text-center= submit_tag l(:button_save), class: "btn btn-primary" if hide_save_button
+
+- html_title(l(:label_my_account))

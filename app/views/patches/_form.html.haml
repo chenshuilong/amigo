@@ -1,0 +1,38 @@
+= labelled_form_for @patch, html: {class: 'newPatchForm'} do |f|
+  = error_messages_for 'patch'
+  .issue-details#update
+    #all_attributes
+      %p= f.select :patch_type, list_for_select(:patch, :patch_type), {:required => true, label: :patch_patch_type},   |
+          :onchange => "generatePatchNo(); return false;"
+      %p
+        %label
+          = l(:patch_patch_no)
+          %span.required *
+        %span#patchPatchNo= @patch.patch_no
+      %p= f.text_area :notes, value: @patch.notes, :required => true, label: :patch_notes, :style => "width: 80%; height: 100px"
+      %p
+        %label
+          = "manifest_url"
+          %span.required *
+        = text_field_tag "patch[init_command][manifest_url]", @manifest_url, :style => "width: 80%"
+      %p
+        %label
+          = "manifest_branch"
+          %span.required *
+        = text_field_tag "patch[init_command][manifest_branch]", @manifest_branch, :style => "width: 80%"
+      %p
+        %label= "manifest_xml"
+        = text_field_tag "patch[init_command][manifest_xml]", @manifest_xml, :style => "width: 80%"
+      %p
+        %label= "repo_url"
+        = text_field_tag "patch[init_command][repo_url]", @repo_url, :style => "width: 80%"
+      - if @patch.patch_type.to_i == 2
+        %p= f.text_field :proprietary_tag, :required => true, label: :patch_proprietary_tag, :style => "width: 80%"
+      %p
+        = f.select :object_ids, spec_option_for_select(@patch.object_ids), {:required => true, label: :patch_object_ids}#, {multiple: true}
+        = select2_remote('patch_object_ids', nil, "--- 请选择待验证项目 ---", :url => search_spec_patches_path)
+      %p
+        = f.text_field :due_at, :required => true, label: :patch_due_at
+        = calendar_for("patch_due_at")
+  .text-center
+    %a{:href => "javascript:submitByValidate()", class: "btn btn-primary", id: "savePatch"}= l(:label_confirmation)

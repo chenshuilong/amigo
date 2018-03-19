@@ -1,0 +1,3 @@
+%h1= link_to(@news.title, @news_url)
+%p= l(:text_user_wrote, :value => h(@comment.author))
+= textilizable @comment, :comments, :only_path => false

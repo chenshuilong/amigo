@@ -1,0 +1,21 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  category: MyString
+  based_id: 1
+  status: 1
+  from_user_id: 1
+  to_user_id: 1
+  subject: MyString
+  content: MyText
+  is_read: false
+
+two:
+  category: MyString
+  based_id: 1
+  status: 1
+  from_user_id: 1
+  to_user_id: 1
+  subject: MyString
+  content: MyText
+  is_read: false

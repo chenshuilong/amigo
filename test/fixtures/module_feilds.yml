@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  product_definition_id: 1
+  definition_module_id: 1
+  custom_feild_id: 1
+
+two:
+  product_definition_id: 1
+  definition_module_id: 1
+  custom_feild_id: 1

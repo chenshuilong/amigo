@@ -1,0 +1,59 @@
+- provide :css, "bootstrap"
+
+= labelled_form_for @release, :html => {:class => 'form-wrapper version-release-form', :multipart => true} do |f|
+  = error_messages_for 'release'
+  .box.tabular
+    #all_attributes
+      = render :partial => 'version_releases/form', :locals => { :f => f }
+    %p#attachments_form
+      %label= l(:label_attachments)
+      = render :partial => 'attachments/form', :locals => {:container => @release}
+  .button-group.text-center
+    %a.btn.btn-primary.btn-sm{class: "btn btn-primary btn-sm", id:"faster-creation", remote: true}= l(:button_create)
+
+:javascript
+  //form submit
+  $("#faster-creation").on("click", function(){
+    window.onbeforeunload = null;
+
+    var $Form = $("form#new_version_release");
+    var data = $Form.serialize();
+    
+    var $versionID = $Form.find("#version_release_version_id");
+    var $testedMobile = $Form.find("#version_release_tested_mobile");
+    
+    var result1 = SMValidator.validate($testedMobile);
+    var result2 = SMValidator.validate($versionID);
+
+    if(result1 && result2){
+      $.ajax({
+        url: '/version_releases.json?key=#{User.current.api_key}',
+        type: "post",
+        data: data,
+        dataType: "json"
+      }).done( function(result){
+          window.parent.location.href = url = "/version_releases/"+result.id;
+      }).fail(function(xhr, textStatus, errorThrown){
+        if(xhr.status == 403){
+          layer.alert("创建失败, 请确认有该权限！");
+        }else{
+          var errorText = $.parseJSON(JSON.stringify(xhr.responseText));
+          var errors = eval("(" + errorText + ")").errors;  
+
+          var html = '';
+          html = html + "<div id='errorExplanation'><ul>";
+              
+          $.each(errors, function(i, value) {
+            html = html + "<li>" + value + "</li>";
+          });    
+
+          html = html + "</ul></div>";    
+
+          $("#errorExplanation").remove();
+          $("#faster-new-top #content").prepend(html);  
+
+          location.href = "#faster-new-top"
+        }
+      }); 
+    }  
+  });

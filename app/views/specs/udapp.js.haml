@@ -1,0 +1,17 @@
+:plain
+  var flag = #{@appid.to_i};
+
+  if(flag == 0){
+    window.location.reload();
+    layer.msg('新建成功！');
+  }else{
+    app_tr = $('[data-id="app-#{@app.app_id}"]');
+    app_tr.children().eq(1).end().eq(2).text("#{@app.app_version}")
+                .end().eq(3).text("#{@app.app_version}")
+                .end().eq(3).text("#{@app.cn_name}")
+                .end().eq(4).text("#{@app.desktop_name}")
+                .end().eq(5).text("#{@app.developer}")
+                .end().eq(6).text("#{@app.mark}")
+
+    layer.msg('修改成功！');
+  }

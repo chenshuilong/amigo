@@ -1,0 +1,18 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+.h2= l(:label_version_new)
+- if @project.module_enabled?("specs")
+  - if @project.specs.present?
+    .defalut-value
+      = render :partial => 'default_values/index', :locals => {:defaults => @default_values}
+    = labelled_form_for @version, :url => project_versions_path(@project) do |f|
+      = render :partial => 'versions/form', :locals => { :f => f }
+      .button-group.text-center
+        = submit_tag l(:button_create), class: "btn btn-primary"
+        = link_to l(:button_save_template), void_js, :class => "get-default-value", :for => "version"
+  - else
+    .flash.warning= l(:version_no_spec)
+- else
+  .flash.warning= l(:version_disabled_spec)
+

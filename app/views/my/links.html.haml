@@ -1,0 +1,19 @@
+- provide :nav, "1, 2"
+- provide :css, "bootstrap"
+
+- company_links.each do |l|
+  .row
+    .links-head= l[:name]
+  .row
+    - l[:contents].each do |c|
+      .col-md-3.col-sm-6
+        %a.links-body{:href => c[:url], :target => "_blank"}
+          .links-body-img
+            = image_tag "neiwangjuhe_#{c[:image]}.png"
+          .links-body-text
+            .links-body-title
+              %p= c[:title]
+            .links-body-content
+              %p= c[:subtitle]
+            .links-body-desc= c[:description].gsub("\n", "<br>").html_safe
+          .clearfix

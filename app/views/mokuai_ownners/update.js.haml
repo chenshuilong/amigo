@@ -1,0 +1,5 @@
+:plain
+  ownner_tr = $('[data-id="#{@ownner.id}"]')
+  ownner_tr.children().eq(3).text("#{@ownner.tfder.try(:name)}")
+  ownner_tr.children().eq(4).text("#{@ownner.main_ownner}")
+  ownner_tr.children().eq(5).text("#{@ownner.minor_ownner}")

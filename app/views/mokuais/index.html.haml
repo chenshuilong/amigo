@@ -1,0 +1,53 @@
+.h2 模块
+
+.well
+  %p 备注： 现象类型所占用的类别是100
+  = form_tag mokuais_path, multipart: true, class: "form-inline", role: "form" do
+    .form-group
+      = file_field_tag :file
+    .form-group
+      = submit_tag "导入", data: { disable_with: "导入中..." }
+
+.panel.panel-default
+  .panel-heading 模块筛选
+  .panel-footer
+    = form_tag({}, {method: :get, class: 'form-inline'}) do |f|
+      .form-group
+        = label_tag 'category', l(:field_category)
+        = select_tag 'category', options_for_select( Mokuai.pluck(:category).uniq.map{  |
+          |m| [m, m]}.unshift([l(:label_all), '']), @category), class: "form-control",  |
+          :onchange => "this.form.submit(); return false;"
+      .form-group
+        = label_tag 'reason', l(:field_mokuai_reason)
+        = text_field_tag 'reason', params[:reason], class: "form-control"
+      .form-group
+        = label_tag 'name', l(:field_mokuai_name)
+        = text_field_tag 'name', params[:name], class: "form-control"
+      = submit_tag l(:button_submit), :name => nil, class: "btn btn-primary btn-sm"
+
+- if @mokuais.present?
+
+  %table.table.table-striped.table-bordered.table-hover
+    %thead
+      %tr
+        %th ID
+        %th 类别
+        %th 归属
+        %th 模块
+        %th 描述 / 严重等级(品质分类)
+        %th= l(:field_package_name)
+        %th 操作
+    %tbody
+      - @mokuais.each do |m|
+        %tr{:data =>{:id => m.id}}
+          %th= m.id
+          %th= m.category
+          %th= m.reason
+          %th= m.name
+          %th= m.desc
+          %th= m.package_name
+          %th
+            = link_to "修改", edit_mokuai_path(m.id), remote: true
+            = link_to "删除", mokuai_path(m.id), "data-confirm" => "确定删除吗？", method: :delete, remote: true
+
+  %span.pagination= pagination_links_full @mokuai_pages, @mokuai_count

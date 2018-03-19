@@ -1,0 +1,155 @@
+- provide :nav, "4,3"
+- provide :css, "bootstrap"
+
+.top-action-menu.pull-right
+  - if User.current.allowed_to?(:release_versions, nil, :global => true)
+    %a#new_version_release.btn.btn-primary.btn-sm{:href => "#{void_js}"}
+      %i.fa.fa-plus
+        = l(:thirdparty_version_release_new)
+
+.h2= l(:sdk_version_release_title)
+
+.clearfix
+.issue-details
+  - if @releases.blank?
+    %p.nodata= l(:label_no_data)
+  - else
+    .roadmap-query{:style => "width:100%;"}
+      %ul.notification-list
+        %li.notification-list-item
+          .notification-menu
+            %i.fa.fa-chevron-up
+          .notification-content
+            %p
+              %strong= "查询条件"
+          .clearfix
+          .notification-acton.select2-rectify{:style => "display:block;"}
+            = form_tag({}, {method: :get, class: 'form-horizontal'}) do |f|
+              .form-group
+                = label_tag 'project_id', l(:sdk_version_release_project_name), class: "col-sm-2 control-label"
+                .col-sm-3
+                  = select_tag 'sdk_project_id', options_for_select(Production.sdk_apps, @project_id), class: "form-control", :onchange => "this.form.submit(); return false;"
+                  = select2_for "sdk_project_id"
+                = label_tag 'status', l(:field_status), class: "col-sm-2 control-label"
+                .col-sm-3
+                  = select_tag 'status', options_for_select(list_for_select(:version_release, :status).first(3).unshift([l(:label_all), '']), @status),
+                    class: "form-control", :multiple => true, :onchange => "this.form.submit(); return false;"
+                  = select2_for 'status'
+                .col-sm-2
+                  = submit_tag l(:button_query), :name => nil, class: "btn btn-primary btn-sm"
+
+    .roadmap-table
+      %table#releaseTable.list.table.table-striped.table-bordered
+        %thead
+          %tr
+            = sort_header_tag('id', :caption => "#")
+            %th= l(:sdk_version_release_version_name)
+            %th= l(:sdk_version_release_type)
+            %th= l(:sdk_version_release_maven_result)
+            = sort_header_tag('status', :caption => l(:field_status))
+            %th= l(:sdk_version_release_projects)
+            = sort_header_tag('note', :caption => l(:sdk_version_release_note))
+            = sort_header_tag('created_at', :caption => l(:thirdparty_version_release_created_at))
+            = sort_header_tag('author_id', :caption => l(:thirdparty_version_release_author_id))
+        %tbody
+          - @releases.each do |release|
+            %tr
+              %td= link_to release.id, sdk_version_release_path(release)
+              %td= link_to_version release.version
+              %td= render_sdk_type(release)
+              %td= render_maven_result(release)
+              %td= release.status_name
+              %td= render_release_projects(release)
+              %td
+                = popover(:trigger => "click", :content => simple_format(release.note),:title => "详细信息", :placement => 'bottom') do
+                  = release.note.to_s[0,20]
+              %td= format_time release.created_at
+              %td= link_to_user release.author
+    %span.pagination= pagination_links_full @release_pages, @release_count
+
+
+  .sdk-new{:style => "display:none;width:540px;padding:20px;"}
+    = form_tag("#{upload_sdk_version_releases_path}",:id => "sdkForm", :multipart => true, :remote => true, :class => "form-horizontal") do
+      .form-group
+        = label_tag :project_id, l(:sdk_version_release_project_name), class: 'control-label col-sm-3'
+        .col-xs-9
+          = select_tag 'project_id', options_for_select(Production.sdk_apps.map{|pd| [pd.name, pd.id]}.unshift([l(:label_all), ''])), { class: 'form-control', style: 'width:100%'}
+          = select2_for 'project_id'
+      .form-group
+        = label_tag :spec_id, l(:sdk_version_release_spec_name), class: "control-label col-sm-3"
+        .col-xs-9
+          = select_tag 'spec_id', options_for_select([]), { class: 'form-control', style: 'width:100%'}
+      .form-group
+        = label_tag :version_id, l(:sdk_version_release_version_name), class: "control-label col-sm-3"
+        .col-xs-9
+          = select_tag 'version_id', options_for_select([]), { class: 'form-control', style: 'width:100%'}
+      .form-group
+        = label_tag :note, l(:sdk_version_release_note), class: "control-label col-sm-3"
+        .col-xs-9
+          = text_area_tag "sdk[note]", "", { style: 'width:100%;height:120px;'}
+          = hidden_field_tag "sdk[status]", "1"
+          = hidden_field_tag "sdk[version_id]", ""
+
+= production_submenu_by_type(5)
+= javascript_tag "$('#tab-productions').find('li').eq(1).removeAttr('class');"
+= javascript_tag "$('#tab-productions').find('li').eq(2).attr('class', 'active');"
+
+:javascript
+
+  new SMValidator('#sdkForm', {
+    focus: true,
+    required: '这是必填项',
+    rules: {
+      onlyNumber:   [/^V\d*.\d*.\d*.$/, '产品版本不正确'],
+      onlyAlphabet: [/^[a-z]*$/, '只能输入字母'],
+    },
+    fields: {
+      project_id:         'required',
+      spec_id:            'required',
+      version_id:         'required'
+    },
+    submit: function(valid, form) {
+      // if(valid) form.submit();
+    }
+  });
+
+  $('#new_version_release').on('click', function(){
+    openLayer("#{l(:thirdparty_version_release_new)}", "680px", $('.sdk-new'), function(){
+      if (SMValidator.validate('#sdkForm')) {
+        $('#sdk_version_id').val($('#version_id').val());
+        $('#sdkForm').submit();
+        refreshPage();
+      } else {
+        return false;
+      }
+    })
+  })
+
+  $('#project_id').on("change", function (e) {
+    fillSpecs($(this).val(), $(this).val(), 'spec_id');
+    $('#version_id').siblings(".select2-container").remove();
+    $('#version_id').val('').trigger("change");
+    $('#version_id').empty().append('');
+    $('#version_id').select2();
+  });
+
+  $('#spec_id').on("change", function (e) {
+    if($(this).val() != "null" && $(this).val() != ""){
+        remote('/projects/' + $(this).val() + '/specs/get_spec_main_versions', "GET", {spec_id: $(this).val(), is_main: false}, function (result) {
+            if (result.success.toString() == "1") {
+                var select = $('#version_id');
+                var opts = '';
+                $.grep(result.rows, function (row) {
+                    opts += "<option value='" + row[0] + "'>" + row[1] + "</option>";
+                });
+
+                select.siblings(".select2-container").remove();
+                select.val('').trigger("change");
+                select.empty().append(opts);
+                select.select2();
+            }
+        })
+    }
+  });
+
+- html_title(l(:project_production_type_sdk_version_release))

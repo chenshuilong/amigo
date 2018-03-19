@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  version_id: 1
+  status: 1
+  yml_result: MyText
+  maven_result: MyText
+  release_project_ids: MyText
+  author_id: 1
+
+two:
+  version_id: 1
+  status: 1
+  yml_result: MyText
+  maven_result: MyText
+  release_project_ids: MyText
+  author_id: 1

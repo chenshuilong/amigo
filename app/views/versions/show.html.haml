@@ -1,0 +1,199 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+.row
+  .col-sm-6
+    .h2
+      = @version.name
+      %small= load_value(@version, :compile_status)
+  .col-sm-6.text-right
+    .top-action-menu
+      - if User.current.allowed_to?(:manage_versions, @version.project)
+        = link_to(l(:version_stop_compiling), stop_compiling_version_path(@version), :class => 'icon', :method => :post, :remote => true) if @version.is_compiling?
+        = link_to(l(:button_edit), edit_version_path(@version), :class => 'icon icon-edit')
+        = delete_link version_path(@version, :back_url => url_for(:controller => 'versions', :action => 'index', :project_id => @version.project))
+      = link_to_if_authorized(l(:button_edit_associated_wikipage, :page_title => @version.wiki_page_title), {:controller => 'wiki', :action => 'edit', :project_id => @version.project, :id => Wiki.titleize(@version.wiki_page_title)}, :class => 'icon icon-edit') unless @version.wiki_page_title.blank? || @version.project.wiki.nil?
+      = call_hook(:view_versions_show_contextual, { :version => @version, :project => @project })
+
+- if @version.is_stopped?
+  %p.flash.warning.text-center= l(:version_compile_stopped_info, :user => link_to_user(@version.stopped_user), :time => format_time(@version.compile_stop_on)).html_safe
+
+.issue-details{:class => "#{@version.css_classes}"}
+  .description
+    .label= l(:field_description)
+    - if @version.description?
+      .wiki= textilizable @version, :description
+    - else
+      .wiki= l(:label_no_description)
+
+  %hr
+  .attributes
+    = fields_rows do |rows|
+      - rows.left l(:field_project), link_to_project(@version.project), :class => 'project'
+      - rows.left l(:version_priority), load_value(@version, :priority)
+      - rows.left l(:version_compile_status), load_value(@version, :compile_status)
+      - rows.left l(:version_spec_id), link_to(@version.spec.try(:name), project_specs_path(@project, :id => @version.spec_id))
+      - rows.left l(:version_compile_due_on), format_time(@version.compile_due_on)
+      - rows.left l(:version_compile_start_on), format_time(@version.compile_start_on)
+      - rows.left l(:version_compile_end_on), format_time(@version.compile_end_on)
+      - rows.left l(:version_compile_machine), @version.compile_machine
+      - rows.left l(:version_compile_total), @version.compile_total_hours
+      - rows.left l(:version_last_version_id), link_to_version(@version.last_version)
+
+      - rows.right l(:field_author), link_to_user(@version.author)
+      - rows.right l(:field_created_on), format_time(@version.created_on)
+      - rows.right l(:field_status), load_value(@version, :status)
+
+      - rows.line l("version_repo_one_of_#{@project.show_by(4)? 'app' : 'project'}"), link_to_url(@version.repo_one)
+      - rows.line l("version_repo_two_of_#{@project.show_by(4)? 'app' : 'project'}"), link_to_url(@version.repo_two)
+
+      - if @project.show_by(4) # Production
+        - if @project.production_type == Project.consts[:production_type][:app]
+          - rows.right l(:version_arm), load_value(@version, :arm)
+          - rows.right l(:version_strengthen), load_value(@version, :strengthen)
+          - rows.right l(:version_auto_test), load_value(@version, :auto_test)
+          - rows.right l(:version_auto_test_projects), @version.auto_test_projects.join(',')
+          - rows.right l(:version_unit_test), load_unit_test_value
+          - rows.right l(:version_sonar_test), load_value(@version, :sonar_test)
+          - rows.right l(:version_gradle_version), load_value(@version, :gradle_version)
+
+      - else # Project
+        - rows.right l(:version_compile_type), load_value(@version, :compile_type)
+        - rows.right l(:version_continue_integration), load_value(@version, :continue_integration)
+        - rows.right 'Coverity', load_value(@version, :coverity)
+        - rows.right l(:version_signature), load_value(@version, :signature)
+        - rows.right l(:version_ota_whole_compile), load_value(@version, :ota_whole_compile)
+        - rows.right l(:version_ota_increase_compile), load_value(@version, :ota_increase_compile)
+        - rows.right l(:version_ota_increase_versions), @version.find_increase_versions
+        - rows.right l(:version_as_increase_version), load_value(@version, :as_increase_version)
+        - rows.right l(:version_timezone), time_zone_value(@version.timezone)
+        - rows.line 'FingerPrint', @version.finger_print.present? ? load_value(@version, :finger_print) : '-'
+        - if @version.status.to_i == 7
+          - rows.line l(:version_sendtest_at), format_time(@version.sendtest_at)
+        - if @version.special_app_versions.present?
+          - @version.special_app_versions.each do |key, value|
+            - rows.line key.to_s+l(:field_version), link_to(value['v'], version_path(value['vid']))
+
+  %hr
+  .version-path
+    .label= l(:version_baseline)
+    .wiki= auto_link simple_format(@version.baseline), :all, :target => "_blank"
+
+    %hr
+    .label
+      = l(:version_path)
+      = popover(:trigger => "click", :content => way_to_download_smb, :title => l(:field_how_to_download)) do
+        = icon 'question-circle'
+    .wiki= auto_link simple_format(@version.path), :all, :target => "_blank"
+
+    %hr
+    .label= l(:version_log_url)
+    .wiki= auto_link simple_format(@version.log_url), :all, :target => "_blank"
+
+  - if @issues.any?
+    %hr
+    .version-issues
+      .label= l(:version_related_issues)
+      .wiki
+        = fields_table :class => 'list issues' do |t|
+          - t.title :field_type
+          - t.title '#'
+          - t.title :field_status
+          - t.title :field_subject
+          - t.title :field_assigned_to
+          - @issues.each do |vi|
+            - t.row do
+              - t.data load_value(vi, :issue_type)
+              - t.data vi.issue.is_a?(Issue) ? (link_to vi.issue.id, vi.issue) : vi.issue.id
+              - t.data vi.issue.status
+              - t.data vi.issue.subject, class: 'subject'
+              - t.data link_to_user vi.issue.assigned_to
+
+  - if @app_lists.any?
+    %hr
+    .version-issues
+      .label= l(:version_app_lists)
+      .wiki
+        - if @app_lists.size > 15
+          = data_table_for 'appLists',
+            dom: '<"data-table-top"f>rt<"data-table-bottom"pil><"clear">',
+            lengthMenu: [[-1, 10, 25, 50, 100], ["#{l(:label_all)}", 10, 25, 50, 100]]
+        = fields_table :class => 'list issues data-table', :id => 'appLists' do |t|
+          - unless @project.show_by(4)
+            - t.title :spec_version_cn_name
+            - t.title :spec_version_desktop_name
+          - t.title :version_applist_apk_name
+          - t.title :version_applist_apk_interior_version
+          - t.title :version_applist_apk_size
+          - t.title :version_applist_apk_uploaded
+          - t.title :version_applist_apk_removable
+          - t.title :label_remark
+          - @app_lists.each do |al|
+            - t.row do
+              - if !@project.show_by(4)
+                - t.data al.app_cn_name(al.cn_name, al.desktop_name)[:cn_name], {class: "#{al.id.present? ? '' : 'no_base_info'}"}
+                - t.data al.app_cn_name(al.cn_name, al.desktop_name)[:desktop_name], {class: "#{al.id.present? ? '' : 'no_base_info'}"}
+              - t.data al.id.present? ? link_to(al.apk_name, apk_bases_path(name: al.apk_name)) : al.apk_name, {class: "#{al.id.present? ? '' : 'no_base_info'}"}
+              - t.data al.apk_interior_version, {class: "#{al.id.present? ? '' : 'no_base_info'}"}
+              - t.data al.apk_size.to_i.try(:to_s, :human_size), {:title => al.apk_size, style: "width: 60px", class: "#{al.id.present? ? '' : 'no_base_info'}"}
+              - t.data al.apk_uploaded.nil? ? '-' : load_value(al, :apk_uploaded), {style: "width: 50px", class: "#{al.id.present? ? '' : 'no_base_info'}"}
+              - t.data al.app_category.to_i == 10 ? l("apk_base_removable_#{ApkBase::APK_BASE_REMOVABLE.key(al.removable.to_i).to_s}") : load_value(al, :apk_removable), {class: "#{al.id.present? ? '' : 'no_base_info'}", style: "width: 50px"}
+              - t.data al.notes, {class: "#{al.id.present? ? '' : 'no_base_info'}"}
+
+  - if @version.system_space.any?
+    - @systems = @version.system_space
+    %hr
+    .version-issues
+      .label= l(:version_system_space)
+      .wiki
+        - if @systems.size > 15
+          = data_table_for 'versionSystemSpace',
+            dom: '<"data-table-top"f>rt<"data-table-bottom"pil><"clear">',
+            lengthMenu: [[-1, 10, 25, 50, 100], ["#{l(:label_all)}", 10, 25, 50, 100]]
+        = fields_table :class => 'list data-table', :id => 'versionSystemSpace' do |t|
+          - t.title '#'
+          - t.title :label_directory
+          - t.title :version_applist_apk_size
+          - @systems.each_with_index do |sys, i|
+            - t.row do
+              - t.data i+1
+              - t.data sys[0]
+              - t.data sys[1].to_i.try(:to_s, :human_size)
+
+    -# = render :partial => 'versions/overview', :locals => {:version => @version}
+    -# = render(:partial => "wiki/content", :locals => {:content => @version.wiki_page.content}) if @version.wiki_page
+    -# #version-summary
+    -#   - if @version.estimated_hours > 0 || User.current.allowed_to?(:view_time_entries, @project)
+    -#     %fieldset.time-tracking
+    -#       %legend= l(:label_time_tracking)
+    -#       %table
+    -#         %tr
+    -#           %th= l(:field_estimated_hours)
+    -#           %td.total-hours= html_hours(l_hours(@version.estimated_hours))
+    -#         - if User.current.allowed_to_view_all_time_entries?(@project)
+    -#           %tr
+    -#             %th= l(:label_spent_time)
+    -#             %td.total-hours= html_hours(l_hours(@version.spent_hours))
+    -#   #status_by
+    -#     = render_issue_status_by(@version, params[:status_by]) if @version.fixed_issues.count > 0
+    -# - if @issues.present?
+    -#   = form_tag({}) do
+    -#     %table.list.related-issues
+    -#       %caption= l(:label_related_issues)
+    -#       - @issues.each do |issue|
+    -#         %tr.issue.hascontextmenu
+    -#           %td.checkbox= check_box_tag 'ids[]', issue.id, false, :id => nil
+    -#           %td.subject= link_to_issue(issue, :project => (@project != issue.project))
+
+    = context_menu issues_context_menu_path
+  = call_hook :view_versions_show_bottom, :version => @version
+
+- html_title @version.name
+
+:css
+  #appLists .even td{
+    background-color: #f1f1f1 !important;
+  }
+  #appLists tr td.no_base_info {
+    background-color: #f1b166 !important;
+  }

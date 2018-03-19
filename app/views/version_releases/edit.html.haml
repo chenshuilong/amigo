@@ -1,0 +1,18 @@
+- provide :nav, "4,2"
+- provide :css, "bootstrap"
+
+- content_for :bread do
+  %li= link_to l(:version_release_all), version_releases_path
+  %li= link_to release_heading(@release), @release
+  %li= l(:button_edit)
+
+.h2= l(:button_edit)
+
+= labelled_form_for @release, :html => {:class => 'form-wrapper version-release-form', :multipart => true} do |f|
+  .box.tabular
+    .label= l(:label_add_attachments)
+    %p#attachments_form
+      %label= l(:label_attachments)
+      = render :partial => 'attachments/form', :locals => {:container => @release}
+    %br/
+    %p= submit_tag l(:button_submit), class: "btn btn-primary"

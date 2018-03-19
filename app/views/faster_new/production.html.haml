@@ -1,0 +1,51 @@
+- provide :css, "bootstrap"
+
+= labelled_form_for @project, :html => {:class => "form-wrapper"} do |f|
+  = error_messages_for 'project'
+  .box.tabular
+    #all_attributes
+      = render :partial => 'projects/form'
+      = f.hidden_field :category
+  .button-group.text-center
+    %a.btn.btn-primary.btn-sm{class: "btn btn-primary btn-sm", id:"faster-creation", remote: true}= l(:button_create)
+
+- unless @project.identifier_frozen?
+  - content_for :header_tags do
+    = javascript_include_tag 'project_identifier'
+
+:javascript
+  $("#faster-creation").on("click", function(){
+    window.onbeforeunload = null;
+
+    var data = $("form#new_project").serialize();
+    
+    $.ajax({
+      url: '/projects.json?key=#{User.current.api_key}',
+      type: "post",
+      data: data,
+      dataType: "json"
+    }).done( function(result){
+      if(result.project.status == 1){
+        var url = "/projects/"+result.project.identifier+"/settings"
+        window.parent.location.href = url
+      }
+    }).fail(function(xhr, textStatus, errorThrown){
+      var errorText = $.parseJSON(JSON.stringify(xhr.responseText))
+      var errors = eval("(" + errorText + ")").errors;
+      
+      var html = '';
+      html = html + "<div id='errorExplanation'><ul>"
+          
+      $.each(errors, function(i, value) {
+        html = html + "<li>" + value + "</li>"
+      });
+
+      html = html + "</ul></div>"
+
+      $("#errorExplanation").remove();
+      $("#faster-new-top #content").prepend(html);
+      
+      location.href = "#faster-new-top"
+    });
+  });
+

@@ -1,0 +1,16 @@
+.contextual
+  = link_to_if_authorized l(:label_query_new), new_project_query_path(:project_id => @project), :class => 'icon icon-add'
+%h2= l(:label_query_plural)
+- if @queries.empty?
+  %p
+    %i= l(:label_no_data)
+- else
+  %table.list
+    - @queries.each do |query|
+      %tr{:class => "#{cycle('odd', 'even')}"}
+        %td.name
+          = link_to query.name, :controller => 'issues', :action => 'index', :project_id => @project, :query_id => query
+        %td.buttons
+          - if query.editable_by?(User.current)
+            = link_to l(:button_edit), edit_query_path(query), :class => 'icon icon-edit'
+            = delete_link query_path(query)

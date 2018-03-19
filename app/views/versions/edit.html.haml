@@ -1,0 +1,12 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+.h2= l(:version_edit)
+
+- if @version.free_edit?
+  = labelled_form_for @version, html: {class: 'editVersionForm'} do |f|
+    = render :partial => 'form', :locals => { :f => f }
+    .button-group.text-center
+      = submit_tag l(:button_update), class: "btn btn-primary"
+- else
+  = render :partial => 'form_limited'#, :locals => { :f => f }

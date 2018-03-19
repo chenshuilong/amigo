@@ -1,0 +1,129 @@
+= error_messages_for 'repo_request'
+.issue-details#update
+  #all_attributes
+    - if @repo_request.show_in_form?(:server_ip, 3)
+      %p= f.select :server_ip, list_for_select(:repo_request, :server_ip) , :required => true, label: :repo_request_server_ip
+    - else
+      = f.hidden_field :server_ip
+    - label = @repo_request.category == 1 ? l(:field_project) : l(:version_release_production)
+    - if @repo_request.show_in_form?(:production_type, 3)
+      %p#production_repo
+        = f.select :production_type, options_for_select([['APK', 'apk'], ['代码管理', 'management'], ['其他', 'other']], @repo_request.production_type), required: true, label: l(:repo_request_production_type)
+        %small.form-text.text-muted 产品选择APK类型，Modem/Framework等选择其他
+    - if @repo_request.show_in_form?(:production_type, 1)
+      %p#production_repo= f.select :production_type, options_for_select([['国内项目', 'china'], ['海外项目', 'oversea']], @repo_request.production_type), required: true, label: "项目归属"
+    - if @repo_request.show_in_form?(:repo_name, nil)
+      %p= f.text_field :repo_name, :required => true, label: l(:repo_request_repo_name), :style => "width: 80%;"
+    - if @repo_request.show_in_form?(:project_id, nil)
+      %p
+        = f.select :project_id, project_option_for_select(@repo_request.project_id), :required => true, label: label
+        = select2_remote('repo_request_project_id', nil, "--- 请选择#{label} ---", :url => search_projects_repo_requests_path(category: @repo_request.category, production_type: @repo_request.production_type))
+    - if @repo_request.branch?
+      - if @repo_request.show_in_form?(:version_id, nil)
+        %p
+          = f.select :version_id, version_option_for_select(@repo_request.version_id), :required => true, label: :repo_request_version_id
+          = select2_remote('repo_request_version_id', @repo_request.project, "--- 请选择版本 ---", :url => search_versions_repo_requests_path)
+          %small.form-text.text-muted 项目/产品在阿米哥已经编译成功的版本
+      // - if @repo_request.show_in_form?(:tag_number, nil)
+      //   %p
+      //     = f.text_field :tag_number, :required => true, label: :repo_request_tag_number
+      //     %small.form-text.text-muted 项目/产品在阿米哥已经编译成功的版本
+      - if @repo_request.show_in_form?(:branch, nil)
+        %p
+          %label
+            = l(:repo_request_branch)
+            %span.required *
+          %span.input-group
+            %span.input-group-addon branch_
+            = text_field_tag 'repo_request[branch]', (@repo_request.branch.present? ? @repo_request.branch.split("_")[1..-1].join("_") : ''), :style => "width: 80%; border-radius: 0 4px 4px 0"
+          %small.form-text.text-muted 分支名填写后，系统会自动在分支名前添加“branch_”前缀
+    - if @repo_request.show_in_form?(:android_repo, nil)
+      %p
+        %label= l(:repo_request_version_id)+l(:version_repo_one_of_project)
+        = text_field_tag :address, '', placeholder: "需选择项目版本获取", :style => "width: 80%;", readonly: true
+      %p
+        = f.text_field :android_repo, :required => true, label: :repo_request_android_repo, placeholder: "android仓库名, 例如: android_mtk_m_6755_c66", :style => "width: 80%;", readonly: true
+        %small.form-text.text-muted 需选择项目版本，获取安卓代码仓
+    - if @repo_request.show_in_form?(:package_repo, nil)
+      %p
+        = f.text_field :package_repo, :required => false, label: :repo_request_package_repo, placeholder: "package仓库名, 例如: gionee_packages_apk_amigo_4.0", :style => "width: 80%;", readonly: true
+        %small.form-text.text-muted 需选择项目版本，获取包代码仓
+    - if @repo_request.show_in_form?(:use, nil)
+      %p= f.select :use, options_for_select([["量产流", 1], ["政企", 5], ["预研", 7], ["临时流", 8]]), :required => true, label: :repo_request_use
+    - if @repo_request.read_perm?
+      %p
+        = f.select :read_users, users_option_for_select(@repo_request.read_users), {:required => false, label: :repo_request_read_users}, {multiple: true}
+        = select2_remote("repo_request_read_users", nil, nil, {withme: false})
+    - if @repo_request.write_perm?
+      %p
+        = f.select :write_users, users_option_for_select(@repo_request.write_users), {:required => @repo_request.production_repo?, label: :repo_request_write_users}, {multiple: true}
+        = select2_remote("repo_request_write_users", nil, nil, {withme: false})
+        - if @repo_request.category == 1
+          %small.form-text.text-danger * 为空时，默认为All_in
+    - if @repo_request.submit_perm?
+      %p
+        = f.select :submit_users, users_option_for_select(@repo_request.submit_users), {:required => @repo_request.production_repo?, label: :repo_request_submit_users}, {multiple: true}
+        = select2_remote("repo_request_submit_users", nil, nil, {withme: false})
+        %small.form-text.text-muted 合并代码到仓库权限
+    %p= f.text_area :notes, value: '', :required => @repo_request.category.to_i == 1, label: :repo_request_notes, :style => "width: 80%; height: 100px"
+    - if @repo_request.category != 2
+      - status_options = repo_request_status(@repo_request)
+      - if status_options.present?
+        %p#repoStatus= f.select :status, options_for_select(status_options), :require => true, label: :repo_request_status
+    = f.hidden_field :category, value: @repo_request.category
+
+:javascript
+  $("#repo_request_project_id").on("change", function(){
+    var projectId = $(this).val();
+    var $versionSelector = $("#repo_request_version_id");
+    var $productionType = $("#repo_request_production_type");
+    var category = "#{@repo_request.category}";
+
+    if(projectId == null){
+      $(this).find("option").remove();
+      $versionSelector.find("option").remove();
+      var url = "/repo_requests/search_versions";
+      $versionSelector.select2_remote({url: url});
+    }else{
+      if(category == "1"|| category == "2"){
+        $versionSelector.val("");
+        var url = "/repo_requests/search_versions";
+        $versionSelector.select2_remote({project: projectId, url: url})
+      }
+    }
+    if(category != '3'){
+      resetValues();
+    }
+  });
+  $("#repo_request_version_id").on("change", function(){
+    var versionId = $(this).val();
+    if(versionId == null){ 
+      $(this).find("option").remove(); resetValues();
+    }else{
+      $.get("/versions/"+versionId+"/search_repo_info", function(data){
+        resetValues(data);
+      })
+    }
+  });
+  $("#production_repo select#repo_request_production_type").on("change", function(){
+    $select = $(this)
+    var newRecord = "#{@repo_request.new_record?}";
+    if(newRecord == "true"){
+      path = "/repo_requests/new?category=#{RepoRequest::REPO_REQUEST_CATEGORY.key(@repo_request.category)}&production_type="+$select.val();
+    }else{
+      path = "/repo_requests/#{@repo_request.id}/edit?production_type="+$select.val();
+    }
+    location.href = path;
+  })
+
+
+  function resetValues(data=null){
+    var androidRepo = $("#repo_request_android_repo");
+    var packageRepo = $("#repo_request_package_repo");
+    var serverIp = $("#repo_request_server_ip");
+    var androidAddr = $("#address");
+    if(androidRepo != null){ var val = data == null ? "" : data.android_repo; androidRepo.val(val)}      
+    if(packageRepo != null){var val = data == null ? "" : data.package_repo; packageRepo.val(val)}      
+    if(serverIp != null){var val = data == null ? "" : data.server_ip; serverIp.val(val)}      
+    if(androidAddr != null){var val = data == null ? "需选择版本获取安卓代码库地址" : data.addr; androidAddr.val(val)}
+  }

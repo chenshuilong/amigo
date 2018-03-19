@@ -1,0 +1,17 @@
+.h2= l(:label_global_permission)
+
+%p.flash.warning= render_set_user_notice
+
+= form_tag(edit_permission_resourcings_path, {method: :post}) do |f|
+  #permissions.box.tabular
+    - current_get_params.each do |key, value|
+      = hidden_field_tag key, value
+    - perms_by_block = @polices.group_by {|p| p.block.to_s}
+    - perms_by_block.keys.sort.each do |blk|
+      %fieldset
+        %legend= l("resourcing_block_#{blk.to_s}")
+        - perms_by_block[blk].each do |permission|
+          %label.floating
+            = permissions_tag(permission, @users)
+            = l_or_humanize(permission.label)
+  = submit_tag l(:button_submit), :name => nil

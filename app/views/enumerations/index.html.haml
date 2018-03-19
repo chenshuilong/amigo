@@ -1,0 +1,26 @@
+%h2= l(:label_enumerations)
+- Enumeration.get_subclasses.each do |klass|
+  %h3= l(klass::OptionName)
+  - enumerations = klass.shared.where(parent_id: nil)
+  - if enumerations.any?
+    %table.list.enumerations
+      %thead
+        %tr
+          %th= l(:field_name)
+          %th= l(:field_is_default)
+          %th= l(:field_active)
+          %th
+      - enumerations.each do |enumeration|
+        %tr{:class => "#{cycle('odd', 'even')}"}
+          %td.name= link_to enumeration.real_name, edit_enumeration_path(enumeration)
+          %td.tick= checked_image enumeration.is_default?
+          %td.tick= checked_image enumeration.active?
+          %td.buttons
+            = reorder_handle(enumeration, :url => enumeration_path(enumeration), :param => 'enumeration')
+            = delete_link enumeration_path(enumeration)
+    - reset_cycle
+  %p= link_to l(:label_enumeration_new), new_enumeration_path(:type => klass.name)
+- html_title(l(:label_enumerations))
+
+= javascript_tag do
+  $(function() { $("table.enumerations tbody").positionedItems(); });

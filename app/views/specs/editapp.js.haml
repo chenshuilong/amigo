@@ -1,0 +1,18 @@
+:plain
+  $("#ajax-modal").html('#{j render :partial => "app_form", :locals => { :app => @app, :all_apps => @parent_and_children}}')
+    app_window = layer.open({
+      type: 1,
+      title: '<b>编辑应用 - [#{app_name(@project) + @spec.name}]</b>',
+      area: ['880px', 'auto'],
+      zIndex: 666,
+      moveType: 1,
+      shadeClose: false,
+      content: $("#ajax-modal"),
+      btn: ['取消', '确定'],
+      yes: function(index, layero){
+        layer.close(app_window)
+      },
+      btn2: function(index, layero){
+        $("#ajax-modal").find("form").submit();
+      }
+  });

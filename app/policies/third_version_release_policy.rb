@@ -1,0 +1,3 @@
+class ThirdVersionReleasePolicy < VersionReleasePolicy
+
+end

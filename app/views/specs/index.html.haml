@@ -1,0 +1,260 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+- content_for :header_tags do
+  %link{:href => "/amg/dataTable/datatable.css", :rel => "stylesheet"}
+  %link{:href => "/amg/dataTable/fixedColumns.bootstrap.min.css", :rel => "stylesheet"}
+
+  %script{:src => "/amg/dataTable/dataTables.fixedColumns.min.js", :type => "text/javascript"}
+  %script{:src => "/amg/dataTable/dataTables.bootstrap.min.js", :type => "text/javascript"}
+
+.filter-right
+  .panel.panel-default{:style => "margin-top:20px;"}
+    .panel-heading
+      %h4= "规格管理"
+    .panel-body
+      .issues-head
+        .row.issues-head-title
+          .col-sm-6
+            - if User.current.is_spm?(@project) || User.current.allowed_to?(:add_specs, @project)
+              %a#new_spec.btn.btn-primary.btn-sm{:href => "#{void_js}"}
+                %i.fa.fa-plus
+                  新建规格
+          .col-sm-6.issues-head-title-new.text-right
+            - if !@project.show_by(4) && @specs.present?
+              %a.btn.btn-primary.btn-sm{:href => "/specs?#{@project_ids}"}= l(:label_spec_list)
+            - if @specs.present?
+              %a.btn.btn-primary.btn-sm{:href => "/projects/#{@project_id}/specs/export"}
+                %i.fa.fa-file-excel-o
+                  导出规格
+
+        .issues-body
+          - if @specs.blank?
+            %p.nodata= l(:label_no_data)
+          - else
+            %table#specTable.table.table-bordered.table-hover
+              %thead
+                %tr
+                  %th 序号
+                  %th 规格名称
+                  - unless @project.show_by(4)
+                    %th 计划收集完成时间
+                    %th 实际收集完成时间
+                  - if @project.show_by(4)
+                    %th 用途
+                  - else
+                    %th 备注
+                  - unless @project.show_by(4)
+                    %th 锁定
+                    %th 冻结
+                  %th 默认
+                  %th 操作
+              %tbody
+                - @specs.each_with_index do |spec,idx|
+                  %tr{:data =>{:id => "spec-#{spec.id}"}, :class => spec.id == @spec_id.to_i ? 'gird-row-selected' : (spec.deleted ? 'danger' : '')}
+                    %th= idx + 1
+                    %th
+                      = link_to spec.name, "/projects/#{@project_id}/specs?id=#{spec.id}"
+                    - unless @project.show_by(4)
+                      %th= format_date spec.jh_collect_finish_dt
+                      %th= format_date spec.sj_collect_finish_dt
+                    %th
+                      = popover(:trigger => "click", :content => spec.note.to_s,:title => "详细信息", :placement => 'bottom') do
+                        = spec.note.to_s[0,10]
+                    - unless @project.show_by(4)
+                      %th
+                        %i{:class => "fa fa-#{spec.locked ? '' : 'un'}lock", :style => "padding-left: 10px;"}
+                      %th
+                        %i{:class => "fa fa-#{spec.freezed ? '' : 'un'}lock", :style => "padding-left: 10px;"}
+                    %th
+                      %i{:class => "fa fa-#{spec.is_default ? '' : 'un'}check", :style => "padding-left: 10px;"}
+                    %th
+                      - if spec.deleted
+                        = link_to "启用"
+                      - else
+                        - if User.current.admin? || User.current.allowed_to?(:add_specs, @project)
+                          %a{:href => "/projects/#{spec.project_id}/specs/#{spec.id}/edit", "data-remote" => true}
+                            %i.spec-edit.fa.fa-edit
+                          = "|"
+                          %a{:href => "javascript:onDelete('/projects/#{spec.project_id}/specs/#{spec.id}','delete');"}
+                            %i.spec-delete.fa.fa-close
+                            -#= link_to "删除", "/projects/#{spec.project_id}/specs/#{spec.id}", "data-confirm" => "确定删除吗？", method: :delete, remote: true
+
+                        .btn-group
+                          %button.btn.dropdown-toggle.btn-default{"data-toggle" => "dropdown", :type => "button"}
+                            更多
+                            %span.caret
+                          %ul.dropdown-menu.dropdown-menu-right{:role => "menu",:width => "10px;"}
+                            - unless @project.show_by(4)
+                              %li= link_to "应用清单", "/projects/#{@project_id}/specs?id=#{spec.id}"
+                            - unless spec.is_default
+                              %li
+                                - if User.current.allowed_to?(:collect_specs, @project)
+                                  %a{:href => "javascript:onSetDefaultSpec(#{spec.id}, #{spec.project_id});"} 设为默认
+                            %li
+                              - if !@project.show_by(4) && User.current.allowed_to?(:collect_specs, @project)
+                                %a{:href => "javascript:onLockSpec(#{spec.id}, #{spec.project_id}, #{spec.for_new});"}= (spec.locked ? "解锁" : "锁定") << "规格"
+                              - if !@project.show_by(4) && User.current.allowed_to?(:collect_specs, @project)
+                                %a{:href => "javascript:onFreezeSpec(#{spec.id}, #{spec.project_id});"}= (spec.freezed ? "解冻" : "冻结") << "规格"
+                            - if !@project.show_by(4) && User.current.allowed_to?(:collect_specs, @project) && !spec.is_colleted
+                              %li= link_to "收集规格", "/projects/#{spec.project_id}/specs/collct?spec_id=#{spec.id}", method: :post, remote: true
+                            %li.divider
+                            %li= link_to "变更记录", "/projects/#{spec.project_id}/specs/alter_records?spec_id=#{spec.id}", method: :post, remote: true
+
+  - unless @project.show_by(4)
+    .panel.panel-default
+      .panel-heading
+        %h4= "应用清单列表#{@spec_name.blank? ? '' :'——' + (app_name(@project) + @spec_name)}"
+      .panel-body
+        .issues-head
+          .row.issues-head-title
+            .col-sm-6
+              - if User.current.is_spm?(@project) && @apps.present?
+                %a#delete_app_all.btn.btn-danger.btn-sm{:href => "#{void_js}"}
+                  %i.fa.fa-close
+
+              - if @spec_id.present? && (User.current.is_spm?(@project) || !@my_productions.map{|pd| User.current.is_app_spm?(pd)}.include?(false))
+                %a#add_app.btn.btn-primary.btn-sm{:href => "#{void_js}"}
+                  %i.fa.fa-plus
+                    添加应用
+            .col-sm-6.issues-head-title-new.text-right
+              - if @spec_id.present? && policy(:version_publish).preview?
+                %a.btn.btn-primary.btn-sm{:href => "/version_publishes/preview?spec_id=#{@spec_id}"}= l(:label_version_publish_preview)
+              - if @apps.present?
+                %a.btn.btn-primary.btn-sm{:href => "/projects/#{@project_id}/specs/export_apps?spec_id=#{@spec_id}"}
+                  %i.fa.fa-file-excel-o
+                    导出应用清单
+
+          .issues-body
+            - if @apps.blank?
+              %p.nodata= l(:label_no_data)
+            - else
+              %table#appTable.list.issues-relations-table.table.table-bordered.table-hover
+                %thead
+                  %tr
+                    %th 序号
+                    %th 应用名称
+                    %th 应用版本
+                    %th 应用中文名
+                    %th 桌面显示名称
+                    %th 开发者信息
+                    %th 功能描述
+                    - unless @spec.for_new == 3
+                      %th 发布路径
+                    %th APP-SPMS
+                    %th 修改时间
+                    %th 操作
+                %tbody
+                  - @apps.each_with_index do |pd,num|
+                    %tr{:data =>{:id => "app-#{pd.app_id}"}}
+                      %td{:style => "text-align: center;"}
+                        = check_box_tag("app", pd.app_id)
+                        = num + 1
+                      %td= link_to_project Production.find_by_name(pd.app_name)
+                      %td.highlight= pd.app_version
+                      %td= pd.cn_name
+                      %td= pd.desktop_name
+                      %td= pd.developer
+                      %td
+                        = popover(:trigger => "click", :content => pd.mark.to_s,:title => "详细信息") do
+                          = pd.mark.to_s[0,10]
+                      - unless @spec.for_new == 3
+                        %td
+                          = popover(:trigger => "click", :content => pd.release_path.to_s,:title => "详细信息", :placement => 'bottom') do
+                            = pd.release_path.to_s[0,10]
+                      %td
+                        = app_spms(pd.production_id).join(",").html_safe
+                      %td
+                        = pd.app_updated_on
+                      %td
+                        - if User.current.is_spm?(@project) || app_editable?(pd.production_id)
+                          %a{:href => "/projects/#{@project_id}/specs/editapp?spec_id=#{@spec_id}&appid=#{pd.app_id}", "data-remote" => true, "data-method" => "post", :rel => "nofollow"}
+                            %i.app-edit-tip.fa.fa-edit
+                          = "|"
+                          - if pd.app_freezed == 0
+                            %a{:href => "javascript:onBatchHandleApp('/projects/#{@project_id}/specs/frost?spec_id=#{@spec_id}&appid=#{pd.app_id}&freeze=1','post','#{pd.production_id}','#{@project_id}','#{@spec_id}',1, #{@project.ownership == Project::PROJECT_OWNERSHIP[:china]}, #{project_specs(@project_id)});"}
+                              %i.app-freeze-tip.fa.fa-unlock
+                          - else
+                            %a{:href => "javascript:onBatchHandleApp('/projects/#{@project_id}/specs/frost?spec_id=#{@spec_id}&appid=#{pd.app_id}&freeze=0','post','#{pd.production_id}','#{@project_id}','#{@spec_id}',0, #{@project.ownership == Project::PROJECT_OWNERSHIP[:china]}, #{project_specs(@project_id)});"}
+                              %i.app-unfreeze-tip.fa.fa-lock
+                          = "|"
+                          %a{:href => "javascript:onBatchHandleApp('/projects/#{@project_id}/specs/delapp?spec_id=#{@spec_id}&appid=#{pd.app_id}','post','#{pd.production_id}','#{@project_id}','#{@spec_id}',1, #{@project.ownership == Project::PROJECT_OWNERSHIP[:china]}, #{project_specs(@project_id)});"}
+                            %i.app-delete-tip.fa.fa-close
+
+              %span.pagination= pagination_links_full @apps_pages, @apps_count
+
+:javascript
+
+  var specTable = initDataTable('specTable',{
+    paging: false, ordering: true, info: true, searching: false, select: true // , scrollX: true, fixedColumns: {leftColumns: 2,rightColumns: 1}, scrollY: '50vh', scrollCollapse: true
+  });
+
+  var appTable = initDataTable('appTable',{
+    paging: false, ordering: true, info: false, searching: false, select: true, scrollX: true, fixedColumns: {leftColumns: 3,rightColumns: 1}
+  });
+
+  $('.dropdown-menu').click(function(e) {
+    $(this).parent().removeClass("open");
+  });
+
+  $('#specTable tbody tr').on('click', 'th', function (event) {
+    if($(this).text().indexOf("变更记录") > -1){
+      console.log($(this).parent().attr("data-id"));
+    } else {
+      var spec_id = $(this).parent().attr("data-id").replace("spec-", "");
+      window.location.href = "/projects/#{@project_id}/specs?id=" + spec_id;
+    }
+  });
+
+  $('.app-edit-tip').showToolTip("编辑父项目/子项目下的相同");
+  $('.app-freeze-tip').showToolTip("冻结父项目/子项目下的相同应用");
+  $('.app-unfreeze-tip').showToolTip("解冻父项目/子项目下的相同应用");
+  $('.app-delete-tip').showToolTip("删除父项目/子项目下的相同应用");
+  $('#delete_app_all').showToolTip("批量删除所勾选的应用的所有信息");
+
+  $("#new_spec").click(function() {
+    var content = $("#ajax-modal").html('#{j render :partial => "modify", :locals => { :spec => Spec.new }}');
+    openLayer('<b>新建规格</b>', '580px', content, function() {
+      if($("#ajax-modal").find("input#specs_name").val() == ""){
+          layer.alert("请输入规格名称！");
+      }else{
+          $("#ajax-modal").find('form').submit();
+      }
+    })
+  })
+
+  $("#add_app").click(function() {
+    var content = $("#ajax-modal").html('#{j render :partial => "app_form", :locals => { :app => {:app_id => 0, :desktop_name => "无", :developer => "深圳市金立通信设备有限公司", :spec_id => @spec_id || 0} }}');
+    openLayer('<b>添加应用</b>', '880px', content, function() {
+      if($("#ajax-modal").find("select#specs_production_id").val() == null){
+          layer.msg("请选择应用名称！");
+      }else{
+          $("#ajax-modal").find('form').submit();
+      }
+    })
+  })
+
+  $('#delete_app_all').on('click',function() {
+    var ids = new Array();
+    $("[name = app]:checkbox").each(function () {
+      if ($(this).is(":checked")) {
+        ids.push($(this).attr("value"));
+      }
+    });
+
+    if(ids.length == 0){
+      layer.alert("请选择要删除的应用!")
+    }else {
+      layer.confirm("确定要批量删除所勾选的应用的所有信息吗？", {btn: ['取消', '确定']},
+        function (cancal) {
+            layer.close(cancal);
+        },
+        function () {
+            for(var i = 0; i < ids.length; i++){
+              remote("/projects/#{@project_id}/specs/delapp?appid=" + ids[i].toString(), "POST", {  }, function (res) {
+                eval(res.message);
+              })
+            }
+        }
+      );
+    }
+  })

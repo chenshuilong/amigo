@@ -1,0 +1,18 @@
+- provide :nav, "5,3"
+- provide :css, "bootstrap"
+- content_for :bread do
+  %li= link_to l(:periodic_versions), periodic_versions_path
+  %li= link_to l(:periodic_version_rules), periodic_version_path(@rule)
+  %li= l(:periodic_version_rule_edit)
+
+.h2= l(:periodic_version_rule_edit)
+= labelled_form_for @rule, url: {}, :html => {:class => 'form-wrapper', :multipart => true, :method => :post} do |f|
+  = error_messages_for @rule
+  .box.tabular
+    #all_attributes
+      = render :partial => 'rule_form', :locals => { :f => f }
+  .button-group.text-center
+    = submit_tag l(:button_update), class: "btn btn-primary"
+
+
+- html_title(l(:periodic_version_rule_edit))

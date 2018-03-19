@@ -1,0 +1,7 @@
+:plain
+  $(".top-action-menu").empty();
+  layer.alert('#{@release.version.fullname} #{@released_message}', function(index) {
+    location.reload(); // Reload Page
+  });
+
+

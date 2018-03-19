@@ -1,0 +1,13 @@
+= labelled_form_for :custom_permission, custom_permission, remote: true do |f|
+  .issue-details#update
+    #all_attributes
+      %p
+        = f.select :user_id, [], :required => false, label: "人员"
+        = select2_remote("custom_permission_user_id", nil, nil, {withme: false})
+      - if @type == "manage"
+        %p= f.select :permission_type.to_sym, permission_type_options_for_select(list_for_select(:custom_permission, :manage)), :required => false, label: "权限类型"
+      - else 
+        %p= f.select :permission_type.to_sym, permission_type_options_for_select(@manages), :required => false, label: "权限类型"
+
+      %p= f.text_area :notes, :required => false, :style => "width: 80%; height: 100px"
+      = f.hidden_field :author_id, value: User.current.id

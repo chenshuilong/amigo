@@ -1,0 +1,94 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+- content_for :header_tags do
+  %link{:href => "/amg/jqwidgets/styles/jqx.base.css", :rel => "stylesheet"}
+  %link{:href => "/amg/jqwidgets/styles/jqx.orange.css", :rel => "stylesheet"}
+
+  %script{:src => "http://www.jq22.com/jquery/jquery-migrate-1.2.1.min.js", :type => "text/javascript"}
+  %script{:src => "/amg/jqwidgets/jqx-all.js", :type => "text/javascript"}
+
+.top-action-menu.pull-right
+  - if @project
+    - if allow_to_view_plan? && @menuid == "wbs"
+      %a#copy.btn.btn-primary.btn-sm{:href => "#{void_js}"}
+        %i.fa.fa-copy
+          = l(:plan_copy)
+      %a#lock.btn.btn-primary.btn-sm{:href => "#{void_js}", :disabled => @project.plan_locked}
+        %i.fa.fa-lock
+          = l(:plan_lock)
+      %a#newGantt.btn.btn-primary.btn-sm{:href => "#{void_js}"}
+        %i.fa.fa-plus
+          = l(:plan_new_gantt)
+
+.h2= l(("label_plan_" << @menuid).to_sym)
+
+.clearfix
+
+.issue-details
+  = render :partial => '/plans/plan_tabs/' << @menuid if @menuid
+
+:javascript
+
+  $(".plans").parent().find(".xx-#{@project.plan_modules.index{|mod| mod.label == @menuid} + 1}").addClass("selected")
+  $(".plans").parent().find("ul.menu-children").css("display", "block");
+
+  $("#newGantt").click(function() {
+    var grid = $("#wbsTreeGrid");
+    var timelines = "";
+    var checkedRows = grid.jqxTreeGrid('getCheckedRows');
+
+    openLayer("#{l(:plan_new_gantt)}", '880px', $("#ajax-modal").html('#{j render :partial => "new_gantt"}'), function() {
+      if(checkedRows.length > 0){
+        if (SMValidator.validate('#formGantt')){
+          var obj = $('#formGantt').serializeObject();
+          if(obj.is_branch){
+            if(obj.group_key == undefined || obj.group_key == ""){
+              layer.alert("请选择拉分支甘特图!");
+              return false;
+            }
+            if(obj.parent_id == undefined || obj.parent_id == ""){
+              layer.alert("请选择拉分支点!");
+              return false;
+            }
+          }
+          // Commit the form when validate pass
+          remote("#{project_timelines_path @project}", "POST", { timelines: obj }, function(res) {
+            if(res.success.toString() == "1"){
+              layer.confirm("甘特图创建成功，是否需要前往查看？", {btn: ['取消', '确定']},
+                function (cancal) {
+                    layer.close(cancal);
+                },
+                function () {
+                    window.location.href = "/projects/#{@project.identifier}/plans?menuid=key_point"
+                }
+              );
+            }
+          })
+        }else{
+          layer.alert("请输入名称!");
+          return false;
+        }
+      }else{
+        layer.alert("请勾选项目计划节点!");
+      }
+    })
+
+    for (var i = 0; i < checkedRows.length; i++) {
+      var planId = checkedRows[i].id;
+      timelines += "<li><div class=\"row\" style=\"width:800px;padding:10px;\"><div class=\"col-xs-2 text-center\">" + checkedRows[i].name + "</div>" +
+          "<div class=\"col-xs-3\"><label class=\"radio-inline\"><input name=\"plans[time_display_" + planId + "]\" type=\"radio\" value=\"1\" checked=\"checked\">计划开始时间</label></div>" +
+          "<div class=\"col-xs-3\"><label class=\"radio-inline\"><input name=\"plans[time_display_" + planId + "]\" type=\"radio\" value=\"2\">计划完成时间</label></div>" +
+          "<div class=\"col-xs-3\"><label class=\"radio-inline\"><input name=\"plans[time_display_" + planId + "]\" type=\"radio\" value=\"3\">时间区间</label></div></div></li>";
+    }
+    $("#ajax-modal").find("ul.filter-pane").empty().append(timelines);
+  })
+
+  $('#lock').on('click', function(){
+    if ($(this).attr('disabled')){
+      layer.msg("项目计划已经锁定过了，请勿重复操作！")
+    } else {
+      openConfirmDiaiog("", function(){
+        remote('/projects/#{@project.identifier}/plans/lock', 'POST', {}, function() { $('#lock').attr('disabled', 'disabled'); })
+      })
+    }
+  })

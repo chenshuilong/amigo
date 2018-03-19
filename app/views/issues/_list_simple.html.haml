@@ -1,0 +1,28 @@
+- if issues && issues.any?
+  = form_tag({}) do
+    %table.list.issues
+      %thead
+        %tr
+          %th #
+          %th= l(:field_project)
+          %th= l(:field_tracker)
+          %th= l(:field_status)
+          %th= l(:field_priority)
+          %th= l(:field_subject)
+
+      %tbody
+        - for issue in issues
+          %tr{:class => "hascontextmenu #{issue.css_classes}", :id => "issue-#{h(issue.id)}"}
+            %td.id
+              = check_box_tag("ids[]", issue.id, false, :style => 'display:none;', :id => nil)
+              = link_to(issue.id, issue_path(issue))
+            %td.project{:style => "text-align: left"}= link_to_project(issue.project)
+            %td.tracker{:style => "text-align: left"}= issue.tracker
+            %td.status{:style => "text-align: left"}= issue.status
+            %td.priority{:style => "text-align: left"}= issue.priority
+            %td.subject
+              = link_to(issue.subject.truncate(60), issue_path(issue))
+              (#{issue.status})
+
+- else
+  %p.nodata= l(:label_no_data)

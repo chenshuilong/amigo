@@ -1,0 +1,8 @@
+- provide :nav, "5,5"
+- provide :css, "bootstrap"
+
+- content_for :bread do
+  %li= link_to l(:label_patch), patches_path
+  %li= l(:label_patch_new)
+
+= render :partial => 'form'

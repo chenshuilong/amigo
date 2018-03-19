@@ -1,0 +1,46 @@
+= labelled_fields_for :task, @task do |f|
+  -#%p
+  -#  = label_tag "task_android_platform", l(:version_name_rule)
+  -#  = select_tag "task[android_platform]", options_for_select(Project::PROJECT_ANDROID_PLATFORM), label: :version_name_rule
+  %p= f.text_field :name, :required => true, label: :field_name
+  %p#description_and_toolbar
+    = f.text_area :description, :rows => 5, :class => 'wiki-edit'
+    = wikitoolbar_for 'task_description'
+  %p
+    = label_tag :weekday, l(:periodic_version_weekday)
+    - 1.upto(7).each do |day|
+      - day = 0 if day == 7
+      = check_box_tag 'task[weekday][]', day, @task.weekday.to_s.include?(day.to_s), :id => nil
+      = l('date.day_names')[day]
+  %p
+    = f.text_field :time, value: @task.time.try(:to_s, :time), :required => true, label: :periodic_version_time
+    = calendar_time_for 'task_time', maxTime: '23:30'
+    %small.form-text.text-muted= l(:version_periodic_notice_disabled_23_30)
+
+  %hr
+
+  #versionForm= render :partial => 'version_form'
+
+
+
+:javascript
+
+  new SMValidator('form', {
+    fields: {
+      'task[name]'           : 'required',
+      'task[time]'           : 'required',
+      'task[weekday][]'      : 'required'
+    },
+    submit: function(valid, form) {
+      if(valid) form.submit();
+    }
+  });
+
+  /*
+  $('#task_android_platform').on('change', function(){
+    var selected = $(this).val();
+    remote('/periodic_versions/get_rules_by_platform', 'POST', {}, function(res) {
+
+    })
+  })
+  */

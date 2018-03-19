@@ -1,0 +1,26 @@
+- provide :nav, "5,6"
+- provide :css, "bootstrap"
+
+- content_for :bread do
+  %li= link_to l(:label_signatures), signatures_path
+  %li= l(:label_signatures_new)
+
+- if @alert.present?
+  .flash.error#flash_error= @alert
+
+.h2= l(:label_signatures_new)
+
+= labelled_form_for :signature, @sign, :html => {:multipart => true} do |f|
+  = error_messages_for @sign
+  .issue-details#update
+    #all_attributes
+      %p= f.select :key_name, list_for_select(@sign, :key_name)
+      %p= f.text_area :notes, value: @sign.notes, :style => "width: 60%; height: 100px"  
+      .box.tabular
+        %p#attachments_form
+          %label.col-sm-2= l(:signature_new_attachment)
+          %p.col-sm-10
+            = render :partial => 'attachment', :locals => {:container => @sign}
+
+  .text-center
+    = submit_tag l(:button_save), class: "btn btn-primary"

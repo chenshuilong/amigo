@@ -1,0 +1,32 @@
+:plain
+  $("#ajax-modal").html('#{j render :partial => "edit_batch", :locals => { :mokuai => @mokuai}}');
+  mokuai_edit_batch_window = layer.open({
+    type: 1,
+    title: '<b>#{l(:label_sync)}</b>',
+    area: ['600px', 'auto'],
+    zIndex: 1001,
+    moveType: 1,
+    shadeClose: false,
+    content: $("#ajax-modal"),
+    btn: ['取消', '确定'],
+    yes: function(index, layero){
+      layer.close(mokuai_edit_batch_window)
+    }
+  });
+
+  $(".layui-layer-btn1").on("click", function(){
+    var form = $("#editBatchMokuaiForm")
+    var data = form.serialize();
+    $.ajax({
+       url: '/mokuais/#{@mokuai.id}/sync_batch',
+       type: "post",
+       data: data,
+       success: function (data) {
+          if(data.success == 1){
+            layer.msg("操作成功!");
+          }else{
+            layer.alert(data.messages);
+          }
+       }
+    });
+  })

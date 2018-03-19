@@ -1,0 +1,35 @@
+.flash.warning
+  邮件相关注意事项：
+  %ul
+    %li 请勿将阿米哥(os-system@gionee.com)设成黑名单
+    %li
+      请及时清理邮箱，邮箱总邮件数上限为
+      %span.text-danger 8万封
+    %li 以上两项皆可能导致你及你的部门同学无法收到阿米哥邮件
+
+%p
+  = label_tag "user_mail_notification", l(:description_user_mail_notification), :class => "hidden-for-sighted"
+  = select_tag(                                                                                                            |
+     'user[mail_notification]',                                                                                            |
+     options_for_select(                                                                                                   |
+        user_mail_notification_options(@user), @user.mail_notification),                                                   |
+     :onchange => 'if (this.value == "selected") {$("#notified-projects").show();} else {$("#notified-projects").hide();}' |
+    )                                                                                                                      |
+= content_tag 'div', :id => 'notified-projects', :style => (@user.mail_notification == 'selected' ? '' : 'display:none;') do
+  = render_project_nested_lists(@user.projects) do |project| |
+      content_tag('label',                                   |
+        check_box_tag(                                       |
+          'user[notified_project_ids][]',                    |
+           project.id,                                       |
+           @user.notified_projects_ids.include?(project.id), |
+           :id => nil                                        |
+        ) + ' ' + h(project.name)                            |
+      )                                                      |
+    end                                                      |
+  = hidden_field_tag 'user[notified_project_ids][]', ''
+  %p
+    %em.info= l(:text_user_mail_option)
+= fields_for :pref, @user.pref do |pref_fields|
+  %p
+    = pref_fields.check_box :no_self_notified
+    %label{:for => "pref_no_self_notified"}= l(:label_user_mail_no_self_notified)

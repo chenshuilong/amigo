@@ -1,0 +1,21 @@
+- if @members_was < 1 && @members.all? {|m| m.valid? }
+  layer.close(new_member_window);
+  $('#tab-content-members').html("#{j render :partial => 'projects/settings/members'}");
+- elsif @members.present? && @members.all? {|m| m.valid? }
+  layer.close(new_member_window);
+  - @members.each do |member|
+    $("#memberTable").prepend("#{j render :partial => 'members/member_list', :locals => {:member => member}}");
+    - if member.principal.class.name == 'Group'
+      - member.children.each do |m|
+        - if m.principal.class.name == "User"
+          :plain
+            member_html = "#{j render :partial => 'members/member_list', :locals => {:member => m}}"
+            if($("#member-#{m.id}").length > 0){
+              $("#member-#{m.id}").replaceWith(member_html);
+            } else {
+              $("#memberTable").prepend(member_html);
+            }
+            $("#member-#{m.id}").effect("highlight");
+- elsif @members.present?
+  - errors = @members.collect {|m| m.errors.full_messages}.flatten.uniq.join(', ')
+  alert('#{raw(escape_javascript(l(:notice_failed_to_save_members, :errors => errors)))}');

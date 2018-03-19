@@ -1,0 +1,19 @@
+:plain
+  $('#ajax-modal').html('#{escape_javascript(render :partial => 'watchers/new', :locals => {:watchables => @watchables, :users => @users})}');
+  watcher_window = layer.open({
+    type: 1,
+    title: '<b>#{l(:permission_add_issue_watchers)}</b>',
+    area: ['600px', '400px'],
+    zIndex: 666,
+    moveType: 1,
+    shadeClose: false,
+    content: $('#ajax-modal'),
+    btn: ['#{l(:button_cancel)}', '#{l(:button_add)}'],
+    yes: function(index, layero){
+      layer.close(watcher_window)
+    },
+    btn2: function(index, layero){
+      $("#new-watcher-form").submit()
+    }
+  })
+  $('#ajax-modal').addClass('new-watcher');

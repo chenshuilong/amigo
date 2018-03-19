@@ -1,0 +1,116 @@
+.form-horizontal
+  = hidden_field_tag 'project_id', project_id
+  .form-group
+    = label_tag nil, l(:repo_category), class: 'control-label col-sm-2'
+    .col-xs-10
+      = select_tag "category", category_options_for_select, { class: 'form-control', style: 'width:100%'}
+  .form-group
+    = label_tag nil, l(:repo_url), class: 'control-label col-sm-2'
+    .col-xs-10
+      = select_tag "repo_id", nil, { class: 'form-control', style: 'width:100%'}
+  .button-group.text-center
+    = button_tag l(:repo_link), {id: 'btn-repo-link', class: "btn btn-primary"}
+  %hr
+  .roadmap-table
+    %table#versionTable.list.table.table-striped.table-bordered{:class => "csacsa"}
+      %thead
+        %tr
+          %th= l(:repo_url)
+          %th= l(:repo_category)
+          %th= l(:field_author)
+          %th= l(:field_operation)
+      %tbody#repos-link
+
+:javascript
+  $(function($) {
+    // initSelect("repo_id");
+    getRepos();
+    getRepoLink();
+
+    $('#category').change(function() {
+      getRepos();
+    });
+
+    $('#btn-repo-link').click(function() {
+      linkRepo();
+    });
+  });
+
+  function getRepos() {
+    $('#repo_id').choose_remote({url: '/repos.json', text: 'url', data: { category: $('#category').val(), project_id: $('#project_id').val() }});
+  }
+
+  function getRepoLink() {
+    $.ajax({
+      url: '/repos/link.json',
+      type: 'get', cache: false,
+      data: {
+        'project_id': $('#project_id').val(),
+      },
+      dataType: 'json'
+    })
+      .done(function(data){
+        var cat = '';
+        $.each(data, function(index, item) {
+          var freeze_text = item.freezed ? "#{l(:repo_unfreeze)}" : "#{l(:repo_freeze)}"
+          cat += '<tr>';
+          cat += '<td>' + item.url +'</td><td>' + item.category_name + '</td><td>' + item.author_name + '</td>'
+                  + '<td><a href="#{void_js}" onclick="unlinkRepo('
+                  + item.project_id + ', ' + item.repo_id + ', ' + item.freezed
+                  + ')">#{l(:repo_unlink)}</a> | <a href="#{void_js}" onclick="onfreeze('
+                  + item.project_id + ', ' + item.repo_id + ', ' + (item.freezed == 1 ? 0 : 1) + ')"> '
+                  + freeze_text + ' </a></td>';
+          cat += '</tr>';
+        });
+        $('#repos-link').html(cat);
+      });
+  }
+
+  function linkRepo() {
+    $.ajax({
+      url: '/repos/link',
+      type: 'post', cache: false,
+      data: {
+        project_id: $('#project_id').val(),
+        repo_id: $('#repo_id').val(),
+      },
+      dataType: 'json',
+      success: function(data) {
+        getRepoLink();
+      }
+    })
+      .fail(function() {
+        layer.alert("关联失败，本条记录可能已经存在！");
+      });
+  }
+
+  function unlinkRepo(project_id, repo_id, freezed) {
+    layer.confirm("关联取消了哦，确定要取消关联吗？", {btn: ['取消', '确定']},
+        function (cancel) {
+            layer.close(cancel);
+        },
+        function () {
+            if(freezed){
+              layer.alert("已经冻结的代码仓无法取消关联！");
+            }else{
+              remote('/repos/unlink','post',{project_id: project_id,repo_id: repo_id},function (res) {
+                  getRepoLink();
+              });
+            }
+        }
+    );
+  }
+
+  function onfreeze(project_id, repo_id, freezed) {
+    var confirm_text = freezed ? "#{l(:repo_freeze)}" : "#{l(:repo_unfreeze)}"
+    layer.confirm("确定要" + confirm_text + "吗？", {btn: ['取消', '确定']},
+        function (cancel) {
+            layer.close(cancel);
+        },
+        function () {
+            remote('/repos/freeze','post',{project_id: project_id,repo_id: repo_id,freezed: freezed},function (res) {
+                getRepoLink();
+            });
+        }
+    );
+  }

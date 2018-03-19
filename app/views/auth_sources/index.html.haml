@@ -1,0 +1,22 @@
+.contextual
+  = link_to l(:label_auth_source_new), {:action => 'new'}, :class => 'icon icon-add'
+= title l(:label_auth_source_plural)
+%table.list
+  %thead
+    %tr
+      %th= l(:field_name)
+      %th= l(:field_type)
+      %th= l(:field_host)
+      %th= l(:label_user_plural)
+      %th
+  %tbody
+    - for source in @auth_sources
+      %tr{:class => "#{cycle("odd", "even")}", :id => "auth-source-#{source.id}"}
+        %td.name= link_to(source.name, :action => 'edit', :id => source)
+        %td= source.auth_method_name
+        %td= source.host
+        %td= source.users.count
+        %td.buttons
+          = link_to l(:button_test), try_connection_auth_source_path(source), :class => 'icon icon-test'
+          = delete_link auth_source_path(source)
+%span.pagination= pagination_links_full @auth_source_pages

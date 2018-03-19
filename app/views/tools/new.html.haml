@@ -1,0 +1,40 @@
+- provide :css, "bootstrap"
+
+.clearfix{style: "margin-top:25px"}
+  = labelled_form_for @tool, html: {id: 'newToolForm', class: 'tool-form'} do |f|
+    = error_messages_for 'tool'
+    = render :partial => 'form', :locals => { :f => f }
+    .button-group.text-center
+      %a.btn.btn-primary.btn-sm{class: "btn btn-primary btn-sm", id:"createTool", remote: true}= l(:button_create)
+
+:javascript
+  $("#createTool").on("click", function(){
+    window.onbeforeunload = null;
+    if($('.progress').length != 0){layer.alert("文件正在上传中，请等待文件上传完成后再提交！"); return false;}
+    var data = $("form#newToolForm").serialize();
+    $.ajax({
+      url: '/tools.json?key=#{User.current.api_key}&&category=#{@tool.category}',
+      type: "post",
+      data: data,
+      dataType: "json"
+    }).done( function(result){
+      success = result.success;
+      messages = result.message;
+      if(success == 1){
+        var url = "/tools";
+        window.parent.location.href = url;
+      }else if(success == 0){
+        var html = '';
+        html = html + "<div id='errorExplanation'><ul>";
+              
+        $.each(messages, function(i, value) {
+          html = html + "<li>" + value + "</li>";
+        });    
+
+        html = html + "</ul></div>";    
+
+        $("#errorExplanation").remove();
+        $("form#newToolForm").prepend(html);
+      }
+    });   
+  })

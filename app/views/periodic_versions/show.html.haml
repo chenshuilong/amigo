@@ -1,0 +1,62 @@
+- provide :nav, "5,3"
+- provide :css, "bootstrap"
+- content_for :bread do
+  %li= link_to l(:periodic_versions), periodic_versions_path
+  %li= @task.name
+
+.row
+  .col-sm-6
+    .h2= @task.name
+  .col-sm-6.text-right
+    .top-action-menu
+      - if !@task.closed? && @task.class.permit?
+        = link_to l(:label_edit), edit_periodic_version_path(@task)
+        = link_to l(:button_close), void_js, :onclick => "layer.confirm('确定关闭吗？', function(){$.post('#{close_periodic_version_path(@task)}')})"
+
+
+- if @task.closed?
+  %p.flash.warning.text-center= l(:periodic_version_closed_info, :user => link_to_user(@task.closed_by), :time => format_time(@task.closed_on)).html_safe
+
+- if @task.exceptional?
+  %p.flash.warning.text-center= @task.warning
+
+.issue-details
+  .description
+    .label= l(:field_description)
+    - if @task.description?
+      .wiki= textilizable @task, :description
+    - else
+      .wiki= l(:label_no_description)
+
+  %hr
+  .attributes
+    = fields_rows do |rows|
+      - rows.left l(:periodic_version_weekday), running_days_every_week(@task)
+      - rows.left l(:periodic_version_time), @task.time.to_s(:time)
+      - rows.left l(:field_status), load_value(@task, :status)
+      - rows.left l(:periodic_version_running_count), @task.running_count
+
+      - rows.right l(:field_author), link_to_user(@task.author)
+      - rows.right l(:field_created_on), format_time(@task.created_at)
+      - rows.right l(:periodic_version_last_running_on), @task.last_running_on
+
+  %hr
+  .attributes
+    = fields_rows do |rows|
+      - rows.left l(:periodic_version_rules), @version.rule.name
+      - rows.left l(:field_project), link_to_project(@version.project), :class => 'project'
+      - rows.left l(:version_priority), load_value(@version, :priority)
+      - rows.left l(:version_spec_id), link_to(@version.spec.try(:name), project_specs_path(@version.project, :id => @version.spec_id))
+      - rows.left l(:version_continue_integration), load_value(@version, :continue_integration)
+
+      - rows.line l(:version_repo_one_of_project), link_to_url(@version.repo_one)
+      - rows.line l(:version_repo_two_of_project), link_to_url(@version.repo_two)
+
+      - rows.right l(:version_compile_type), load_value(@version, :compile_type)
+      - rows.right l(:version_signature), load_value(@version, :signature)
+      - rows.right l(:version_ota_whole_compile), load_value(@version, :ota_whole_compile)
+      - rows.right l(:version_ota_increase_compile), load_value(@version, :ota_increase_compile)
+      - rows.right 'Coverity', load_value(@version, :coverity)
+
+
+- html_title(@task.name)

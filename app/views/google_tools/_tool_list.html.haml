@@ -1,0 +1,39 @@
+#roadmap
+  .roadmap-table
+    - if tools.present?
+      %table#googleToolTable.list.table.table-striped.table-bordered
+        %thead
+          %tr
+            %th{width: "140"} #
+            - unless category == 'gts'
+              %th{width: "140"}= l(:google_tool_android_version)
+            %th{width: "140"}= l("google_tool_category_#{category}") + l(:field_version)
+            %th{width: "140"}= l(:google_tool_tool_url)
+            %th{width: "140"}= l(:field_created_on)
+            %th{width: "140"}= l(:google_tool_closed_at)
+            %th= l(:label_remark)
+            - if params[:action] == 'category'
+              %th{width: "100"}= l(:field_operation)
+        %tbody
+          - tools.each_with_index do |t, index|
+            %tr
+              %td= index+1
+              - unless category == 'gts'
+                %td= t.android_version
+              %td= t.tool_version
+              %td= render_tool_url(t)
+              %td= format_time t.created_at
+              %td= format_date t.closed_at
+              %td
+                = popover(:trigger => "click", :content => t.notes.to_s,:title => "详细信息") do
+                  = t.notes.to_s[0,50]
+              - if params[:action] == 'category'
+                %td
+                  %a{:href => operate_google_tools_path(id: t.id, operate_type: 'edit', category: t.category), "data-remote" => true}
+                    %i.spec-edit.fa.fa-edit
+                  = "|"
+                  %a{:href => void_js, class: "deleteGoogleTool", "data-id" => t.id, "data-content1" => l(:google_tool_android_version), "data-content2" => t.android_version, "data-content3": t.tool_version_text + l(:field_version), "data-content4": t.tool_version, "data-content5": t.category, remote: true}
+                    %i.spec-delete.fa.fa-close
+
+      - if params[:action] == "category"
+        %span.pagination= pagination_links_full @pages, @count

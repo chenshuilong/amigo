@@ -1,0 +1,70 @@
+= form_tag("/projects/#{@project_id}/plans/new_progress",method: "post",remote:true,:class => "form-horizontal") do
+  .form-group
+    = label_tag :plans_name,'名称', class: 'control-label col-sm-2'
+    .col-xs-10
+      = text_field_tag "plans[name]", spec.name, class: 'form-control'
+  .form-group
+    = label_tag :plans_progress, "节点", class: "control-label col-sm-2"
+    .col-xs-10
+      #progreeTreeGrid
+
+:javascript
+  $(document).ready(function () {
+            var plans = #{raw_json @plans};
+            var grid = $("#progreeTreeGrid");
+            // prepare the data
+            var source =
+            {
+                dataType: "json",
+                dataFields: [
+                    { name: "id", type: "number" },
+                    { name: "name", type: "string" },
+                    { name: "parent_id", type: "number" },
+                    { name: "plan_start_date", type: "date" },
+                    { name: "plan_due_date", type: "date" },
+                    { name: "assigned_to_id", type: "number" },
+                    { name: "check_user_id", type: "number" },
+                    { name: "author_id", type: "number" }
+                ],
+                hierarchy:
+                {
+                    keyDataField: { name: 'id' },
+                    parentDataField: { name: 'parent_id' }
+                },
+                id: 'id',
+                localData: plans
+            };
+            var dataAdapter = new $.jqx.dataAdapter(source, {
+                loadComplete: function () {
+                    // data is loaded.
+                }
+            });
+            grid.jqxTreeGrid(
+            {
+                width: '100%',
+                height: 400,
+                source: dataAdapter,
+                pageable: true,
+                pageSize: 1000,
+                altRows: true,
+                ready: function()
+                {
+                    // called when the DatatreeGrid is loaded.
+                    grid.jqxTreeGrid('expandAll');
+                },
+                pagerButtonsCount: 8,
+                toolbarHeight: 35,
+                columns: [
+                  { text: '#{l(:plan_name)}', dataField: "name", align: 'center', cellsAlign: 'center',width: '20%' },
+                  { text: '#{l(:plan_start_date)}', dataField: "plan_start_date", align: 'center', cellsAlign: 'center', width: '15%', cellsFormat: "yyyy-MM-dd" },
+                  { text: '#{l(:plan_due_date)}', dataField: "plan_due_date", align: 'center', cellsAlign: 'center', width: '15%', cellsFormat: "yyyy-MM-dd" },
+                  { text: '#{l(:plan_assigned_to_id)}', dataField: "assigned_to_id", align: 'center', cellsAlign: 'center', width: '10%' },
+                  { text: '#{l(:plan_check_user_id)}', dataField: "check_user_id", align: 'center', cellsAlign: 'center', width: '10%' },
+                  {
+                      text: '#{l(:plan_author_id)}', cellsAlign: 'center', align: "center", columnType: 'none', editable: false, sortable: false, dataField: null , width: '15%', cellsRenderer: function (row, column, value) {
+                          return "<a class='user active ajax-loading' href='/users/252'>李莹莹(BASEROM产品)</a>";
+                      }
+                  }
+                ]
+            });
+        });

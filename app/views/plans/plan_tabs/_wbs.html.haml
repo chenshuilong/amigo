@@ -1,0 +1,793 @@
+.tab{:role => "tabpanel"}
+  / Nav tabs
+  %ul.nav.nav-tabs{:role => "tablist", :style => "margin-top:20px;"}
+    %li.active{:role => "presentation"}
+      %a{"aria-controls" => "product", "data-toggle" => "tab", :href => "#section_table", :role => "tab"} 表格视图
+    %li{:role => "presentation"}
+      %a{"aria-controls" => "module", "data-toggle" => "tab", :href => "#section_scheduler", :role => "tab"} 日期视图
+
+  / Tab panes
+  .tab-content
+    #section_table.tab-pane.fade.in.active{:role => "tabpanel"}
+      #jqxLoader
+      .row
+        #wbsTreeGrid
+      #contentMenu{:style => "display:none;"}
+        %ul
+          %li
+            = image_tag "/amg/jqwidgets/styles/images/icon-down-blue.png", {:style => "float: left; margin-right: 5px;"}
+            %span 展开(选中行)
+          %li
+            = image_tag "/amg/jqwidgets/styles/images/icon-up-blue.png", {:style => "float: left; margin-right: 5px;"}
+            %span 折叠(选中行)
+          %li ※ 全部展开
+          %li ∷ 全部折叠
+          - if User.current.allowed_to?(:edit_plans, @project)
+            %li
+              = image_tag "/amg/jqwidgets/styles/images/icon-edit.png", {:style => "float: left; margin-right: 5px;"}
+              %span 编辑(选中行)
+            %li
+              = image_tag "/amg/jqwidgets/styles/images/icon-delete.png", {:style => "float: left; margin-right: 5px;"}
+              %span 删除(选中行)
+          %li
+            = image_tag "/amg/jqwidgets/styles/images/icon-cancel.png", {:style => "float: left; margin-right: 5px;"}
+            %span 取消(选中行)
+    #section_scheduler.tab-pane.fade{:role => "tabpanel"}
+      #scheduler
+
+.insert-info{:style => "display:none;width:400px;padding:20px;"}
+  = form_tag("#{quick_sort_project_plans_path}",:id => "quickSortForm", :multipart => true, :remote => true, :class => "form-horizontal") do
+    .form-group
+      = label_tag :insert_up, "", class: 'control-label col-sm-2'
+      .col-xs-8
+        %label.radio-inline
+          %input#insert_up{:name => "plans[insert_type]", :type => "radio", :value => "1", :checked => "checked"} 插入选中行的上面
+    .form-group
+      = label_tag :insert_down, "", class: 'control-label col-sm-2'
+      .col-xs-8
+        %label.radio-inline
+          %input#insert_down{:name => "plans[insert_type]", :type => "radio", :value => "2"} 插入选中行的下面
+        = hidden_field_tag "plans[insert_id]"
+
+:javascript
+  $(document).ready(function () {
+
+    var plansEditable = #{allow_to_edit_plan?};
+    var loader = $("#jqxLoader").jqxLoader({ width: 100, height: 60, imagePosition: 'top' });
+
+    var plans = #{raw_json @plans};
+    var status = #{raw_json @status};
+    var newRowID = null;
+    var grid = $("#wbsTreeGrid");
+    var scheduler = $("#scheduler");
+    var contextMenu = $("#contentMenu");
+
+    var sourceUser =
+    {
+        datatype: "json",
+        datafields: [
+            { name: 'id' },
+            { name: 'name' }
+        ],
+        url: "/users/assigned",
+        data: {
+            project_id: "#{@project.id}",
+            maxRows: 20,
+            username: "assigned_to_id",
+            rolename: "SPM"
+        }
+    };
+
+    // prepare the data
+    var source =
+    {
+        dataType: "json",
+        dataFields: [
+            { name: "id", type: "number" },
+            { name: "name", type: "string" },
+            { name: "parent_id", type: "number" },
+            { name: "plan_start_date", type: "date" },
+            { name: "plan_due_date", type: "date" },
+            { name: "task_start_date", type: "date" },
+            { name: "task_due_date", type: "date" },
+            { name: "assigned_to_id", type: "number" },
+            { name: "check_user_id", type: "number" },
+            { name: "author_id", type: "number" },
+            { name: "checker", type: "string" },
+            { name: "assigned", type: "string" },
+            { name: "author", type: "string" },
+            { name: "status_id", type: "number" },
+            { name: "status_name", type: "string" },
+            { name: "position", type: "number" }
+        ],
+        hierarchy:
+        {
+            keyDataField: { name: 'id' },
+            parentDataField: { name: 'parent_id' }
+        },
+        id: 'id',
+        localData: plans,
+         addRow: function (rowID, rowData, position, parentID, commit) {
+             commit(true);
+             newRowID = rowID;
+         },
+         updateRow: function (rowID, rowData, commit) {
+             commit(true);
+         },
+         deleteRow: function (rowID, commit) {
+             commit(true);
+         }
+    };
+    var dataAdapter = new $.jqx.dataAdapter(source, {
+        downloadComplete: function (data, status, xhr) { },
+        loadError: function (xhr, status, error) { },
+        loadComplete: function () {
+            // data is loaded.
+            $('#jqxLoader').jqxLoader('close');
+        }
+    });
+
+    contextMenu.jqxMenu({ width: 200, autoOpenPopup: true, mode: 'popup' });
+    grid.on('contextmenu', function () { return false; });
+
+    var cellClass = function (row, dataField, cellText, rowData) {
+        var cellValue = rowData[dataField];
+        if (new Date() > rowData.plan_due_date){
+          if (rowData.status_name == null || $.trim(rowData.status_name.toString()) == ""){
+            return "delay";
+          } else if (rowData.status_name.toString() != "关闭"){
+            return "delay";
+          }
+        }
+        return "normal";
+    }
+    grid.jqxTreeGrid(
+    {
+        width: '100%',
+        height: 680,
+        source: dataAdapter,
+        pageable: false,
+        editable: plansEditable,
+        sortable: true,
+        showToolbar: true,
+        altRows: false,
+        columnsResize: true,
+        filterable: true,
+        // theme: 'orange',
+        filterMode: "advanced",
+        localization: getLocalization(),
+        hierarchicalCheckboxes: true,
+        checkboxes: true,
+        editSettings: { saveOnPageChange: false, saveOnBlur: true,
+          saveOnSelectionChange: true, cancelOnEsc: true, saveOnEnter: false,
+          editSingleCell: false, editOnDoubleClick: true, editOnF2: true },
+        ready: function()
+        {
+            // called when the DatatreeGrid is loaded.
+
+            $.each(grid.jqxTreeGrid('getRows'), function(idx, row) {
+              grid.jqxTreeGrid('expandRow', row.uid);
+            })
+        },
+        pagerButtonsCount: 8,
+        toolbarHeight: 35,
+        renderToolbar: function(toolBar)
+        {
+          if (plansEditable){
+            var theme = document.body ? $.data(document.body, 'theme') : null
+            if (theme == null) {
+                theme = '';
+            }
+            var toTheme = function (className) {
+                if (theme == "") return className;
+                return className + " " + className + "-" + theme;
+            }
+            // appends buttons to the status bar.
+            var container = $("<div style='overflow: hidden; position: relative; height: 100%; width: 100%;'></div>");
+            var buttonTemplate = "<div style='float: left; padding: 3px; margin: 2px;'><div style='margin: 4px; width: 16px; height: 16px;'></div></div>";
+            var addButton = $(buttonTemplate);
+            var editButton = $(buttonTemplate);
+            var deleteButton = $(buttonTemplate);
+            var cancelButton = $(buttonTemplate);
+            var updateButton = $(buttonTemplate);
+            container.append(addButton);
+            container.append(editButton);
+            container.append(deleteButton);
+            container.append(cancelButton);
+            container.append(updateButton);
+            toolBar.append(container);
+            addButton.jqxButton({cursor: "pointer", enableDefault: false, disabled: true, height: 25, width: 25 });
+            addButton.find('div:first').addClass(toTheme('jqx-icon-plus'));
+            addButton.jqxTooltip({ position: 'bottom', content: "新增"});
+            editButton.jqxButton({ cursor: "pointer", disabled: true, enableDefault: false,  height: 25, width: 25 });
+            editButton.find('div:first').addClass(toTheme('jqx-icon-edit'));
+            editButton.jqxTooltip({ position: 'bottom', content: "编辑"});
+            deleteButton.jqxButton({ cursor: "pointer", disabled: true, enableDefault: false,  height: 25, width: 25 });
+            deleteButton.find('div:first').addClass(toTheme('jqx-icon-delete'));
+            deleteButton.jqxTooltip({ position: 'bottom', content: "删除"});
+            updateButton.jqxButton({ cursor: "pointer", disabled: true, enableDefault: false,  height: 25, width: 25 });
+            updateButton.find('div:first').addClass(toTheme('jqx-icon-save'));
+            updateButton.jqxTooltip({ position: 'bottom', content: "保存"});
+            cancelButton.jqxButton({ cursor: "pointer", disabled: true, enableDefault: false,  height: 25, width: 25 });
+            cancelButton.find('div:first').addClass(toTheme('jqx-icon-cancel'));
+            cancelButton.jqxTooltip({ position: 'bottom', content: "取消"});
+            var updateButtons = function (action) {
+                switch (action) {
+                    case "Select":
+                        addButton.jqxButton({ disabled: false });
+                        // deleteButton.jqxButton({ disabled: false });
+                        editButton.jqxButton({ disabled: false });
+                        cancelButton.jqxButton({ disabled: true });
+                        updateButton.jqxButton({ disabled: true });
+                        break;
+                    case "Unselect":
+                        addButton.jqxButton({ disabled: true });
+                        // deleteButton.jqxButton({ disabled: true });
+                        editButton.jqxButton({ disabled: true });
+                        cancelButton.jqxButton({ disabled: true });
+                        updateButton.jqxButton({ disabled: true });
+                        break;
+                    case "Edit":
+                        addButton.jqxButton({ disabled: true });
+                        // deleteButton.jqxButton({ disabled: true });
+                        editButton.jqxButton({ disabled: true });
+                        cancelButton.jqxButton({ disabled: false });
+                        updateButton.jqxButton({ disabled: false });
+                        break;
+                    case "End Edit":
+                        addButton.jqxButton({ disabled: false });
+                        // deleteButton.jqxButton({ disabled: false });
+                        editButton.jqxButton({ disabled: false });
+                        cancelButton.jqxButton({ disabled: true });
+                        updateButton.jqxButton({ disabled: true });
+                        break;
+                }
+            }
+            var rowKey = null;
+            grid.on('rowSelect', function (event) {
+                var args = event.args;
+                rowKey = args.key;
+                updateButtons('Select');
+            });
+            grid.on('rowCheck', function (event) {
+                deleteButton.jqxButton({ disabled: false });
+            });
+            grid.on('rowUnselect', function (event) {
+                updateButtons('Unselect');
+            });
+            grid.on('rowEndEdit', function (event) {
+                updateButtons('End Edit');
+                var row = event.args.row;
+
+                // Generate alter records if lock the projects' plan
+                if ("#{@locked}" == "true") {
+                  // layer.msg("计划开始时间不能大于计划完成时间!");
+
+                  layer.confirm("是否进行变更流程处理", {btn: ['取消', '确定']},
+                      function (cancal) {
+                          endRowEdit(row, event.args.rowKey, false);
+                          layer.close(cancal);
+                      },
+                      function() {
+                          endRowEdit(row, event.args.rowKey, true);
+                      }
+                  );
+                } else {
+                  endRowEdit(row, event.args.rowKey, false);
+                }
+            });
+            grid.on('rowBeginEdit', function (event) {
+                updateButtons('Edit');
+            });
+            addButton.click(function (event) {
+                if (grid.jqxTreeGrid('getSelection').length == 0) {
+                    // add new empty row.
+                    grid.jqxTreeGrid('addRow', null, {}, 'last');
+                    // select the first row and clear the selection.
+                    grid.jqxTreeGrid('clearSelection');
+                    grid.jqxTreeGrid('selectRow', newRowID);
+                    // edit the new row.
+                    grid.jqxTreeGrid('beginRowEdit', newRowID);
+                    updateButtons('add');
+                } else {
+                    if (!addButton.jqxButton('disabled')) {
+                        grid.jqxTreeGrid('expandRow', rowKey);
+                        // add new empty row.
+                        grid.jqxTreeGrid('addRow', null, {}, 'last', rowKey);
+                        // select the first row and clear the selection.
+                        grid.jqxTreeGrid('clearSelection');
+                        grid.jqxTreeGrid('selectRow', newRowID);
+                        // edit the new row.
+                        grid.jqxTreeGrid('beginRowEdit', newRowID);
+                        updateButtons('add');
+                    }
+                }
+            });
+            cancelButton.click(function (event) {
+                if (!cancelButton.jqxButton('disabled')) {
+                    // cancel changes.
+                    grid.jqxTreeGrid('endRowEdit', rowKey, true);
+                }
+            });
+            updateButton.click(function (event) {
+                if (!updateButton.jqxButton('disabled')) {
+                    // save changes.
+                    grid.jqxTreeGrid('endRowEdit', rowKey, false);
+                }
+            });
+            editButton.click(function () {
+                if (!editButton.jqxButton('disabled')) {
+                    grid.jqxTreeGrid('beginRowEdit', rowKey);
+                    updateButtons('edit');
+                }
+            });
+            deleteButton.click(function () {
+                if (!deleteButton.jqxButton('disabled')) {
+                    var rows = grid.jqxTreeGrid('getCheckedRows');
+                    if (rows.length >= 1) {
+                      layer.confirm("确定要删除吗？", {btn: ['取消', '确定']},
+                          function (cancal) {
+                              layer.close(cancal);
+                          },
+                          function () {
+                              for (var i = 0; i < rows.length; i++) {
+                                if (rows[i].id){
+                                   remote("/projects/#{@project_id}/plans/" + rows[i].id.toString(), "DELETE", {}, function(res) {
+                                      layer.msg(res.message.toString());
+                                   })
+                                }
+                                grid.jqxTreeGrid('deleteRow', [grid.jqxTreeGrid('getKey', rows[i])]);
+                              }
+                          }
+                      );
+                    } else {
+                        layer.msg("请勾选要删除的项!")
+                    }
+                    updateButtons('delete');
+                }
+            });
+          }
+
+          grid.on('rowSelect', function ( event) {contextMenu.jqxMenu('close'); });
+        },
+        // called when jqxTreeGrid is going to be rendered.
+        rendering: function()
+        {
+            // destroys all buttons.
+            if ($(".editButtons").length > 0) {
+                $(".editButtons").jqxButton('destroy');
+            }
+            if ($(".cancelButtons").length > 0) {
+                $(".cancelButtons").jqxButton('destroy');
+            }
+        },
+        // called when jqxTreeGrid is rendered.
+        rendered: function () {
+            if ($(".editButtons").length > 0 && plansEditable) {
+                $(".cancelButtons").jqxButton();
+                $(".editButtons").jqxButton();
+                $(".sendButtons").jqxButton();
+
+                var editClick = function (event) {
+                    var target = $(event.target);
+                    // get button's value.
+                    var value = target.val();
+                    // get clicked row.
+                    var rowKey = event.target.getAttribute('data-row');
+                    if (value == "编辑") {
+                        // begin edit.
+                        grid.jqxTreeGrid('beginRowEdit', rowKey);
+                        target.parent().find('.cancelButtons').show();
+                        target.parent().find('.sendButtons').hide();
+                        target.val("保存");
+                    } else {
+                        // end edit and save changes.
+                        target.parent().find('.cancelButtons').hide();
+                        target.parent().find('.sendButtons').show();
+                        target.val("编辑");
+                        grid.jqxTreeGrid('endRowEdit', rowKey);
+                    }
+                }
+                $(".editButtons").on('click', function (event) {
+                    editClick(event);
+                });
+
+                $(".cancelButtons").click(function (event) {
+                    // end edit and cancel changes.
+                    var rowKey = event.target.getAttribute('data-row');
+                    grid.jqxTreeGrid('endRowEdit', rowKey, true);
+                });
+
+                $('.sendButtons').on('click', function (event) {
+                    var rowKey = event.target.getAttribute('data-row');
+                    var row = grid.jqxTreeGrid('getRow', rowKey);
+
+                    layer.confirm("确定要发送吗？", {btn: ['取消', '确定']},
+                          function (cancal) {
+                              layer.close(cancal);
+                          },
+                          function () {
+                              var sendRows = grid.jqxTreeGrid('getCheckedRows');
+                              if (sendRows.length > 0){
+                                for (var i = 0; i < sendRows.length; i++) {
+                                  var row = sendRows[i];
+                                  remote("/projects/#{@project_id}/plans/" + row.id.toString() + "/send_task", "POST", {}, function(res) {
+                                      // lock the row when sended
+                                      // 已经发送不让再编辑
+                                      layer.msg(res.message.toString());
+                                      if (res.success.toString() == "1")
+                                        grid.jqxTreeGrid('lockRow', row.id);
+                                  })
+                                }
+                                layer.msg("批量发送任务成功！");
+                              } else {
+                                if (row.id){
+                                   remote("/projects/#{@project_id}/plans/" + row.id.toString() + "/send_task", "POST", {}, function(res) {
+                                      // lock the row when sended
+                                      // 已经发送不让再编辑
+                                      layer.msg(res.message.toString());
+                                      if (res.success.toString() == "1")
+                                        grid.jqxTreeGrid('lockRow', rowKey);
+                                   })
+                                } else {
+                                     layer.msg("无任何任务可以发送！")
+                                }
+                              }
+                          }
+                    );
+                });
+            }
+        },
+        columns: [
+          {
+            text: '#{l(:plan_name)}', dataField: "name", cellClassName: cellClass, align: 'center', cellsAlign: 'left',width: '10%', editable: plansEditable, columntype: 'textbox',
+            validation: function (cell, value) {
+              if (value.toString() == "") {
+                return { message: "#{l(:plan_name)}不能为空!", result: false };
+              }
+              return true;
+            }
+          },
+          {
+            text: '#{l(:plan_start_date)}', dataField: "plan_start_date", cellClassName: cellClass, align: 'center', cellsAlign: 'center', width: '15%', cellsFormat: "yyyy-MM-dd", editable: plansEditable, columnType: "template",
+              createEditor: function (row, cellvalue, editor, cellText, width, height) {
+                  // construct the editor.
+                  // editor.defaultDateTimeInput({min: new Date(#{Time.now.year - 1}, 0, 1), max: new Date(#{Time.now.year + 5}, 0, 1)});
+                  editor.jqxMaskedInput({ width: '100%', height: '100%', mask: '[0-2][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]', promptChar: "-"});
+              },
+              initEditor: function (row, cellvalue, editor, celltext, width, height) {
+                  // set the editor's current value. The callback is called each time the editor is displayed.
+                  // editor.jqxDateTimeInput('setDate', new Date(cellvalue));
+                  editor.jqxMaskedInput('val', celltext);
+              },
+              getEditorValue: function (row, cellvalue, editor) {
+                  // return the editor's value.
+                  return editor.val();
+              }
+          },
+          {
+            text: '#{l(:plan_due_date)}', dataField: "plan_due_date", cellClassName: cellClass, align: 'center', cellsAlign: 'center', width: '15%', cellsFormat: "yyyy-MM-dd", editable: plansEditable, columnType: "template",
+              createEditor: function (row, cellvalue, editor, cellText, width, height) {
+                  // construct the editor.
+                  // editor.defaultDateTimeInput({min: new Date(#{Time.now.year - 1}, 0, 1), max: new Date(#{Time.now.year + 5}, 0, 1)});
+                  editor.jqxMaskedInput({ width: '100%', height: '100%', mask: '[0-2][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]', promptChar: "-"});
+              },
+              initEditor: function (row, cellvalue, editor, celltext, width, height) {
+                  // set the editor's current value. The callback is called each time the editor is displayed.
+                  // editor.jqxDateTimeInput('setDate', new Date(cellvalue));
+                  editor.jqxMaskedInput('val', celltext);
+              },
+              getEditorValue: function (row, cellvalue, editor) {
+                  // return the editor's value.
+                  return editor.val();
+              }
+          },
+          { text: '#{l(:task_start_date)}', dataField: "task_start_date", cellClassName: cellClass, align: 'center', cellsAlign: 'center', editable: false, width: '15%', cellsFormat: "yyyy-MM-dd" },
+          { text: '#{l(:task_due_date)}', dataField: "task_due_date", cellClassName: cellClass, align: 'center', cellsAlign: 'center', editable: false, width: '15%', cellsFormat: "yyyy-MM-dd" },
+          {
+            text: '#{l(:plan_assigned_to_id)}', dataField: "assigned", cellClassName: cellClass, align: 'center', cellsAlign: 'center', width: '5%', editable: plansEditable, columnType: "template",
+              createEditor: function (row, cellvalue, editor, cellText, width, height) {
+                  // construct the editor.
+                  var dataAdapterUser = new $.jqx.dataAdapter(sourceUser,
+                    {
+                      formatData: function (data) {
+                          if (editor.jqxComboBox('searchString') != undefined) {
+                              data.name = editor.jqxComboBox('searchString');
+                              return data;
+                          }
+                      }
+                    }
+                  );
+                  editor.jqxComboBox(
+                  {
+                      width: 150,
+                      height: 25,
+                      source: dataAdapterUser,
+                      remoteAutoComplete: true,
+                      autoDropDownHeight: true,
+                      autoOpen: true,
+                      selectedIndex: 0,
+                      searchMode: 'contains',
+                      displayMember: "name",
+                      valueMember: "name",
+                      renderer: function (index, label, value) {
+                          var item = dataAdapterUser.records[index];
+                          if (item != null) {
+                              var label = item.name;
+                              return label;
+                          }
+                          return "";
+                      },
+                      renderSelectedItem: function(index, item)
+                      {
+                          var item = dataAdapterUser.records[index];
+                          if (item != null) {
+                              var label = item.name;
+                              return label;
+                          }
+                          return "";
+                      },
+                      search: function (searchString) {
+                          dataAdapterUser.dataBind();
+                      }
+                  });
+              },
+              initEditor: function (row, cellvalue, editor, celltext, width, height) {
+                  // set the editor's current value. The callback is called each time the editor is displayed.
+                  editor.jqxComboBox('val', grid.jqxTreeGrid('getRow',row).assigned);
+              },
+              getEditorValue: function (row, cellvalue, editor) {
+                  // return the editor's value.
+                  return editor.val();
+              }
+          },
+          {
+            text: '#{l(:plan_check_user_id)}', dataField: "checker", cellClassName: cellClass, align: 'center', cellsAlign: 'center', width: '5%', columnType: "template", editable: plansEditable,
+              createEditor: function (row, cellvalue, editor, cellText, width, height) {
+                  var dataAdapterChecker = new $.jqx.dataAdapter(sourceUser,
+                      {
+                          formatData: function (data) {
+                              if (editor.jqxComboBox('searchString') != undefined) {
+                                  data.name = editor.jqxComboBox('searchString');
+                                  return data;
+                              }
+                          }
+                      }
+                  );
+                  editor.jqxComboBox(
+                  {
+                      width: 150,
+                      height: 25,
+                      source: dataAdapterChecker,
+                      remoteAutoComplete: true,
+                      autoDropDownHeight: true,
+                      autoOpen: true,
+                      selectedIndex: 0,
+                      searchMode: 'contains',
+                      displayMember: "name",
+                      valueMember: "name",
+                      renderer: function (index, label, value) {
+                          var item = dataAdapterChecker.records[index];
+                          if (item != null) {
+                              var label = item.name;
+                              return label;
+                          }
+                          return "";
+                      },
+                      renderSelectedItem: function(index, item)
+                      {
+                          var item = dataAdapterChecker.records[index];
+                          if (item != null) {
+                              var label = item.name;
+                              return label;
+                          }
+                          return "";
+                      },
+                      search: function (searchString) {
+                          dataAdapterChecker.dataBind();
+                      }
+                  });
+              },
+              initEditor: function (row, cellvalue, editor, celltext, width, height) {
+                  // set the editor's current value. The callback is called each time the editor is displayed.
+                  editor.jqxComboBox('val', grid.jqxTreeGrid('getRow',row).checker);
+              },
+              getEditorValue: function (row, cellvalue, editor) {
+                  // return the editor's value.
+                  return editor.val();
+              }
+          },
+          {
+            text: '#{l(:my_task_status_name)}', dataField: "status_name", cellClassName: cellClass, align: 'center', editable: false,  cellsAlign: 'center', width: '5%'
+          },
+          {
+            text: '#{l(:plan_position)}', dataField: "position", cellClassName: cellClass, align: 'center', cellsAlign: 'left',width: '5%', editable: plansEditable, columntype: 'textbox',
+            validation: function (cell, value) {
+              if (value.toString() == "") {
+                return { message: "#{l(:plan_position)}不能为空!", result: false };
+              }
+              return true;
+            }
+          },
+          {
+              text: '#{l(:option_all)}', cellsAlign: 'center', align: "center", columnType: 'none', editable: false, sortable: false, dataField: null , width: '10%', cellsRenderer: function (row, column, value) {
+                  if (plansEditable)
+                    return "<button data-row='" + row + "' class='sendButtons' disabled='true'>#{l(:plan_send)}</button><button data-row='" + row + "' class='editButtons'>编辑</button><button style='display: none; margin-left: 5px;' data-row='" + row + "' class='cancelButtons'>取消</button>";
+                  else
+                    return "";
+              }
+          }
+        ]
+    });
+
+    function endRowEdit(row, key, recordable) {
+      var rowData = new Object();
+      if (row.plan_due_date && row.plan_start_date && row.plan_start_date > row.plan_due_date) {
+        return false;
+      } else {
+        rowData.project_id = "#{@project.id}";
+        rowData.author_id = "#{User.current.id}";
+        if (row.parent_id)
+          rowData.parent_id = row.parent_id
+        else
+          rowData.parent = row.parent ? row.parent.name : null
+        rowData.name = row.name;
+        rowData.plan_start_date = row.plan_start_date;
+        rowData.plan_due_date = row.plan_due_date;
+        rowData.assigned_to_id = row.assigned;
+        rowData.check_user_id = row.checker;
+        rowData.status = row.status_id;
+        rowData.recordable = recordable;
+        rowData.position = row.position;
+        var plan_id = row.id ? row.id : 0;
+        remote("/projects/#{@project_id}/plans/" + plan_id.toString() + "/edit", "GET", {plans: rowData}, function(res) {
+          if (res.success.toString() == "0")
+            layer.msg(res.message.toString());
+
+          grid.jqxTreeGrid('updateRow', key, res.row);
+        });
+      }
+    }
+
+    var appointments = new Array();
+    $.each(plans, function(idx, item) {
+      appointments.push({
+        id: item.id,
+        description: item.name,
+        location: "",
+        subject: item.name,
+        status: "tentative",
+        calendar: item.name,
+        start: new Date(item.plan_start_date),
+        end: new Date(item.plan_due_date)
+      })
+    })
+
+    var sourceScheduler =
+    {
+        dataType: "json",
+        dataFields: [
+            { name: 'id', type: 'string' },
+            { name: 'description', type: 'string' },
+            { name: 'location', type: 'string' },
+            { name: 'subject', type: 'string' },
+            { name: 'status', type: 'string' },
+            { name: 'calendar', type: 'string' },
+            { name: 'start', type: 'date' },
+            { name: 'end', type: 'date' }
+        ],
+        id: 'id',
+        localData: appointments
+    };
+
+    var adapterScheduler = new $.jqx.dataAdapter(sourceScheduler);
+    scheduler.jqxScheduler({
+        date: new $.jqx.date('todayDate'),
+        width: '100%',
+        height: 600,
+        appointmentsMinHeight: 30,
+        source: adapterScheduler,
+        showLegend: false,
+        editDialog: false,
+        contextMenu: false,
+        // theme: 'orange',
+        dayNameFormat: "abbr",
+        localization: getLocalization(),
+        renderAppointment: function(data)
+        {
+            if (data.view == "weekView" || data.view == "dayView" || data.view == "monthView") {
+                data.html =  "<i>" + data.appointment.subject + "</i>";
+                if (data.appointment.id == 1) {
+                    data.style = "#AA4643";
+                }
+                else if (data.appointment.id == 1 || data.appointment.id == 6) {
+                    data.style = "#309B46";
+                }
+                else if (data.appointment.id == 3) {
+                    data.style = "#447F6E";
+                }
+            }
+            return data;
+        },
+        ready: function () {
+            scheduler.jqxScheduler('ensureAppointmentVisible', '1');
+            scheduler.jqxScheduler('beginAppointmentsUpdate');
+            $.each(plans, function(idx, item) {
+              var tipContent = item.name.toString();
+              tipContent += '\n#{l(:plan_assigned_to_id)}:' + item.assigned;
+              tipContent += '\n#{l(:plan_check_user_id)}:' + item.checker;
+              tipContent += '\n#{l(:my_task_status_name)}:' + item.status_name;
+
+              scheduler.jqxScheduler('setAppointmentProperty', item.id, 'resizable', false);
+              scheduler.jqxScheduler('setAppointmentProperty', item.id, 'draggable', false);
+              scheduler.jqxScheduler('setAppointmentProperty', item.id, 'draggable', false);
+              scheduler.jqxScheduler('setAppointmentProperty', item.id, 'tooltip', tipContent);
+            })
+            scheduler.jqxScheduler('endAppointmentsUpdate');
+        },
+        resources:
+        {
+            colorScheme: "scheme05",
+            dataField: "calendar",
+            // orientation: "horizontal",
+            source:  new $.jqx.dataAdapter(sourceScheduler)
+        },
+        appointmentDataFields:
+        {
+            from: "start",
+            to: "end",
+            id: "id",
+            status: "status",
+            description: "description",
+            location: "place",
+            subject: "subject",
+            resourceId: "calendar",
+            recurrencePattern: "recurrenceRule",
+            recurrenceException: "recurrenceException"
+        },
+        view: 0,
+        views:[{ type: 'monthView', monthRowAutoHeight: true, timeRuler: { hidden: true  }, showWeekNumbers: true}]
+    });
+
+
+    grid.on('rowClick', function (event) {
+      var args = event.args;
+      if (args.originalEvent.button == 2) {
+        var scrollTop = $(window).scrollTop();
+        var scrollLeft = $(window).scrollLeft();
+        contextMenu.jqxMenu('open', parseInt(event.args.originalEvent.clientX) + 5 + scrollLeft, parseInt(event.args.originalEvent.clientY) + 5 + scrollTop);
+        return false;
+      }
+    });
+
+    contextMenu.on('itemclick', function (event) {
+      var args = event.args;
+      var selection = grid.jqxTreeGrid('getSelection');
+      var rowid = selection[0].uid;
+      switch ($.trim($(args).text())){
+        case "编辑(选中行)":
+          grid.jqxTreeGrid('beginRowEdit', rowid);
+          break;
+        case "删除(选中行)":
+          grid.jqxTreeGrid('deleteRow', rowid);
+          break;
+        case "取消(选中行)":
+          grid.jqxTreeGrid('unselectRow', rowid);
+          break;
+        case "展开(选中行)":
+          grid.jqxTreeGrid('expandRow', rowid);
+          break;
+        case "折叠(选中行)":
+          grid.jqxTreeGrid('collapseRow', rowid);
+          break;
+        case "※ 全部展开":
+          grid.jqxTreeGrid('expandAll');
+          break;
+        case "∷ 全部折叠":
+          grid.jqxTreeGrid('collapseAll', rowid);
+          break;
+        default:
+          break;
+      }
+    });
+  });

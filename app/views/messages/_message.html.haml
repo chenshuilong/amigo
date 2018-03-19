@@ -1,0 +1,25 @@
+.message-wrapper
+  .message-head
+    %span.message-reply_count= message.replies_count
+  .message-body
+    .message-body-top
+      .message-body-top-subject
+        = link_to_message message
+      .message-body-top-author
+        = icon "user"
+        = link_to_user message.author
+      .message-body-top-date
+        = time_formatter message.created_on
+    .message-body-bottom
+      .message-body-bottom-content
+        = message.content.to_s[0..80]
+      - if message.last_reply
+        .message-body-bottom-last_reply
+          = icon "comment"
+          = link_to_user message.last_reply.author
+        .message-body-top-last_reply_date
+          = time_formatter message.last_reply.created_on
+
+
+
+

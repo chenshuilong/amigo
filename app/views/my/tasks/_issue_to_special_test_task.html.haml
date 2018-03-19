@@ -1,0 +1,101 @@
+#specialTestTaskTable
+:css
+  .unread{
+    font-weight: 700;
+    color: #f88829;
+  } 
+
+:javascript
+
+  var table = $("#specialTestTaskTable");
+
+  var tasksSource =
+  {
+      dataFields: [
+          { name: 'task_id', type: 'int' },
+          { name: 'project_identifier', type: 'string' },
+          { name: 'test_id', type: 'string' },
+          { name: 'task_name', type: 'string' },
+          { name: 'designer', type: 'string' },
+          { name: 'assigner', type: 'string' },
+          { name: 'is_read', type: 'boolean'}
+      ],
+      type: 'POST',
+      dataType: "json",
+      id: 'id',
+      url: "/tasks/issue_to_special_test_task",
+      addRow: function (rowID, rowData, position, commit) {
+          commit(true);
+      },
+      updateRow: function (rowID, rowData, commit) {
+          commit(true);
+      },
+      deleteRow: function (rowID, commit) {
+          commit(true);
+      }
+  };
+  var dataAdapter = new $.jqx.dataAdapter(tasksSource,
+      {
+          formatData: function (data) {
+              $.extend(data, {
+                  token: "#{Token.generate_token_value}",
+                  issue_type: "IssueToSpecialTestResult",
+                  maxRows: 50
+              });
+              return data;
+          },
+          loadComplete: function () {
+            // data is loaded.
+          }
+      }
+  );
+
+  var cellClass = function (row, dataField, cellText, rowData) {
+      var unread = rowData.is_read == false ? 'unread' : ''
+      return unread;
+  }
+
+  table.jqxDataTable({
+      width: '100%',
+      height: 680,
+      source: dataAdapter,
+      pageable: true,
+      sortable: true,
+      altRows: true,
+      filterable: true,
+      // theme: 'orange',
+      filterMode: 'advanced',
+      localization: getLocalization(),
+      pagerButtonsCount: 8,
+      columns: [
+        { text: '#', dataField: 'task_id', cellsAlign: 'center', align: 'center', width: 200, cellClassName: cellClass },
+        { text: '申请编号', dataField: 'test_id', cellsAlign: 'center', align: 'center', width: 200, cellClassName: cellClass },
+        { text: '标题', dataField: 'task_name', cellsAlign: 'center', align: 'center', width: 650, cellClassName: cellClass },
+        { text: '专项设计者', dataField: 'designer', cellsAlign: 'center', align: 'center', width: 150, cellClassName: cellClass },
+        { text: '专项执行者', dataField: 'assigner', cellsAlign: 'center', align: 'center', width: 150, cellClassName: cellClass },
+        { text: 'is_read', dataField: 'is_read', hidden: true, cellClassName: 'isRead' }
+      ]
+  });
+
+  table.on('rowClick', function (event) {
+      var args = event.args;
+      var index = args.index;
+      var row = args.row;
+
+      var cur_row = $("[data-key="+ index +"]");
+      var $isRead = cur_row.children(".isRead");
+      if($isRead.text() == 'false'){
+        cur_row.children().removeClass("unread");
+        $isRead.text(true);
+        var rest_unread = $("span#200_102").find('.badge').text() - 1;;
+        if(rest_unread == 0){
+          $("span#200_102").find('.badge').remove()
+        }else{
+          $("span#200_102").find('.badge').text(rest_unread);
+        }
+        $.post('/tasks/'+ row.task_id +'/handle');
+      }
+      
+      var taskId = row.task_id;
+      $.get("/tasks/"+taskId+"/special_test_task");
+  });

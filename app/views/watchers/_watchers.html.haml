@@ -1,0 +1,10 @@
+- if User.current.allowed_to?(:add_issue_watchers, watched.project)
+  .contextual
+    = link_to l(:button_add),                                                                  |
+      new_watchers_path(:object_type => watched.class.name.underscore, :object_id => watched), |
+      :remote => true,                                                                         |
+      :method => 'get'                                                                         |
+%h3
+  = l(:label_issue_watchers)
+  (#{watched.watcher_users.size})
+= watchers_list(watched)

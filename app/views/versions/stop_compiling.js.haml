@@ -1,0 +1,4 @@
+- if @version.is_stopped?
+  location.reload();
+- else
+  layer.alert("#{l(:version_stop_compiling_failed)}");

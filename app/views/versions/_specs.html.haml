@@ -1,0 +1,4 @@
+#update_specs
+  = label_tag 'spec', l(:version_spec_id), class: "col-sm-2 control-label"
+  .col-sm-2
+    = select_tag 'spec' ,grouped_options_for_select(@select_specs.collect{|p| [p.project_name, Hash[p.specs_list.split(',').each_slice(2).to_a].to_a]}.unshift([l(:label_all), [[l(:label_all),'']]]), params[:spec]), {class: "form-control", :disabled => project_name.blank? , :onchange => "this.form.submit(); return false;"}

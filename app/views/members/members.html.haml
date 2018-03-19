@@ -1,0 +1,24 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+.h2= l(:label_memberships_members)
+
+.issue-details
+  .top-action-menu.text-right
+    = link_to l(:label_memberships_roles), roles_project_memberships_path(@project), class: 'btn btn-primary btn-sm'
+  - if @members.any?
+    %table#memberTable.list.members.table.table-striped
+      %thead
+        %tr
+          %th{:style => "width:15%"}
+            = l(:label_user)+ " / " + l(:label_group)
+          %th= l(:label_role_plural)
+          %th{:style => "width:5%"}
+          = call_hook(:view_projects_settings_members_table_header, :project => @project)
+      %tbody
+        - @members.each do |member|
+          - next if member.new_record?
+          = render :partial => 'members/member_list', :locals => {:member => member}
+        - end; reset_cycle
+  - else
+    %p.nodata= l(:label_no_data)

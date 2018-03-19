@@ -1,0 +1,3 @@
+= "#{@user.dept.try(:orgNm)} #{@user.name} 申请对 BUG##{@issue.id} 进行裁决，请及时处理！"
+= link_to '立即处理', @issue
+= "提示，编辑BUG之前，需先登录。"

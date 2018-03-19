@@ -1,0 +1,8 @@
+- for journal in journals
+  - unless journal.notes.blank?
+    %div{:class => "#{journal.css_classes}", :id => "change-#{journal.id}"}
+      %div{:id => "note-#{journal.indice}"}
+        .note-title
+          = authoring_at journal.created_on, journal.user, :label => :label_updated_time_at
+        .note-content
+          = render_notes(issue, journal)

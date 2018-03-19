@@ -1,0 +1,173 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+- if @project.production_type.in?([1,2,3])
+  .top-action-menu.pull-right
+    - if User.current.allowed_to?(:add_documents, @project, :global => true)
+      %a{:href => "javascript:newVersion();", class:"btn btn-sm btn-primary"}
+        = l(:button_add_version)
+  #roadmap
+    .roadmap-query
+      = form_tag({}, {method: :get, class: 'form-inline', id: 'queryForm'}) do |f|
+        .form-group
+          = label_tag 'project_spec_version', l(:spec_version_name)
+          = select_tag 'project_spec_version', options_for_select(@project.documents.map{|doc| doc.title}), { class: "form-control", style: 'width: 200px' }
+
+    %hr
+    - unless @documents.present?
+      %p.nodata= l(:label_no_data)
+    - else
+      .roadmap-table
+        %table#documentTable.list.table.table-striped.table-bordered
+          %thead
+            %tr
+              %th= "#"
+              %th= l(:version_name)
+              - @document_category.each do |cate|
+                %th= cate.name
+              %th= l(:label_remark)
+              %th= l(:option_all)
+          %tbody
+            - @documents.each_with_index do |doc, index|
+              %tr{"data-id"=> "tr_#{doc.id}"}
+                %td= index + 1
+                %td= doc.title
+                - @document_category.each do |cate|
+                  -# %td= doc.document_attachments.where(:category_id => cate.id).map{|da| link_to_attachment Attachment.find(da.attachment_id)}.join("<br/>").html_safe
+                  %td= render_attachment_lists(doc, cate)
+                %td= doc.description
+                %td
+                  - if User.current.allowed_to?(:add_documents, @project, :global => true)
+                    %a.uploadAttachment{"data-id"=> "#{doc.id}"}
+                      %i.file-upload-tip.fa.fa-upload
+                    = "|"
+                  - if User.current.allowed_to?(:edit_documents, @project, :global => true)
+                    %a.editDoc{"data-id"=> "#{doc.id}"}
+                      %i.document-edit-tip.fa.fa-edit
+                    -#= "|"
+                  -#- if User.current.allowed_to?(:delete_documents, @project, :global => true)
+                    %a.deleteDoc{"data-id" => "#{doc.id}", :href => "javascript:onDelete('/documents/#{doc.id}','delete');refrshPage();"}
+                      %i.document-delete-tip.fa.fa-close
+                    = "|"
+                    %a.deleteFiles{"data-id" => "#{doc.id}", :href => "javascript:onDelete('/documents/#{doc.id}','delete');refrshPage();"}
+                      %i.file-delete-tip.fa.fa-close
+      %span.pagination= pagination_links_full @doc_pages, @doc_count
+
+  .upload{:style => "display:none;width:540px;padding:20px;"}
+    = form_tag("#{upload_project_documents_path @project}",:id => "uploadForm", :multipart => true, :remote => true, :class => "form-horizontal") do
+      .form-group
+        = label_tag :category_id, '文件类型', class: 'control-label col-sm-3'
+        .col-xs-9
+          = select_tag "document[category_id]", options_for_select(@document_category.map{|v| [v.name,v.id]}), { class: 'form-control', style: 'width:100%'}
+          = select2_tag("document_category_id")
+      .form-group
+        = label_tag :description, "文件", class: "control-label col-sm-3"
+        .col-xs-9
+          .box.tabular
+            %p#attachments_form
+              = render :partial => 'attachments/form', :locals => {:container => Document.first}
+      .form-group
+        .col-xs-12.text-center
+          = hidden_field_tag "document[id]"
+          -#= submit_tag l(:button_save), data: { disable_with: "#{l(:button_save)}..." }, class: "btn btn-primary"
+
+  :javascript
+
+    $('.file-upload-tip').showToolTip("上传文件");
+    $('.document-edit-tip').showToolTip("编辑版本或者备注");
+    // $('.document-delete-tip').showToolTip("删除全部(文件+版本+备注)");
+    // $('.file-delete-tip').showToolTip("删除文件");
+
+    function newVersion() {
+      openLayer("#{l(:button_add_version)}", '580px', $("#ajax-modal").html('#{j render :partial => "new_version", :locals => { :document => Document.new }}'),
+      function(index, layero){
+          var doc_title = $("#ajax-modal").find("input#document_title").val();
+          if(doc_title == ""){
+            layer.alert("请输入版本名称！");
+          }else{
+            $("#ajax-modal").find('form').submit();
+            layer.msg("新建版本号成功！")
+            refreshPage();
+          }
+      })
+    }
+
+    $('#project_spec_version').on('change',function() {
+      $('#queryForm').submit();
+    })
+
+    $('.uploadAttachment').click(function(){
+      $('#document_id').val($(this).attr("data-id"));
+      openLayer("上传文件", '580px', $(".upload"),function() {
+        if($('#document_category_id').val() == null){
+          layer.alert("请选择文件类型！")
+          return false;
+        }else {
+          $('#uploadForm').submit();
+          refreshPage();
+        }
+      })
+    })
+
+    $('.editDoc').click(function() {
+      openLayer("#{l(:button_edit_version)}", '580px', $("#ajax-modal").html('#{j render :partial => "new_version"}'),
+      function(index, layero){
+          var doc_title = $("#ajax-modal").find("input#document_title").val();
+          if(doc_title == ""){
+            layer.alert("请输入版本名称！");
+          }else{
+            $("#ajax-modal").find('form').submit();
+            layer.msg("#{l(:button_edit_version)}成功！")
+            refreshPage();
+          }
+      })
+      var row = $("tr[data-id='tr_" + $(this).attr("data-id") + "']").children().eq(1).end();
+      $("#ajax-modal").find("input#document_title").val(row.eq(1).text())
+      $("#ajax-modal").find("input#document_id").val($(this).attr("data-id"))
+      $("#ajax-modal").find("textarea#document_description").val(row.eq(#{@document_category.count+2}).text())
+    })
+
+    $('.deleteFiles').click(function() {
+      openLayer("删除文件", '580px', $("#ajax-modal").html('#{j render :partial => "new_version"}'),
+      function(index, layero){
+          var doc_title = $("#ajax-modal").find("input#document_title").val();
+          if(doc_title == ""){
+            layer.alert("请输入版本名称！");
+          }else{
+            $("#ajax-modal").find('form').submit();
+            layer.msg("删除文件成功！");
+            refreshPage();
+          }
+      })
+    })
+
+- else
+
+  .top-action-menu.pull-right
+    = link_to l(:label_document_new), new_project_document_path(@project), :class => 'icon icon-add',                                      |
+      :onclick => 'showAndScrollTo("add-document", "document_title"); return false;' if User.current.allowed_to?(:add_documents, @project) |
+  #add-document{:style => "display:none;"}
+    %h2= l(:label_document_new)
+    = labelled_form_for @document, :url => project_documents_path(@project), :html => {:multipart => true} do |f|
+      = render :partial => 'form', :locals => {:f => f}
+      %p
+        = submit_tag l(:button_create)
+        = link_to l(:button_cancel), "#", :onclick => '$("#add-document").hide(); return false;'
+  .h2= l(:label_document_plural)
+  - if @grouped.empty?
+    %p.nodata= l(:label_no_data)
+  - @grouped.keys.sort.each do |group|
+    %h3= group
+    = render :partial => 'documents/document', :collection => @grouped[group]
+  - content_for :sidebar do
+    %h3= l(:label_sort_by, '')
+    %ul
+      %li= link_to(l(:field_category), {:sort_by => 'category'}, |
+          :class => (@sort_by == 'category' ? 'selected' :nil)) |
+      %li= link_to(l(:label_date), {:sort_by => 'date'},     |
+          :class => (@sort_by == 'date' ? 'selected' :nil)) |
+      %li= link_to(l(:field_title), {:sort_by => 'title'},    |
+          :class => (@sort_by == 'title' ? 'selected' :nil)) |
+      %li= link_to(l(:field_author), {:sort_by => 'author'},   |
+          :class => (@sort_by == 'author' ? 'selected' :nil)) |
+  - html_title(l(:label_document_plural))

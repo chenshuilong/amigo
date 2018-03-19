@@ -1,0 +1,193 @@
+- provide :nav, "3,1"
+- provide :css, "bootstrap"
+- content_for :bread do
+  %li= link_to l(:label_issue), _project_issues_path(@project)
+  %li= @copy ? l(:button_copy) : l(:label_bulk_edit_selected_issues)
+
+.h2= @copy ? l(:button_copy) : l(:label_bulk_edit_selected_issues)
+- if @saved_issues && @unsaved_issues.present?
+  #errorExplanation
+    %span
+      = l(:notice_failed_to_save_issues,                         |
+        :count => @unsaved_issues.size,                          |
+        :total => @saved_issues.size,                            |
+        :ids => @unsaved_issues.map {|i| "##{i.id}"}.join(', ')) |
+    %ul
+      - bulk_edit_error_messages(@unsaved_issues).each do |message|
+        %li= message
+#update.issue-details
+  #all_lists
+    .label= l(:label_issue_list)
+    %ul#bulk-selection
+      - @issues.each do |issue|
+        = content_tag 'li', link_to_issue(issue)
+  #all_attributes
+    .label= l(:label_change_properties)
+    = form_tag(bulk_update_issues_path, :id => 'bulk_edit_form', :class => "edit_issue form-wrapper") do
+      = @issues.collect {|i| hidden_field_tag('ids[]', i.id, :id => nil)}.join("\n").html_safe
+      .splitcontent.row
+        .col-md-6
+          %p
+            %label{:for => "issue_rom_version"}= l(:field_rom_version)
+            = select_tag('issue[rom_version]', content_tag('option', l(:label_no_change_option), :value => '') +                     |
+              content_tag('option', l(:label_none), :value => '__none__') + options_for_select(rom_versions_options_for_select))    |
+
+          - if @allowed_projects.present?
+            %p
+              %label{:for => "issue_project_id"}= l(:field_project)
+              = select_tag('issue[project_id]',                                                                                      |
+                project_tree_options_for_select(@allowed_projects,                                                                   |
+                  :include_blank => ((!@copy || (@projects & @allowed_projects == @projects)) ? l(:label_no_change_option) : false), |
+                  :selected => @target_project),                                                                                     |
+                :onchange => "updateBulkEditFrom('#{escape_javascript url_for(:action => 'bulk_edit', :format => 'js')}')")          |
+          %p
+            %label{:for => "issue_tracker_id"}= l(:field_tracker)
+            = select_tag('issue[tracker_id]',                                                        |
+              content_tag('option', l(:label_no_change_option), :value => '') +                      |
+              options_from_collection_for_select(@trackers, :id, :name, @issue_params[:tracker_id])) |
+          - if @available_statuses.any?
+            %p
+              %label{:for => "issue_status_id"}= l(:field_status)
+              = select_tag('issue[status_id]',                                                                  |
+                content_tag('option', l(:label_no_change_option), :value => '') +                               |
+                options_from_collection_for_select(@available_statuses, :id, :name, @issue_params[:status_id])) |
+          - if @safe_attributes.include?('assigned_to_id')
+            %p
+              %label{:for => "issue_assigned_to_id"}= l(:field_assigned_to)
+              = select_tag('issue[assigned_to_id]',                                                                                  |
+                content_tag('option', l(:label_no_change_option), :value => '') +                                                    |
+                content_tag('option', l(:label_nobody), :value => 'none', :selected => (@issue_params[:assigned_to_id] == 'none')) + |
+                principals_options_for_select(@assignables, @issue_params[:assigned_to_id]))                                         |
+              = select2_for "issue_assigned_to_id"
+        .col-md-6
+          - if @safe_attributes.include?('priority_id')
+            %p
+              %label{:for => "issue_priority_id"}= l(:field_priority)
+              = select_tag('issue[priority_id]',                                                                   |
+                content_tag('option', l(:label_no_change_option), :value => '') +                                  |
+                options_from_collection_for_select(IssuePriority.active, :id, :name, @issue_params[:priority_id])) |
+          - if @safe_attributes.include?('category_id')
+            %p
+              %label{:for => "issue_category_id"}= l(:field_category)
+              = select_tag('issue[category_id]', content_tag('option', l(:label_no_change_option), :value => '') +              |
+                content_tag('option', l(:label_none), :value => 'none', :selected => (@issue_params[:category_id] == 'none')) + |
+                options_from_collection_for_select(@categories, :id, :name, @issue_params[:category_id]))                       |
+          - if @safe_attributes.include?('fixed_version_id')
+            %p
+              %label{:for => "issue_fixed_version_id"}= l(:field_fixed_version)
+              = select_tag('issue[fixed_version_id]', content_tag('option', l(:label_no_change_option), :value => '') +              |
+                content_tag('option', l(:label_none), :value => 'none', :selected => (@issue_params[:fixed_version_id] == 'none')) + |
+                version_options_for_select(@versions.sort, @issue_params[:fixed_version_id]))                                        |
+          - if @copy && Setting.link_copied_issue == 'ask'
+            %p
+              %label{:for => "link_copy"}= l(:label_link_copied_issue)
+              = hidden_field_tag 'link_copy', '0'
+              = check_box_tag 'link_copy', '1', params[:link_copy] != 0
+          - if @copy && @attachments_present
+            = hidden_field_tag 'copy_attachments', '0'
+            %p
+              %label{:for => "copy_attachments"}= l(:label_copy_attachments)
+              = check_box_tag 'copy_attachments', '1', params[:copy_attachments] != '0'
+          - if @copy && @subtasks_present
+            = hidden_field_tag 'copy_subtasks', '0'
+            %p
+              %label{:for => "copy_subtasks"}= l(:label_copy_subtasks)
+              = check_box_tag 'copy_subtasks', '1', params[:copy_subtasks] != '0'
+          = call_hook(:view_issues_bulk_edit_details_bottom, { :issues => @issues })
+          -# - if @safe_attributes.include?('is_private')
+          -#   %p
+          -#     %label{:for => "issue_is_private"}= l(:field_is_private)
+          -#     = select_tag('issue[is_private]', content_tag('option', l(:label_no_change_option), :value => '') +              |
+          -#       content_tag('option', l(:general_text_Yes), :value => '1', :selected => (@issue_params[:is_private] == '1')) + |
+          -#       content_tag('option', l(:general_text_No), :value => '0', :selected => (@issue_params[:is_private] == '0')))   |
+          - if @safe_attributes.include?('parent_issue_id') && @project
+            %p
+              %label{:for => "issue_parent_issue_id"}= l(:field_parent_issue)
+              = text_field_tag 'issue[parent_issue_id]', '', :size => 10, :value => @issue_params[:parent_issue_id]
+              %span.inline
+                = check_box_tag 'issue[parent_issue_id]', 'none', (@issue_params[:parent_issue_id] == 'none'), :id => nil, :data => {:disables => '#issue_parent_issue_id'}
+                = l(:button_clear)
+            = javascript_tag "observeAutocompleteField('issue_parent_issue_id', '#{escape_javascript auto_complete_issues_path(:project_id => @project, :scope => Setting.cross_project_subtasks)}')"
+          - if @safe_attributes.include?('start_date')
+            %p
+              %label{:for => "issue_start_date"}= l(:field_start_date)
+              = date_field_tag 'issue[start_date]', '', :value => @issue_params[:start_date], :size => 10
+              = calendar_for('issue_start_date')
+              %span.inline
+                = check_box_tag 'issue[start_date]', 'none', (@issue_params[:start_date] == 'none'), :id => nil, :data => {:disables => '#issue_start_date'}
+                = l(:button_clear)
+          - if @safe_attributes.include?('due_date')
+            %p
+              %label{:for => "issue_due_date"}= l(:field_due_date)
+              = date_field_tag 'issue[due_date]', '', :value => @issue_params[:due_date], :size => 10
+              = calendar_for('issue_due_date')
+              %span.inline
+                = check_box_tag 'issue[due_date]', 'none', (@issue_params[:due_date] == 'none'), :id => nil, :data => {:disables => '#issue_due_date'}
+                = l(:button_clear)
+          - if @safe_attributes.include?('estimated_hours')
+            %p
+              %label{:for => "issue_estimated_hours"}= l(:field_estimated_hours)
+              = text_field_tag 'issue[estimated_hours]', '', :value => @issue_params[:estimated_hours], :size => 10
+              %span.inline
+                = check_box_tag 'issue[estimated_hours]', 'none', (@issue_params[:estimated_hours] == 'none'), :id => nil, :data => {:disables => '#issue_estimated_hours'}
+                = l(:button_clear)
+          - if @safe_attributes.include?('done_ratio') && Issue.use_field_for_done_ratio?
+            %p
+              %label{:for => "issue_done_ratio"}= l(:field_done_ratio)
+              = select_tag 'issue[done_ratio]', options_for_select([[l(:label_no_change_option), '']] + (0..10).to_a.collect {|r| ["#{r*10} %", r*10] }, @issue_params[:done_ratio])
+      .splitcontent.row
+        - textarea_count = @custom_fields.select{|s| s.field_format == "text"}.count
+        - split_on = ((@custom_fields.size + textarea_count*2)/ 2.0).ceil - 1
+        .col-md-6
+          - @custom_fields.each_with_index do |custom_field, index|
+            - if index <= split_on
+              %p
+                %label= custom_field.name
+                = custom_field_tag_for_bulk_edit('issue', custom_field, @issues, @issue_params[:custom_field_values][custom_field.id.to_s])
+        .col-md-6
+          - @custom_fields.each_with_index do |custom_field, index|
+            - if index > split_on
+              %p
+                %label= custom_field.name
+                = custom_field_tag_for_bulk_edit('issue', custom_field, @issues, @issue_params[:custom_field_values][custom_field.id.to_s])
+
+      .splitcontent
+        .label= l(:field_notes)
+        .note_and_toolbar
+          = text_area_tag 'notes', @notes, :cols => 60, :rows => 5, :class => 'wiki-edit'
+          = wikitoolbar_for 'notes'
+      %hr
+      .button-group.text-center
+        - if @copy
+          = hidden_field_tag 'copy', '1'
+          = submit_tag l(:button_copy), :class => "btn btn-primary"
+          = submit_tag l(:button_copy_and_follow), :class => "btn btn-primary", :name => 'follow'
+          = link_to l(:button_cancel), {}, :onclick => "$('#update').hide(); return false;"
+          -# - elsif @target_project
+          -#   = submit_tag l(:button_move), :class => "btn btn-primary"
+          -#   = submit_tag l(:button_move_and_follow), :class => "btn btn-primary", :name => 'follow'
+          -#   = link_to l(:button_cancel), {}, :onclick => "$('#update').hide(); return false;"
+        - else
+          = submit_tag l(:button_submit), :class => "btn btn-primary"
+          = link_to l(:button_cancel), session[:return_to]
+
+      -# .button-group.text-center
+      -#   = f.hidden_field :lock_version
+      -#   = hidden_field_tag 'last_journal_id', params[:last_journal_id] || @issue.last_journal_id
+      -#   = submit_tag l(:button_submit), :class => "btn btn-primary"
+      -#   = submit_tag "提交并返回", :class => "btn btn-primary"
+      -#   = link_to l(:button_cancel), {}, :onclick => "$('#update').hide(); return false;"
+
+= javascript_tag do
+  $(window).load(function(){
+  $(document).on('change', 'input[data-disables]', function(){
+  if ($(this).prop('checked')){
+  $($(this).data('disables')).attr('disabled', true).val('');
+  } else {
+  $($(this).data('disables')).attr('disabled', false);
+  }
+  });
+  });
+  $(document).ready(function(){
+  $('input[data-disables]').trigger('change');
+  });

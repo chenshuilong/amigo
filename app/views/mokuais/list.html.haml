@@ -1,0 +1,62 @@
+- provide :nav, "4,3"
+- provide :css, "bootstrap"
+
+= title [l(:label_production_members), app_members_path], l(:label_mokuai_list)
+
+.top-action-menu.pull-right
+  = link_to l(:label_mokuai_list_new), new_mokuai_path(from: 'list'), class: "btn btn-primary btn-sm", remote: true
+
+#roadmap
+  .roadmap-query
+    %ul.notification-list 
+      %li.notification-list-item
+        .notification-menu
+          %i.fa.fa-chevron-up
+        .notification-content
+          %p
+            %strong= "查询条件"
+        .clearfix
+        .notification-acton.select2-rectify{:style => "display:block;"}          
+          = form_tag({}, {method: :get, class: 'form-horizontal'}) do |f|
+            .form-group
+              = label_tag 'reason', l(:field_mokuai_reason), class: "col-sm-1 control-label"
+              .col-sm-2
+                = text_field_tag 'reason', params[:reason], class: "form-control"
+              = label_tag 'name', l(:field_mokuai_name), class: "col-sm-1 control-label"
+              .col-sm-2
+                = text_field_tag 'name', params[:name], class: "form-control"
+              .col-sm-2.col-sm-offset-1
+                = submit_tag l(:button_query), :name => nil, class: "btn btn-primary btn-sm"
+
+  %hr
+  .roadmap-table
+    - if @mokuais.blank?
+      %p.nodata= l(:label_no_data)
+    - else
+      .filter-right#version_publish_edit
+        .panel.panel-default
+          .panel-heading
+            .panel-body
+              .row
+                %table#issueTable{:class => "list issues table table-striped table-bordered"}
+                  %thead
+                    %tr
+                      %th{width: 100} #
+                      %th= l(:field_mokuai_reason)
+                      %th= l(:field_mokuai_name)
+                      %th{width: 150}= l(:option_all)
+                  %tbody
+                    - @mokuais.each do |mokuai|
+                      %tr
+                        %td= mokuai.id
+                        %td= load_value(mokuai, :reason)
+                        %td= load_value(mokuai, :name)
+                        %td
+                          .btn-group
+                            %button.btn.btn-sm.dropdown-toggle.btn-default{"data-toggle" => "dropdown", :type => "button"}
+                              = l(:option_all)
+                              %span.caret
+                            %ul.dropdown-menu.dropdown-menu-right{:role => "menu",:width => "10px;"}
+                              %li= link_to l(:label_sync), edit_batch_mokuai_path(mokuai.id), method: :get, remote: true
+                              %li= link_to l(:label_history), history_mokuai_path(mokuai.id), method: :get, remote: true
+              %span.pagination= pagination_links_full @pages, @count

@@ -1,0 +1,24 @@
+- provide :nav, "9,1"
+- provide :css, "bootstrap"
+- content_for :header_tags do
+  = javascript_include_tag "/amg/wangEditor/dist/js/wangEditor.min.js"
+  = stylesheet_link_tag '/amg/wangEditor/dist/css/wangEditor.min.css'
+
+
+.h2= l(:qanda_edit)
+= labelled_form_for :qanda, @qanda do |f|
+  = error_messages_for 'qanda'
+  .issue-details#update
+    #all_attributes
+      %p= f.text_field :subject, :style => "width: 80%"
+      %p= f.text_area :content, :style => "width: 80%; height: 500px"
+      :javascript
+        $(function() {
+          var editor = new wangEditor('qanda_content');
+          editor.create();
+        });
+      %p
+        = f.select :tag, @qanda.tag.to_s.split(","), {:selected => @qanda.tag.to_s.split(",")}, :style => "width: 80%", :multiple => true
+        = select2_tag "qanda_tag"
+  %section.button-group.text-right
+    = submit_tag l(:button_update), class: "btn btn-primary"

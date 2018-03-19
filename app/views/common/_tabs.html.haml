@@ -1,0 +1,16 @@
+.tabs
+  %ul
+    - tabs.each do |tab|
+      %li= link_to l(tab[:label]), { :tab => tab[:name] },                              |
+          :id => "tab-#{tab[:name]}",                                                   |
+          :class => (tab[:name] != selected_tab ? nil : 'selected')
+      -# :onclick => "showTab('#{tab[:name]}', this.href); this.blur(); return false;"
+  .tabs-buttons.collapse
+    %button.tab-left{:onclick => "moveTabLeft(this);", :type => "button"}
+    %button.tab-right{:onclick => "moveTabRight(this);", :type => "button"}
+- tabs.each do |tab|
+  - next if tab[:name] != selected_tab
+  = content_tag('div', render(:partial => tab[:partial], :locals => {:tab => tab} ), |
+    :id => "tab-content-#{tab[:name]}",                                              |
+    :style => (tab[:name] != selected_tab ? 'display:none' : nil),                   |
+    :class => 'tab-content')

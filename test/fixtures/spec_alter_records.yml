@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  spec_id: 
+  user_id: 
+  old_value: MyString
+  value: MyString
+
+two:
+  spec_id: 
+  user_id: 
+  old_value: MyString
+  value: MyString

@@ -1,0 +1,66 @@
+- provide :nav, '6,1'
+- provide :css, 'bootstrap'
+  
+- if policy(:demand).index?
+  .top-action-menu.pull-right
+    = link_to(l(:label_demands_new), new_demand_path, :class => 'btn btn-primary btn-sm') if policy(:demand).new?
+  .h2= l(:label_demands)
+
+
+  #roadmap
+    - if @demands.empty? && params[:utf8].blank?
+      %p.nodata= l(:label_no_data)
+    - else
+      .roadmap-query
+        = form_tag({}, {method: :get, class: 'form-inline'}) do |f|
+          .form-group
+            = label_tag "sub_category_id", l(:demand_sub_category_id)
+            = select_tag "sub_category_id", options_for_select(@source_categories.pluck(:name, :id).unshift([l(:label_all), '']), @sub_category_id), class: "form-control", :onchange => "this.form.submit(); return false;"
+          .form-group
+            = label_tag "category_id", l(:demand_category_id)
+            = select_tag "category_id", options_for_select(@demand_categories.pluck(:name, :id).unshift([l(:label_all), '']), @category_id), class: "form-control", :onchange => "this.form.submit(); return false;"
+          .form-group
+            = label_tag "status", l(:demand_status)
+            = select_tag "status", options_for_select([["跟踪", 1], ["挂起", 2], ["关闭", 3]].unshift([l(:label_all), '']), @status), class: "form-control", :onchange => "this.form.submit(); return false;"
+          .form-group
+            = label_tag 'created_at', l(:demand_created_at)
+            = text_field_tag 'created_at_start', @created_at_start, class: "form-control", :id => 'demand_created_at_start'
+            = hidden_field_tag 'created_at_end', @created_at_end, class: "form-control", :id => 'demand_created_at_end'
+            = calendar_range_for 'demand_created_at_start', 'demand_created_at_end'  
+
+          = submit_tag l(:button_submit), :name => nil, class: "btn btn-primary btn-sm"
+      .roadmap-table
+        %table#versionTable.list.table.table-striped.table-bordered
+          %thead
+            %tr
+              %th{width: "100"} #
+              %th= l(:demand_description)
+              %th{width: "150"}= l(:demand_category_id)
+              %th{width: "150"}= l(:demand_sub_category_id)
+              %th{width: "60"}= l(:demand_status)
+              %th{width: "80"}= l(:demand_author_id)
+              %th{width: "180"}= l(:demand_dept)
+              %th{width: "100"}= l(:demand_feedback_at)
+              %th{width: "100"}= l(:demand_created_at)
+              %th{width: "60"}= l(:option_all)
+          %tbody
+            - @demands.each do |demand|
+              %tr 
+                %td= link_to demand.id, demand_path(demand)
+                %td
+                  = popover(:trigger => "click", :content => simple_format(demand.description),:title => "详细信息", :placement => 'bottom') do
+                    = demand.description.to_s[0,50]
+                %td= demand.demand_category
+                %td= demand.source_category
+                %td= load_value(demand, :status)
+                %td= link_to_user demand.author
+                %td= demand.author.orgNm
+                %td= format_date(demand.feedback_at)
+                %td= demand.created_at.strftime("%F %T")
+                %td
+                  - if policy(demand).edit?
+                    = link_to l(:button_edit), edit_demand_path(demand), class: "btn btn-xs btn-primary"
+      %span.pagination= pagination_links_full @pages, @count
+
+- html_title(l(:label_demands))
+

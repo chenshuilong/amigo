@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  orgNm: MyString
+  orgNo: MyString
+  parentNo: MyString
+
+two:
+  orgNm: MyString
+  orgNo: MyString
+  parentNo: MyString

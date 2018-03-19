@@ -1,0 +1,28 @@
+= form_tag({}) do
+  = hidden_field_tag 'back_url', url_for(params)
+  .autoscroll
+    %table.list.time-entries
+      %thead
+        %tr
+          %th.checkbox.hide-when-print
+            = check_box_tag 'check_all', '', false, :class => 'toggle-selection', |
+              :title => "#{l(:button_check_all)}/#{l(:button_uncheck_all)}"       |
+          - @query.inline_columns.each do |column|
+            = column_header(column)
+          %th
+      %tbody
+        - entries.each do |entry|
+          %tr{:class => "time-entry #{cycle("odd", "even")} hascontextmenu"}
+            %td.checkbox.hide-when-print= check_box_tag("ids[]", entry.id, false, :id => nil)
+            = raw @query.inline_columns.map {|column| "<td class=\"#{column.css_classes}\">#{column_content(column, entry)}</td>"}.join
+            %td.buttons
+              - if entry.editable_by?(User.current)
+                = link_to l(:button_edit), edit_time_entry_path(entry), |
+                  :title => l(:button_edit),                            |
+                  :class => 'icon-only icon-edit'                       |
+                = link_to l(:button_delete), time_entry_path(entry), |
+                  :data => {:confirm => l(:text_are_you_sure)},      |
+                  :method => :delete,                                |
+                  :title => l(:button_delete),                       |
+                  :class => 'icon-only icon-del'                     |
+= context_menu time_entries_context_menu_path

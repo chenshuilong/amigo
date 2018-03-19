@@ -1,0 +1,7 @@
+= labelled_form_for @project do |f|
+  = error_messages_for 'project'
+  #update.box.tabular.issue-details
+    #all_attributes
+      = render :partial => 'form'
+    .button-group.text-center
+      = submit_tag l(:button_save), class: "btn btn-primary"

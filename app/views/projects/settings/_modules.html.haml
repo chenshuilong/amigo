@@ -1,0 +1,13 @@
+= form_for @project,                                 |
+  :url => { :action => 'modules', :id => @project }, |
+  :html => {:id => 'modules-form',                   |
+  :method => :post} do |f|
+  #update.issue-details
+    .label= l(:text_select_project_modules)
+    - Redmine::AccessControl.available_project_modules.each do |m|
+      %p
+        %label
+          = check_box_tag 'enabled_module_names[]', m, @project.module_enabled?(m), :id => nil
+          = l_or_humanize(m, :prefix => "project_module_")
+    %p= check_all_links 'modules-form'
+    .text-center= submit_tag l(:button_save), :class => "btn btn-primary"

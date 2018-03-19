@@ -1,0 +1,9 @@
+= labelled_fields_for :pref, @user.pref do |pref_fields|
+  %p= pref_fields.check_box :hide_mail
+  %p= pref_fields.time_zone_select :time_zone, nil, :include_blank => true
+  %p= pref_fields.select :comments_sorting, [[l(:label_chronological_order), 'asc'], [l(:label_reverse_chronological_order), 'desc']]
+  %p= pref_fields.check_box :warn_on_leaving_unsaved
+  %p= pref_fields.select :emoji_font, ['apple', 'google', 'emojione', 'twitter'], {}, :onchange => '$(".emoji-example").attr("src", "/images/emoji/"+$(this).val()+"/1f60b.png")'
+  %p
+    = l(:text_emoji_font_example)
+    = image_tag "/images/emoji/#{@user.emoji_font}/1f60b.png", class: "emoji emoji-example"

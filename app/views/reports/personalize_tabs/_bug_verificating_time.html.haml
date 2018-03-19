@@ -1,0 +1,53 @@
+%div{:style => "width:100%;"}
+  %ul.notification-list
+    %li.notification-list-item
+      .notification-content
+        %p
+          %strong= "查询条件"
+      .clearfix
+      .notification-acton.select2-rectify
+        %form#formBugVerificatingTime.form-horizontal{:role => "form"}
+          .form-group
+            .input-group
+              .input-group-addon 项目
+              = hidden_field_tag "project","project_id"
+              = select_tag "project_value", project_tree_options_for_select(Project.all), :multiple => :multiple, :class => "form-control"
+
+              .input-group-addon 部门
+              = hidden_field_tag "role","depts.id"
+              = select_tag "role_value", options_for_select(Dept.all.collect{|dept| [dept.orgNm,dept.id]}), :multiple => :multiple, :class => "form-control"
+          .form-group
+            .input-group
+              .input-group-addon 时间
+              %input#start_dt.form-control{:name => "start_dt",:value => "#{(Time.now-30.days).strftime('%Y-%m-%d')}"}
+              .input-group-addon 至
+              %input#end_dt.form-control{:name => "end_dt",:value => "#{Time.now.strftime('%Y-%m-%d')}"}
+            .input-group
+              = hidden_field_tag "created_time_yn","2"
+              = hidden_field_tag "dwm_yn","1"
+
+          .text-right
+            %input{:type => "button",:onclick => "queryBugVerificatingTime('bug_verificating_time')",:class => "btn btn-primary",:value => "查询"}
+
+.panel.panel-default
+  .panel-heading= "bug验证时长"
+  .panel-body
+    .button-group-report.text-right
+      %input{:type => "button",:onclick => "exportPersonalize('bug_verificating_time','formBugVerificatingTime')",:class => "btn btn-primary",:value => "导出Excel"}
+    .autoscroll
+      %table#bug_verificating_time.table.table-striped.table-bordered.table-hover
+
+:javascript
+  initSelect("project_value");
+  initSelect("role_value");
+  initDateTimePicker("start_dt","Y-m-d",false);
+  initDateTimePicker("end_dt","Y-m-d",false);
+
+  $('#project_value,#start_dt,#end_dt,#role_value').on("change", function (e) {
+    // queryBugVerificatingTime('bug_verificating_time');
+  });
+
+  setTimeout(function () {
+        $('.notification-acton').css("display","block");
+        //queryBugVerificatingTime('bug_verificating_time');
+    }, 500);

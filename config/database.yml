@@ -1,0 +1,53 @@
+﻿# Default setup is given for MySQL with ruby1.9.
+# Examples for PostgreSQL, SQLite3 and SQL Server can be found at the end.
+# Line indentation must be 2 spaces (no tabs).
+
+default: &default
+  adapter: mysql2
+  encoding: utf8
+  pool: 25
+  username: root
+  password: root # chenshuilong
+#  socket: /var/lib/mysql/mysql.sock
+
+production:
+  adapter: mysql2
+  database: amigo_tt_2017_dec
+  host: localhost
+  username: root
+  password: chenshuilong
+  encoding: utf8
+
+development:
+  <<: *default
+  database: amigo # amigo_tt_2018_mar # amigo_tt_2017_dec # amigo_2016_dec
+  host: 18.8.5.10 # dev.os.gionee.com # localhost
+
+test:
+  adapter: mysql2
+  database: amigo_tt_2017_dec
+  host: localhost
+  username: root
+  password: chenshuilong
+  encoding: utf8
+
+# PostgreSQL configuration example
+#production:
+#  adapter: postgresql
+#  database: redmine
+#  host: localhost
+#  username: postgres
+#  password: "postgres"
+
+# SQLite3 configuration example
+# development:
+#  adapter: sqlite3
+#  database: db/redmine.sqlite3
+
+# SQL Server configuration example
+#production:
+#  adapter: sqlserver
+#  database: redmine
+#  host: localhost
+#  username: jenkins
+#  password: jenkins

@@ -1,0 +1,22 @@
+%fieldset.box
+  = hidden_field_tag 'membership[role_ids][]', @role
+  %legend= label_tag("principal_search", l(:label_principal_search))
+  .row
+    .col-md-8
+      %p= text_field_tag('principal_search', nil, :class => "form-control", :autocomplete => "off")
+    .col-md-4
+      %p
+        = check_box_tag 'checkall', 'yes' ,false , onclick: "checkAll('principals', this.checked)"
+        = l(:button_check_all)
+  = javascript_tag "observeSearchfield('principal_search', null, '#{ escape_javascript autocomplete_project_memberships_path(@project, :role_id => @role,:format => 'js') }')"
+  #principals_for_new_member
+    = render_principals_for_new_members_with_role(@project, @role)
+// %fieldset.box
+//   %legend
+//     = l(:label_role_plural)
+//     = toggle_checkboxes_link('.roles-selection input')
+//   .roles-selection
+//     - User.current.managed_roles(@project).each do |role|
+//       %label
+//         = check_box_tag 'membership[role_ids][]', role.id, false, :id => nil
+//         = role

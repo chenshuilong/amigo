@@ -1,0 +1,27 @@
+- if @project.repositories.any?
+  %table.list
+    %thead
+      %tr
+        %th= l(:field_identifier)
+        %th= l(:field_repository_is_default)
+        %th= l(:label_scm)
+        %th= l(:label_repository)
+        %th
+    %tbody
+      - @project.repositories.sort.each do |repository|
+        %tr{:class => "#{cycle 'odd', 'even'}"}
+          %td.name
+            = link_to repository.identifier,                                                                                                                      |
+              {:controller => 'repositories', :action => 'show',:id => @project, :repository_id => repository.identifier_param} if repository.identifier.present? |
+          %td= checked_image repository.is_default?
+          %td= repository.scm_name
+          %td= repository.url
+          %td.buttons
+            - if User.current.allowed_to?(:manage_repository, @project)
+              = link_to(l(:label_user_plural), committers_repository_path(repository), :class => 'icon icon-user')
+              = link_to(l(:button_edit), edit_repository_path(repository), :class => 'icon icon-edit')
+              = delete_link repository_path(repository)
+- else
+  %p.nodata= l(:label_no_data)
+- if User.current.allowed_to?(:manage_repository, @project)
+  %p= link_to l(:label_repository_new), new_project_repository_path(@project), :class => 'icon icon-add'

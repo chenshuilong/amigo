@@ -1,0 +1,5 @@
+= form_tag({:action => 'edit', :tab => 'api'}) do
+  .box.tabular.settings
+    %p= setting_check_box :rest_api_enabled
+    %p= setting_check_box :jsonp_enabled
+  = submit_tag l(:button_save)

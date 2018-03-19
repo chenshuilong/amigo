@@ -1,0 +1,17 @@
+=desktop-only
+  display: none !important
+  +media($desktop)
+    display: block !important
+
+=mobile-only
+  +media($desktop)
+    display: none !important
+
+=responsive-width
+  max-width: 100%
+
+=tablet-only
+  +media($mobile)
+    display: none !important
+  +media($desktop)
+    display: none !important

@@ -1,0 +1,43 @@
+- provide :nav, "8,1"
+- provide :css, "bootstrap"
+
+.top-action-menu.pull-right
+  - if policy(:tool).new?
+    = link_to l(:label_tool_new), operate_tools_path(operate_type: 'new'), :class => 'btn btn-primary btn-sm', remote: true
+.h2= l(:label_tool)
+
+- if @tools.present?
+  #roadmap
+    .roadmap-table
+      - if @tools.present?
+        %table#toolTable.list.table.table-striped.table-bordered
+          %thead
+            %tr
+              %th{width: "100"} #
+              %th= l(:tool_name)
+              %th{width: "120"}= l(:tool_provider_id)
+              %th= l(:tool_description)
+              %th{width: "120"}= l(:tool_tool_url)
+              %th{width: "120"}= l(:tool_tool_note)
+              - if policy(:tool).operate?
+                %th{width: "80"}= l(:field_operation)
+          %tbody
+            - @tools.each_with_index do |t, index|
+              %tr
+                %td= index+1
+                %td= t.name
+                %td= link_to_user t.provider
+                %td
+                  = popover(:trigger => "click", :content => t.description.to_s,:title => "详细信息") do
+                    = t.description.to_s[0,50]
+                %td= tool_links(t.tool_urls, 'tool_url')
+                %td= tool_links(t.tool_urls, 'tool_note')
+                - if policy(:tool).operate?
+                  %td
+                    %a{:href => operate_tools_path(id: t.id, operate_type: 'edit'), "data-remote" => true}
+                      %i.spec-edit.fa.fa-edit
+                    = "|"
+                    %a{:href => void_js, class: "deleteTool", "data-id" => t.id, "data-content1" => t.name, remote: true}
+                      %i.spec-delete.fa.fa-close  
+
+          %span.pagination= pagination_links_full @pages, @count

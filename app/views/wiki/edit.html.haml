@@ -1,0 +1,40 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+= wiki_page_breadcrumb(@page)
+%h2= @page.pretty_title
+= form_for @content, :as => :content,                                       |
+  :url => {:action => 'update', :id => @page.title},                        |
+  :html => {:method => :put, :multipart => true, :id => 'wiki_form'} do |f| |
+  = f.hidden_field :version
+  - if @section
+    = hidden_field_tag 'section', @section
+    = hidden_field_tag 'section_hash', @section_hash
+  = error_messages_for 'content'
+  .box.tabular
+    = text_area_tag 'content[text]', @text, :cols => 100, :rows => 25, |
+      :class => 'wiki-edit', :accesskey => accesskey(:edit)            |
+    - if @page.safe_attribute_names.include?('parent_id') && @wiki.pages.any?
+      = fields_for @page do |fp|
+        %p
+          %label= l(:field_parent_title)
+          = fp.select :parent_id,                     |
+            content_tag('option', '', :value => '') + |
+            wiki_page_options_for_select(             |
+            @wiki.pages.includes(:parent).to_a -      |
+            @page.self_and_descendants, @page.parent) |
+    %p
+      %label= l(:field_comments)
+      = f.text_field :comments, :size => 120, :maxlength => 1024
+    %p
+      %label= l(:label_attachment_plural)
+      = render :partial => 'attachments/form'
+  %p
+    = submit_tag l(:button_save)
+    = preview_link({:controller => 'wiki', :action => 'preview', :project_id => @project, :id => @page.title }, 'wiki_form')
+    | #{link_to l(:button_cancel), wiki_page_edit_cancel_path(@page)}
+  = wikitoolbar_for 'content_text'
+#preview.wiki
+- content_for :header_tags do
+  = robot_exclusion_tag
+- html_title @page.pretty_title

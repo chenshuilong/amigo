@@ -1,0 +1,29 @@
+- if @records.blank?
+  %p.nodata= l(:label_no_data)
+- else
+  %table#recordsTable.table.table-bordered.table-hover
+    %thead
+      %tr
+        %th 序号
+        %th 变更前
+        %th 变更后
+        %th 变更类型
+        %th 变更字段
+        %th 变更时间
+        %th 变更人
+        -#%th 版本号
+
+    %tbody
+      - @records.each_with_index do |record,idx|
+        %tr{:data =>{:id => "record-#{record.id}"},:class => "#{record.record_type == SpecAlterRecord::DELETE_RECORD ? 'danger' : ''}"}
+          %th= idx + 1
+          %th= record.old_value
+          %th= record.value
+          %th= to_record_type record.record_type
+          %th= record.prop_key
+          %th= format_date record.created_at
+          %th= to_user User.find(record.user_id)
+          -#%th= record.definition_version
+
+:javascript
+  var recordsTable = initDataTable('recordsTable', {});

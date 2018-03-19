@@ -1,0 +1,36 @@
+%h2= l(:approval_edit)
+
+= labelled_form_for @approval  do |f|
+  = error_messages_for 'approval'
+  .issue-details#update
+    #all_attributes
+      %p= f.select :type, {l(:approval_type_UmpirageApproval) => "UmpirageApproval"} , class: "form-control"
+      %p= f.select :object_type, { l(:approval_object_type_user) => "user", l(:approval_object_type_dept) => "dept"}, label: l(:approval_object_type), class: "form-control"
+      %p= f.select :object_id, {@approval.object.name => @approval.object_id}, {label: l(:approval_object_id)}, style: "width: 200px"
+      %p
+        = f.select :user_id, {@approval.user.name => @approval.user_id}, {label: l(:approval_user_id)}, style: "width: 200px"
+        = select2_remote("approval_user_id")
+      %p= submit_tag l(:button_submit), class: "btn btn-primary"
+
+
+:javascript
+  var dept_data = #{Dept.select2_available_depts.to_json}
+  var $object = $("#approval_object_id");
+  if("#{@approval.object_type}" == "user")
+    $object.select2_remote({status: 1})
+  else
+    $object.select2({data: dept_data});
+  $("#approval_object_type").change(function(){
+    $object.empty().val("");
+    switch($(this).val()) {
+      case "user":
+        $object.select2('destroy');
+        $object.select2_remote({status: 1});
+        break;
+      case "dept":
+        $object.select2('destroy');
+        $object.select2({data: dept_data});
+        break;
+    }
+  })
+

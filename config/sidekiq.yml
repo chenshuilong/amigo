@@ -1,0 +1,32 @@
+---
+:concurrency: 20
+:pidfile: tmp/pids/sidekiq.pid
+:logfile: ./log/sidekiq.log
+:queues:
+  - default
+  - ["release", 4] # 第一个参数为queue 的名称, 第二个为优先级, 数字越大优先级越高
+  - ["sdk_release", 2]
+  - ["thirdparty_release", 2]
+  - ["resource_release", 2]
+  - ["apply_umpirage", 1]
+  - export
+  - repo_request
+  - copy_project_members
+  - issue_to_merge
+
+:limits:
+  release: 1
+  export: 5
+  repo_request: 1
+  apply_umpirage: 1
+  issue_to_merge: 1
+  copy_project_members: 2
+  sdk_release: 1
+  thirdparty_release: 1
+  resource_release: 1
+development:
+  :concurrency: 5
+staging:
+  :concurrency: 10
+production:
+  :concurrency: 25

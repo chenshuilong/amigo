@@ -1,0 +1,28 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+.contextual
+  - if User.current.allowed_to?(:edit_wiki_pages, @project)
+    = link_to l(:label_wiki_page_new), new_project_wiki_page_path(@project), :remote => true, :class => 'icon icon-add'
+  = watcher_link(@wiki, User.current)
+%h2= l(:label_index_by_title)
+- if @pages.empty?
+  %p.nodata= l(:label_no_data)
+- else
+  = render_page_hierarchy(@pages_by_parent_id, nil, :timestamp => true)
+- content_for :sidebar do
+  = render :partial => 'sidebar'
+- unless @pages.empty?
+  - other_formats_links do |f|
+    = f.link_to 'Atom',                                         |
+      :url => {:controller => 'activities', :action => 'index', |
+      :id => @project, :show_wiki_edits => 1,                   |
+      :key => User.current.rss_key}                             |
+    - if User.current.allowed_to?(:export_wiki_pages, @project)
+      = f.link_to('PDF', :url => {:action => 'export', :format => 'pdf'})
+      = f.link_to('HTML', :url => {:action => 'export'})
+- content_for :header_tags do
+  = auto_discovery_link_tag(                                   |
+    :atom, :controller => 'activities', :action => 'index',    |
+    :id => @project, :show_wiki_edits => 1, :format => 'atom', |
+    :key => User.current.rss_key)                              |

@@ -1,0 +1,39 @@
+- if @deliveries
+  = form_tag({:action => 'edit', :tab => 'notifications'}) do
+    .box.tabular.settings
+      %p= setting_text_field :mail_from, :size => 60
+      %p= setting_check_box :bcc_recipients
+      %p= setting_check_box :plain_text_mail
+      %p= setting_select(:default_notification_option, User.valid_notification_options.collect {|o| [l(o.last), o.first.to_s]})
+    %fieldset#notified_events.box
+      %legend= l(:text_select_mail_notifications)
+      = hidden_field_tag 'settings[notified_events][]', ''
+      - @notifiables.each do |notifiable|
+        = notification_field notifiable
+        %br/
+      %p= check_all_links('notified_events')
+
+    %fieldset#notified_version_events.box
+      %legend= l(:setting_version_mail_notifications)
+      %p
+        = setting_select :notified_version_compiled, options_for_select(Setting.notified_version_compiled, Setting.notified_version_compiled), :style => "width: 100%", :multiple => true
+        = select2_tag "settings_notified_version_compiled"
+      %p
+        = setting_select :notified_production_version_compiled, options_from_collection_for_select(Role.givable, :id, :name, Setting.notified_production_version_compiled), :style => "width: 100%", :multiple => true
+        = select2_for "settings_notified_production_version_compiled"
+      %p
+        = setting_select :notified_version_released, options_for_select(Setting.notified_version_released, Setting.notified_version_released), :style => "width: 100%", :multiple => true
+        = select2_tag "settings_notified_version_released"
+
+    -# %fieldset.box
+    -#   %legend= l(:setting_emails_header)
+    -#   = setting_text_area :emails_header, :label => false, :class => 'wiki-edit', :rows => 5
+    %fieldset.box
+      %legend= l(:setting_emails_footer)
+      = setting_text_area :emails_footer, :label => false, :class => 'wiki-edit', :rows => 5
+    %div{:style => "float:right;"}
+      = link_to l(:label_send_test_email), test_email_path, :method => :post
+    = submit_tag l(:button_save)
+- else
+  .nodata
+    = simple_format(l(:text_email_delivery_not_configured))

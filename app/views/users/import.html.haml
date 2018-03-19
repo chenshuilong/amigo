@@ -1,0 +1,41 @@
+- provide :nav, "9,1"
+
+= title [l(:label_user_plural), users_path], "导入用户"
+
+%fieldset
+  %legend= "导入格式要求"
+  %p 请导入Excel文档，邮箱不存在时，可以为空。
+
+%br
+%fieldset
+  %legend= "立即导入"
+  = form_tag import_csv_users_path, multipart: true do
+    .uploadCsv
+      = file_field_tag :file
+      = submit_tag "导入用户"
+
+:javascript
+  $('.uploadCsv').on("change","input[type='file']", function() {
+    files = !!this.files ? this.files : [];
+    file_type = this.value
+    // If no files were selected, or no FileReader support, return
+    if (!files.length || !window.FileReader) return;
+    // Only support image type
+    if(!/.(csv|CSV|xls|XLS|xlsx|XLSX)$/.test(file_type)){
+      alert('抱歉，只支持Excel文件导入！');
+      $(this).val("");
+      return;
+    }
+  });
+
+  $("form").submit(function(e) {
+    if($(".uploadCsv input[type='file']").val() == "") {
+      alert("请先选择文件!");
+      return false;
+    }
+  });
+
+:css
+  .uploadCsv input{
+    margin-bottom: 20px
+  }

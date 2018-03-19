@@ -1,0 +1,3 @@
+$("#member-#{@member.id}").replaceWith("#{j render :partial => 'members/member_list', :locals => {:member => @member}}");
+- @member_children.each do |m|
+  $("#member-#{m.id}").replaceWith("#{j render :partial => 'members/member_list', :locals => {:member => m}}");

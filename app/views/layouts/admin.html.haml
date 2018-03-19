@@ -1,0 +1,7 @@
+- unless controller_name == 'admin' && action_name == 'index'
+  - content_for :sidebar do
+    .notification-left
+      .project-menu-info= l(:label_administration)
+      = render :partial => 'admin/menu'
+      
+= render :file => "layouts/base"

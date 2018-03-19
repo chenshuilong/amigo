@@ -1,0 +1,24 @@
+﻿# octopus config file
+
+octopus:
+  environments:
+    - development
+    - production
+  development:
+    slave:
+      adapter: mysql2
+      database: amigo # amigo_tt_2018_mar # amigo_tt_2017_dec
+      host: 18.8.5.10 # dev.os.gionee.com
+
+      username: root
+      password: root
+      encoding: utf8
+  production:
+    slave:
+      adapter: mysql2
+      database: amigo_tt_2017_dec
+      host: dev.os.gionee.com
+
+      username: root
+      password: root
+      encoding: utf8

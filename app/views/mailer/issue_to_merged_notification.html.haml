@@ -1,0 +1,24 @@
+- message = @success ? "成功" : "失败"
+%p
+  - if @success
+    %span.tag.tag-success= message
+  - else
+    %span.tag.tag-danger= message
+  %span
+    = "#{@issue.issue.try(:name)}  必合问题合入#{message}！"
+
+  %hr
+  %table
+    %tbody
+      %tr
+        %td.talbe-col-md-2
+          %p.label 问题
+        %td.talbe-col-md-4
+          = link_to_issue(@issue.issue, :subject => false, :tracker => true)
+        %td.talbe-col-md-2
+          %p.label commit-id
+        %td.talbe-col-md-4= @issue.commit_id
+      %tr
+        %td.talbe-col-md-2
+          %p.label 合入的流信息如下:
+        %td{:colspan => 3}= render_merged_repos(@issue)

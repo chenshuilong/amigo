@@ -1,0 +1,127 @@
+= form_tag("/projects/#{@project_id}/specs/udapp/?appid=#{app[:app_id].to_i}&spec_id=#{app[:spec_id]}",method: "post",remote:true,:class => "form-horizontal") do
+  .form-group
+    = label_tag :production_id,'应用名称', class: 'control-label col-sm-2'
+    .col-xs-10
+      = select_tag "specs[production_id]", options_for_select(@my_productions.map{|v| [v.name,v.id]}), { class: 'form-control', style: 'width:100%'}
+      = select2_tag("specs_production_id")
+  .form-group
+    = label_tag :version_id, "应用版本", class: "control-label col-sm-2"
+    .col-xs-10
+      = select_tag "specs[version_id]", options_for_select([]), { class: 'form-control', style: 'width:100%'}
+  .form-group
+    = label_tag :cn_name, "应用中文名", class: "control-label col-sm-2"
+    .col-xs-10
+      = text_field_tag "specs[cn_name]", app[:cn_name], class: 'form-control', style: 'width:100%'
+  .form-group
+    = label_tag :desktop_name, "桌面显示名称", class: "control-label col-sm-2"
+    .col-xs-10
+      = text_field_tag "specs[desktop_name]", app[:desktop_name], class: 'form-control', style: 'width:100%'
+  .form-group
+    = label_tag :developer, "开发者信息", class: "control-label col-sm-2"
+    .col-xs-10
+      = text_field_tag "specs[developer]", app[:developer], class: 'form-control', style: 'width:100%'
+  - if @spec && @spec.for_new != 3
+    .form-group
+      = label_tag :release_path, "发布路径", class: "control-label col-sm-2"
+      .col-xs-10
+        = text_area_tag "specs[release_path]", app[:release_path], { style: 'width:100%;height:120px;'}
+  .form-group
+    = label_tag :mark, "功能描述", class: "control-label col-sm-2"
+    .col-xs-10
+      = text_area_tag "specs[mark]", app[:mark], { style: 'width:100%;height:120px;'}
+  .form-group
+    .col-xs-12
+      = label_tag :ids, "以下应用规格版本是否需要同步"
+  .form-group
+    .col-xs-2
+    .col-xs-10
+      %table#appsTable.table.table-striped.table-bordered.table-hover{:class => "csacsa"}
+        %thead
+          %tr
+            %th= l :numerical_order_all
+            %th= "项目规格"
+            %th= "规格版本"
+            %th= "应用中文名"
+            %th= "桌面显示名称"
+            %th= "开发者信息"
+            %th= "功能描述"
+            %th= "是否需要同步"
+        %tbody
+
+  = hidden_field_tag "specs[spec_id]", app[:spec_id]
+
+
+:javascript
+  initSelect("specs_production_id");
+
+  if("#{app[:production_id].to_i}" == "0"){
+    $("#specs_production_id").prop({'required': true, 'disabled': false});
+  } else {
+    $("#specs_production_id").val("").prop({'required': true, 'disabled': true});
+    $("#specs_production_id").val('#{app[:production_id]}').trigger("change");
+  }
+
+  if($("#specs_production_id").val() != null){
+    fillAppVersions($("#specs_production_id").val());
+    parentAndChildren($("#specs_production_id").val(), 'appsTable', true);
+  } else {
+    initSelect("specs_version_id");
+  }
+
+  $('#specs_production_id').on("change", function (e) {
+    fillAppVersions($(this).val());
+    parentAndChildren($(this).val(), 'appsTable', true);
+  });
+
+  if('#{app[:app_id].to_i}' != '0')
+    parentAndChildren('#{app[:production_id].to_i}', 'appsTable', false);
+
+  function fillAppVersions(pid) {
+    remote('/projects/#{@project_id}/specs/get_app_versions',"GET",{pid : pid,spec_id : '#{app[:spec_id]}'},function(result) {
+      if(result.success.toString() == "1"){
+        var opts = '';
+        $.grep(result.rows,function(row) {
+          opts += "<option value='" + row[0] + "'>" + row[1] + "</option>";
+        });
+        $('#specs_version_id').siblings(".select2-container").remove();
+        $('#specs_version_id').val('').trigger("change");
+        $('#specs_version_id').empty().append(opts);
+        $('#specs_version_id').select2();
+        $("#specs_version_id").val('#{app[:version_id]}').trigger("change");
+
+        $('#specs_cn_name').val(result.app_cn_name.toString());
+      }
+    })
+  }
+
+  function parentAndChildren(appid, tableId, isNew) {
+    remote('/projects/#{@project_id}/specs/get_parent_and_children_spec_version', "GET", {appid: appid, project_id: '#{@project_id}', spec_id: '#{app[:spec_id]}', is_new: isNew}, function(result) {
+      if (result.rows != undefined && result.rows != null) {
+        var trs = "";
+        $.grep(result.rows,function (row) {
+           trs += "<tr>";
+           trs += "<th>" + (result.rows.indexOf(row) + 1).toString() + "</th>";
+           trs += "<th>" + (row.spec_name == null ? '-' : row.spec_name) + "</th>";
+           trs += "<th>" + (row.app_version == null ? '-' : row.app_version) + "</th>";
+           trs += "<th>" + (row.cn_name == null ? '-' : row.cn_name) + "</th>";
+           trs += "<th>" + (row.desktop_name == null ? '-' : row.desktop_name) + "</th>";
+           trs += "<th>" + (row.developer == null ? '-' : row.developer) + "</th>";
+           trs += "<th>" + (row.mark == null ? '-' : row.mark) + "</th>";
+
+           var current_project_specs = #{project_specs(@project_id)};
+           if ("#{@project.ownership}" == "1") {
+            trs += "<th width='80px'><select id='isSync' name='sync[id_" + row.app_id.toString() + "_" + row.spec_id.toString() + "]' class='form-control'><option value='1'>是</option><option value='0'>否</option></select></th>";
+           } else {
+            if (current_project_specs.indexOf(row.spec_name.toString()) > -1){
+              trs += "<th width='80px'><select id='isSync' name='sync[id_" + row.app_id.toString() + "_" + row.spec_id.toString() + "]' class='form-control'><option value='1'>是</option><option value='0'>否</option></select></th>";
+             } else {
+              trs += "<th width='80px'><select id='isSync' name='sync[id_" + row.app_id.toString() + "_" + row.spec_id.toString() + "]' class='form-control'><option value='0'>否</option><option value='1'>是</option></select></th>";
+             }
+           }
+           trs += "</tr>";
+        });
+
+        $('#' + tableId.toString()).find("tbody").empty().append(trs);
+      }
+    })
+  }

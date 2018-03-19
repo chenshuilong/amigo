@@ -1,0 +1,85 @@
+- provide :css, "bootstrap"
+
+.defalut-value
+  - if @default_values.present?
+    .btn-group.pull-right
+      %button.btn.btn-default.dropdown-toggle{"data-toggle" => "dropdown", :type => "button"}
+        %sapn 选择模板
+        %span.caret
+      %ul.dropdown-menu{:role => "menu", :id => "default-value-dropdown"}
+        - @default_values.each do |d|
+          %li.load-default-value
+            %span= link_to (icon "close"), default_value_path(d.id), method: :delete, data: { confirm: "确定删除本模板吗？" }, remote: true, class: "icon-right"
+            = link_to d.name, '', :remote => true, class:"default-value-item", "data-id"=> d.id
+
+= labelled_form_for @version, :url => project_versions_path(@project) do |f|
+  = render :partial => 'versions/form', :locals => { :f => f }
+  .button-group.text-center
+    %a.btn.btn-primary.btn-sm{class: "btn btn-primary btn-sm", id:"faster-creation", remote: true}= l(:button_create)
+
+:javascript
+  //refresh page when change project 
+  $("#version_project_id").on("change", function(){
+    window.onbeforeunload = null;
+    var projectId = $(this).val();
+    var projectType = "#{params[:project_type]}";
+
+    if(projectId != null){
+      location.href = "/faster_new/version?project_id="+projectId+"&project_type="+projectType;
+    };
+  })
+
+  //refresh page to select default_value
+  $(".load-default-value .default-value-item").on("click", function(){
+    window.onbeforeunload = null;
+    var defaultID = $(this).data("id");
+    var projectType = "#{params[:project_type]}";
+    location.href = "/faster_new/version?default_value_id="+defaultID+"&project_type="+projectType;
+  })
+
+  //form submit
+  $("#faster-creation").on("click", function(){
+    window.onbeforeunload = null;
+
+    var data = $("form#new_version").serialize();
+    var projectId = $("#version_project_id").val();
+    var specId = $("#version_spec_id").val();
+    if(specId != null){
+      $.ajax({
+        url: '/projects/'+ projectId +'/versions.json?key=#{User.current.api_key}',
+        type: "post",
+        data: data,
+        dataType: "json"
+      }).done( function(result){
+        var url = "/projects/" + projectId +"/roadmap"
+        window.parent.location.href = url
+      }).fail(function(xhr, textStatus, errorThrown){
+        if(xhr.status == 403){
+          var category = "#{@project.category}";
+          if(category != 4){
+            layer.alert("无编译版本权限，请同该项目SPM确认是否配置了该权限！");
+          }else{
+            layer.alert("无编译版本权限，请同该应用APP-SPM确认是否配置了权限！");         
+          };
+        }else{
+          var errorText = $.parseJSON(JSON.stringify(xhr.responseText));
+          var errors = eval("(" + errorText + ")").errors;
+          var html = '';
+          html = html + "<div id='errorExplanation'><ul>";
+              
+          $.each(errors, function(i, value) {
+            html = html + "<li>" + value + "</li>";
+          });    
+
+          html = html + "</ul></div>";    
+
+          $("#errorExplanation").remove();
+          $("#faster-new-top #content").prepend(html);
+
+        location.href = "#faster-new-top"
+        }
+      });
+    }else{
+      layer.alert("请选择规格,若该项目下无规格请先创建!");
+    };    
+  })

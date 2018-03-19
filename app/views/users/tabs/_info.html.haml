@@ -1,0 +1,27 @@
+= labelled_fields_for :user, @user do |f|
+  %p.text-right
+    = additional_emails_link(@user)
+    = call_hook(:view_my_account_contextual, :user => @user)
+  / User info
+  .label= l(:label_information_plural)
+  .row
+    .col-md-6.col-md-push-6
+      .large-avatar
+        = image_tag @user.picture.large.url
+      .upload-avatar.text-center
+        = link_to (@user.picture?? l(:user_update_avatar) : l(:user_upload_avatar)), void_js, class: "btn btn-primary btn-sm"
+        = file_field_tag 'avatar_file', accept: 'image/png, image/jpeg', id: 'avatar-input'
+    .col-md-6.col-md-pull-6
+      %p= f.text_field :name, :required => true, :readonly => true
+      %p= f.text_field :mail, :required => true, :readonly => true
+      %p= f.text_field :mobile, :pattern => "^1[345678][0-9]{9}$", :label => l(:user_contact_mobile), :required => true
+      %p= f.text_field :phone, :pattern => "^[0-9](-|\\d)*$", :label => l(:user_contact_phone)
+      %p= f.text_field :qq, :pattern => "^[0-9]\\d{5,11}$"
+      - unless @user.force_default_language?
+        %p= f.select :language, lang_options_for_select
+      - if Setting.openid?
+        %p= f.text_field :identity_url
+      - @user.custom_field_values.select(&:editable?).each do |value|
+        %p= custom_field_tag_with_label :user, value
+      = call_hook(:view_my_account, :user => @user, :form => f)
+    .clearfix

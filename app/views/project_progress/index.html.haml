@@ -1,0 +1,59 @@
+- provide :nav, "2,3"
+- provide :css, "bootstrap"
+- content_for :header_tags do
+  %link{:href => "/amg/dataTable/datatable.css", :rel => "stylesheet"}
+  %link{:href => "/amg/dataTable/fixedColumns.bootstrap.min.css", :rel => "stylesheet"}
+
+  %script{:src => "/amg/dataTable/dataTables.fixedColumns.min.js", :type => "text/javascript"}
+  %script{:src => "/amg/dataTable/dataTables.bootstrap.min.js", :type => "text/javascript"}
+
+.top-action-menu.pull-right
+.h2= l(:project_progress_all)
+
+.clearfix
+.issue-details
+  .roadmap-table
+    .panel.panel-default
+      .panel-body
+        %table#progressTable.list.issues-relations-table.table.table-bordered.table-hover
+          %thead
+            %tr
+              %th= l(:field_num_order)
+              %th= l(:project_progress_name)
+              %th= l(:project_progress_external_name)
+              %th= l(:project_progress_cta_name)
+              %th= l(:project_progress_project_name)
+              %th= l(:field_app_version_type)
+              %th= l(:project_progress_project_setup_dt)
+              %th= l(:project_progress_project_status)
+              %th= l(:project_progress_project_next_step)
+              %th= l(:project_progress_plan_adapter)
+              %th= l(:project_progress_plan_mast_ok)
+              %th= l(:project_progress_plan_middle)
+              %th= l(:project_progress_plan_end)
+              %th= l(:project_progress_plan_production)
+          %tbody
+            - @progress.each_with_index do |progress, idx|
+              %tr
+                %td= idx + 1
+                %td= progress.progress_name
+                %td= progress.external_name
+                %td= progress.cta_name
+                %td= progress.project_name
+                %td= progress.app_version_type
+                %td= progress.setup_dt
+                %td= progress.plan_status
+                %td= progress.next_step
+                %td= progress.plan_adapter_dt
+                %td= progress.plan_mast_ok_dt
+                %td= progress.plan_middle_dt
+                %td= progress.plan_end_dt
+                %td= progress.plan_production_dt
+
+- html_title(l(:project_progress_all))
+
+:javascript
+
+  var progressTable = initDataTable('progressTable',{
+    paging: true, pageLength: 1000, ordering: false, info: false, searching: false, select: true, scrollX: true
+  });

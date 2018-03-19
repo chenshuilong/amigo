@@ -1,0 +1,57 @@
+%div{:style => "width:100%;"}
+  %ul.notification-list
+    %li.notification-list-item
+      .notification-content
+        %p
+          %strong= "查询条件"
+      .clearfix
+      .notification-acton.select2-rectify
+        %form#formBugMovingTime.form-horizontal{:role => "form"}
+          .form-group
+            %label.col-sm-2.control-label 项目
+            .col-sm-5
+              = select_tag "project_ids", options_for_select(Project.all.collect {|s| [s.name,s.id]}), :multiple => :multiple,class: 'form-control'
+            %label.col-sm-2.control-label 状态
+            .col-sm-3
+              = select_tag "status_ids", options_for_select(IssueStatus.all.collect {|s| [s.name,s.id]}), :multiple => :multiple, :class => "form-control"
+
+          .form-group
+            %label.col-sm-2.control-label 指派者部门
+            .col-sm-5
+              = select_tag "assigned_dept_ids", options_for_select(Dept.all.collect {|s| [s.orgNm,s.id]}), :multiple => :multiple,class: 'form-control'
+            %label.col-sm-2.control-label 指派者
+            .col-sm-3
+              = select_tag "assigned_to_ids", [], :multiple => :multiple, :class => "form-control"
+
+          .form-group
+            %label.col-sm-2.control-label 更新时间
+            .col-sm-2
+              %input#start_dt_moving.form-control{:name => "start_dt",:value => "#{(Time.now-7.days).strftime('%Y-%m-%d')}"}
+            %label.col-sm-1.control-label 至
+            .col-sm-2
+              %input#end_dt_moving.form-control{:name => "end_dt",:value => "#{Time.now.strftime('%Y-%m-%d')}"}
+            .col-sm-5.text-right
+              %input{:type => "button",:onclick => "queryBugMovingTime('bug_moving_time')",:class => "btn btn-primary",:value => "查  询"}
+
+.panel.panel-default
+  .panel-heading= "bug走查"
+  .panel-body
+    .button-group-report.text-right
+      %input{:type => "button",:onclick => "exportPersonalize('bug_moving_time','formBugMovingTime')",:class => "btn btn-primary",:value => "导出Excel"}
+    .autoscroll
+      %table#bug_moving_time.table.table-striped.table-bordered.table-hover
+
+:javascript
+  initSelect("status_ids");
+  initSelect("assigned_dept_ids");
+  initSelect("project_ids");
+
+  $("#assigned_to_ids").select2_remote();
+
+  initDateTimePicker("start_dt_moving","Y-m-d",false);
+  initDateTimePicker("end_dt_moving","Y-m-d",false);
+
+  setTimeout(function () {
+    $('.notification-acton').css("display","block");
+    //queryBugMovingTime('bug_moving_time');
+  }, 500);

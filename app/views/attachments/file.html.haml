@@ -1,0 +1,6 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+= render :layout => 'layouts/file' do
+   
+  \#{render :partial => 'common/file', :locals => {:content => @content, :filename => @attachment.filename} if @attachment.filesize <= Setting.file_max_size_displayed.to_i.kilobyte}

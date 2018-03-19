@@ -1,0 +1,177 @@
+#mergeTaskTable
+.editIssue{:style => "display:none;width:840px;padding:20px;"}
+  = form_tag('/tasks/edit_task', :id => "editTaskForm", :remote => true, :class => "form-horizontal") do
+    .form-group
+      = label_tag :need_merge, l(:issue_to_merge_need_merge), class: 'control-label col-sm-3'
+      .col-xs-9
+        %label.radio-inline
+          %input#need_merge_yes{:name => "tasks[need_merge]", :type => "radio", :value => "1", :checked => "checked"} 需要合入流
+        %label.radio-inline
+          %input#need_merge_no{:name => "tasks[need_merge]", :type => "radio", :value => "0"} 不需要合入流
+    .form-group
+      = label_tag :liu, l(:issue_to_merge_liu), class: 'control-label col-sm-3'
+      .col-xs-9
+        %table.table#repo_requests{:style => "border-right: 1px solid transparent !important;"}
+    .form-group
+      = label_tag :related_issue_ids, l(:issue_to_merge_related_issue_ids), class: 'control-label col-sm-3'
+      .col-xs-9
+        = text_field_tag "tasks[related_issue_ids]", "", class: 'form-control'
+    .form-group
+      = label_tag :related_apks, l(:issue_to_merge_related_apks), class: 'control-label col-sm-3'
+      .col-xs-9
+        = text_field_tag "tasks[related_apks]", "", { style: 'width:100%;', class: 'form-control'}
+    .form-group
+      = label_tag :tester_advice, l(:issue_to_merge_tester_advice), class: 'control-label col-sm-3'
+      .col-xs-9
+        = text_area_tag "tasks[tester_advice]", "", { style: 'width:100%;', class: 'form-control'}
+    .form-group
+      = label_tag :notes, '状态', class: 'control-label col-sm-3'
+      .col-xs-9
+        = select_tag "tasks[status_id]", options_for_select(IssueToMergeTask::ASSIGNED_STATUS.to_a.map { |status| [status[1][1], status[1][0]]}), { class: 'form-control', style: 'width:100%'}
+        = select2_tag("tasks_status_id")
+        = hidden_field_tag "tasks[id]"
+    .form-group
+      = label_tag :dept_result, l(:issue_to_merge_dept_result), class: 'control-label col-sm-3'
+      .col-xs-9
+        = text_area_tag "tasks[dept_result]", "", { style: 'width:100%;', class: 'form-control'}
+    .form-group
+      = label_tag :project_result, l(:issue_to_merge_project_result), class: 'control-label col-sm-3'
+      .col-xs-9
+        = text_area_tag "tasks[project_result]", "", { style: 'width:100%;', class: 'form-control'}
+        = hidden_field_tag "tasks[issue_type]", "IssueToMerge"
+        = hidden_field_tag "tasks[task_id]", ""
+:css
+  .unread{
+    font-weight: 700;
+    color: #f88829;
+  } 
+
+:javascript
+
+  var table = $("#mergeTaskTable");
+
+  var tasksSource =
+  {
+      dataFields: [
+          { name: 'id', type: 'int' },
+          { name: 'project_id', type: 'int' },
+          { name: 'project_name', type: 'string' },
+          { name: 'task_id', type: 'int' },
+          { name: 'task_name', type: 'string' },
+          { name: 'issue_id', type: 'int' },
+          { name: 'commit_id', type: 'string' },
+          { name: 'created_at', type: 'date' },
+          { name: 'status_id', type: 'int' },
+          { name: 'status_name', type: 'string' },
+          { name: 'is_read', type: 'boolean' }
+      ],
+      type: 'POST',
+      dataType: "json",
+      id: 'id',
+      url: "/tasks/issue_to_task",
+      addRow: function (rowID, rowData, position, commit) {
+          commit(true);
+      },
+      updateRow: function (rowID, rowData, commit) {
+          commit(true);
+      },
+      deleteRow: function (rowID, commit) {
+          commit(true);
+      }
+  };
+  var dataAdapter = new $.jqx.dataAdapter(tasksSource,
+      {
+          formatData: function (data) {
+              $.extend(data, {
+                  token: "#{Token.generate_token_value}",
+                  issue_type: "IssueToMerge",
+                  maxRows: 50
+              });
+              return data;
+          },
+          loadComplete: function () {
+            // data is loaded.
+          }
+      }
+  );
+  var cellClass = function (row, dataField, cellText, rowData) {
+      var unread = rowData.is_read == false ? 'unread' : ''
+      return unread;
+  }
+  table.jqxDataTable(
+  {
+      width: '100%',
+      height: 680,
+      source: dataAdapter,
+      pageable: true,
+      sortable: true,
+      altRows: true,
+      filterable: true,
+      // theme: 'orange',
+      filterMode: 'advanced',
+      localization: getLocalization(),
+      ready: function () {
+
+      },
+      pagerButtonsCount: 8,
+      columns: [
+        { text: '项目', dataField: 'project_name', cellsAlign: 'center', align: 'center', width: 100, cellClassName: cellClass },
+        { text: '任务ID', dataField: 'task_id', cellsAlign: 'center', align: 'center', width: 100, cellClassName: cellClass },
+        { text: '问题ID', dataField: 'issue_id', cellsAlign: 'center', align: 'center', width: 100, cellClassName: cellClass },
+        { text: 'Gerrit提交记录ID', dataField: 'commit_id', cellsAlign: 'center', align: 'center', width: 200, cellClassName: cellClass },
+        { text: '任务发起时间', dataField: 'created_at', cellsAlign: 'center', align: 'center', cellsFormat: 'c', cellClassName: cellClass },
+        { text: '状态', dataField: 'status_name', width: 150, cellClassName: cellClass },
+        { text: 'is_read', dataField: 'is_read', hidden: true, cellClassName: 'isRead' }
+      ]
+  });
+  table.on('rowClick', function (event) {
+      var args = event.args;
+      var index = args.index;
+      var row = args.row;
+
+      var cur_row = $("[data-key="+ index +"]");
+      var $isRead = cur_row.children(".isRead");
+      if($isRead.text() == 'false'){
+        cur_row.children().removeClass("unread");
+        $isRead.text(true);
+        var rest_unread = $("span#200_101").find('.badge').text() - 1;;
+        if(rest_unread == 0){
+          $("span#200_101").find('.badge').remove()
+        }else{
+          $("span#200_101").find('.badge').text(rest_unread);
+        }
+        $.post('/tasks/'+ row.task_id +'/handle');
+      }
+      // $('#need_merge_yes').attr('checked', 'checked');
+      $('#need_merge_no').removeAttr('checked');
+      remote('/repo_requests/issue_to_approve_merges', 'post', {project_id: row.project_id}, function(res){
+        if (res.success.toString() == "1"){
+          if (res.rows != undefined && res.rows != null) {
+            var table = "<thead><tr><th>分支名称</th><th>用途</th></tr></thead>";
+            var trs = "";
+            $.each(res.rows, function (index, row) {
+                trs += "<tr>";
+                trs += "<th><input type='checkbox' name='repo_requests[id_" + row.id + "]' value='1' />" + row.branch + "</th>";
+                trs += "<th>" + row.use + "</th>";
+                trs += "</tr>";
+            });
+            table += "<tbody>" + trs + "</tbody></table>";
+            $('#repo_requests').empty().append(table);
+          }
+        }
+      })
+      $('#tasks_task_id').val(row.task_id);
+      $('#tasks_status_id').val(row.status_id).trigger("change");
+
+      openLayer("编辑窗口 -- " + row.task_name, '880px', $(".editIssue"), function(){
+        $('#editTaskForm').submit();
+      })
+  });
+
+  $('#need_merge_no').click(function(){
+    $('table#repo_requests').children().eq(1).find(":checkbox").disabledControl();
+  })
+
+  $('#need_merge_yes').click(function(){
+    $('table#repo_requests').children().eq(1).find(":checkbox").enabledControl();
+  })

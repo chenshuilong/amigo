@@ -1,0 +1,1 @@
+$("#role-#{params[:role_id]}").html('#{@members.uniq.collect{|m| link_to_member(m, @role)}.join(", ").html_safe}')

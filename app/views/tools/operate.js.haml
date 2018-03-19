@@ -1,0 +1,25 @@
+:plain
+  $(".nav-faster-new").removeClass('open');
+  layer.closeAll();
+
+  var operate_type = "#{@operate_type}";
+  var tool = "#{@tool.try(:id)}";
+  
+  if(operate_type == "new"){
+    var title = "新增工具"
+    var content = "/tools/"+operate_type;
+  }else if(operate_type == "edit"){
+    var title = "编辑工具"
+    var content = "/tools/"+tool+"/"+operate_type;
+  };
+
+  layer.open({
+    type: 2,
+    title: "<b>"+title+"</b>",
+    area: ['880px', '560px'],
+    zIndex: 999,
+    moveType: 1,
+    maxmin: false,
+    shadeClose: false,
+    content: content
+  });

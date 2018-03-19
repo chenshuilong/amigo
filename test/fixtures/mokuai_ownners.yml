@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  project_id: 
+  mokuai_id: 
+  ownner: 1
+
+two:
+  project_id: 
+  mokuai_id: 
+  ownner: 1

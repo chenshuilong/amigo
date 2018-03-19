@@ -1,0 +1,29 @@
+- if @records.blank?
+  %p.nodata= l(:label_no_data)
+- else
+  %table#recordsTable.table.table-bordered.table-hover
+    %thead
+      %tr
+        %th= l(:numerical_order_all)
+        %th= l(:alter_record_created_at)
+        %th= l(:alter_record_user)
+        %th= l(:alter_record_type)
+        %th= l(:alter_record_prop_key)
+        %th= l(:alter_record_app_name)
+        %th= l(:alter_record_old_value)
+        %th= l(:alter_record_value)
+
+    %tbody
+      - @records.each_with_index do |spec,idx|
+        %tr{:data =>{:id => "record-#{spec.id}"},:class => "#{spec.record_type == SpecAlterRecord::DELETE_RECORD ? 'danger' : ''}"}
+          %th= idx + 1
+          %th= format_date spec.created_at
+          %th= link_to_user to_user(spec.user_id)
+          %th= to_record_type spec.record_type
+          %th= to_prop_key spec.prop_key
+          %th= to_app_name spec.app_id
+          %th= to_old_value(spec.prop_key,spec.old_value)
+          %th= to_old_value(spec.prop_key,spec.value)
+
+:javascript
+  var recordsTable = initDataTable('recordsTable', {});

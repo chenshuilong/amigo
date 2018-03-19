@@ -1,0 +1,94 @@
+- provide :css, "bootstrap"
+
+.clearfix{style: "margin-top:30px"}
+  - unless (@task.author_id == @task.assigned_to_id && @task.submitted? && @task.attachments.blank?)
+    .issue-details{style: "margin-top: 20px"}
+      - if (@task.author_id == @task.assigned_to_id && @task.closed?) || (@task.author_id != @task.assigned_to_id)
+        = render :partial => "personal_task_show"
+
+      - if @task.attachments.present?
+        .attributes
+          %table.table.table-borderless
+            %tbody
+              %tr 
+                %th.col-sm-2= l(:label_attachments)
+                %td.col-sm-10
+                  .attachments
+                    .attachments.attachments-list
+                      - @task.attachments.preload(:author).each do |a|
+                        %p 
+                          = link_to a.filename, named_upload_files_path(id: a.id, filename: a.filename), target: "_blank", class: "icon icon-attachment"
+                          %span.size= number_to_human_size a.filesize
+                          = link_to l(:button_delete), upload_file_path(id: a.id), method: "delete", class: "delete icon-only icon-del" if a.container.delete_attachment?(a)
+                          = a.author.firstname
+
+      - if @notes.present? || @historys.present?
+        .attributes     
+          .allchange
+            %ul.nav.nav-tabs
+              - if @notes.present?
+                %li.active
+                  %a{"data-toggle" => "tab", :href => "#notes"}= l(:field_notes)
+              - if @historys.present?
+                %li{:class => ("active" unless @notes.present?) }
+                  %a{"data-toggle" => "tab", :href => "#history"}= l(:label_history)
+            .tab-content
+              #notes.tab-pane.in.active
+                .history-details
+                  .journal
+                    - @notes.each_with_index do |r, idx|
+                      #note
+                        .note-title
+                          = task_authoring_at r.created_at, r.user, {:label => :label_updated_time_at, target: "_blank"}
+                        %ul.details
+                          - personal_task_details(r.details.where(prop_key: "notes")).each do |string|
+                            = string
+              #history.tab-pane{:class => ("in active" unless @notes.present?) }
+                .history-details
+                  .journal
+                    - @historys.each_with_index do |r, idx|
+                      #note
+                        .note-title
+                          = task_authoring_at r.created_at, r.user, {:label => :label_updated_time_at, target: "_blank"}
+                        %ul.details
+                          - personal_task_details(r.details.where.not(prop_key: "notes")).each do |string|
+                            %li= string
+  - if @task.personal_task_edit?
+    = error_messages_for @task
+    = labelled_form_for @task, :url => personal_task_update_task_path(@task), :html => {:multipart => true, id: "personalTaskForm"} do |f|
+      = render :partial => 'personal_task_form', :locals => { :f => f }
+      .button-group.text-center
+        %a.btn.btn-primary.btn-sm{class: "btn btn-primary btn-sm", id:"updatePersonalTask", remote: true}= l(:button_send)
+
+:javascript
+  $("#updatePersonalTask").on("click", function(){
+    window.onbeforeunload = null;
+
+    var data = $("form#personalTaskForm").serialize();
+    var taskId = "#{@task.id}";
+    $.ajax({
+      url: '/tasks/'+taskId+'/personal_task_update.json?key=#{User.current.api_key}',
+      type: "post",
+      data: data,
+      dataType: "json"
+    }).done( function(result){
+      success = result.success;
+      messages = result.message;
+      if(success == 1){
+        var url = '#{my_tasks_path(type: "personal_task", person_type: "#{params[:person_type]}")}';
+        window.parent.location.href = url;
+      }else if(success == 0){
+        var html = '';
+        html = html + "<div id='errorExplanation'><ul>";
+              
+        $.each(messages, function(i, value) {
+          html = html + "<li>" + value + "</li>";
+        });    
+
+        html = html + "</ul></div>";    
+
+        $("#errorExplanation").remove();
+        $("form#personalTaskForm").prepend(html);
+      }
+    });   
+  })

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>jQuery微信扫描关注网页特效 - 站长素材</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="css/animation.css">
+    <link rel="stylesheet" href="css/index.css">
+    <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+
+</head>
+<body style="height: 2000px">
+
+<!--返回顶部开始-->
+<div id="code"></div>
+<div id="code_img"></div>
+<a id="gotop" href="javascript:void(0)"><img src="images/fhjt.png" alt=""/></a>
+<script type="text/javascript">
+    function b() {
+        h = $(window).height();
+        t = $(document).scrollTop();
+        if (t > h) {
+            $('#gotop').show();
+        } else {
+            $('#gotop').hide();
+        }
+    }
+    $(document).ready(function (e) {
+
+        b();
+
+        $('#gotop').click(function () {
+            $(document).scrollTop(0);
+        });
+
+        $('#code').hover(function () {
+            $(this).attr('id', 'code_hover');
+            $('#code_img').show();
+            $('#code_img').addClass('a-fadeinL');
+        }, function () {
+            $(this).attr('id', 'code');
+            $('#code_img').hide();
+        })
+
+    });
+
+    $(window).scroll(function (e) {
+        b();
+    });
+</script>
+<!--返回顶部结束-->
+
+<div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';">
+    <p>适用浏览器：360、FireFox、Chrome、Safari、Opera、傲游、搜狗、世界之窗. 不支持IE8及以下浏览器。</p>
+    <p>来源：<a href="http://sc.chinaz.com/" target="_blank">站长素材</a></p>
+</div>
+</body>

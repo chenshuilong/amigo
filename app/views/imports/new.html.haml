@@ -1,0 +1,11 @@
+%h2= l(:label_import_issues)
+= form_tag(imports_path, :multipart => true) do
+  %fieldset.box
+    %legend
+      = l(:label_select_file_to_import)
+      (CSV)
+    %p
+      = file_field_tag 'file'
+  %p= submit_tag l(:label_next).html_safe + " »".html_safe, :name => nil
+- content_for :sidebar do
+  = render :partial => 'issues/sidebar'

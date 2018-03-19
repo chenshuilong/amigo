@@ -1,0 +1,18 @@
+- provide :nav, "5,3"
+- provide :css, "bootstrap"
+- hide_project_menu
+- content_for :bread do
+  %li= link_to l(:periodic_versions), periodic_versions_path
+  %li= link_to @task.name, edit_periodic_version_path(@task)
+  %li= l(:periodic_version_edit)
+
+.h2= l(:periodic_version_edit)
+= labelled_form_for @task, :url => periodic_version_path(@task), :html => {:class => 'form-wrapper', :multipart => true} do |f|
+  = error_messages_for @task
+  .box.tabular
+    #all_attributes
+      = render :partial => 'form', :locals => { :f => f }
+  .button-group.text-center
+    = submit_tag l(:button_update), class: "btn btn-primary"
+
+- html_title(l(:periodic_version_rule_edit))

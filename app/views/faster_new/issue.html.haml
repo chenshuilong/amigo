@@ -1,0 +1,77 @@
+- provide :css, "bootstrap"
+
+.defalut-value
+  = render :partial => 'default_values/index', :locals => {:defaults => @default_values}
+= labelled_form_for @issue, :url => _project_issues_path(@project), |
+  :html => {:id => 'issue-form', :class => 'new_issue form-wrapper', :multipart => true} do |f|         |
+  = error_messages_for 'issue'
+  = hidden_field_tag 'copy_from', params[:copy_from] if params[:copy_from]
+  .box.tabular
+    .issue-switch
+      %ul
+        %li.active 项目问题
+        %li ROM问题
+        %i
+      .clear-fix
+    #all_attributes.all-attributes
+      = render :partial => 'issues/form', :locals => {:f => f}
+    - if @copy_from && Setting.link_copied_issue == 'ask'
+      %p
+        %label{:for => "link_copy"}= l(:label_link_copied_issue)
+        = check_box_tag 'link_copy', '1', @link_copy
+    - if @copy_from && @copy_from.attachments.any?
+      %p
+        %label{:for => "copy_attachments"}= l(:label_copy_attachments)
+        = check_box_tag 'copy_attachments', '1', @copy_attachments
+    - if @copy_from && !@copy_from.leaf?
+      %p
+        %label{:for => "copy_subtasks"}= l(:label_copy_subtasks)
+        = check_box_tag 'copy_subtasks', '1', @copy_subtasks
+    %p#attachments_form
+      %label= l(:label_attachment_plural)
+      = render :partial => 'attachments/form', :locals => {:container => @issue}
+    - if @issue.safe_attribute? 'watcher_user_ids'
+      %p#watchers_form
+        %label= l(:label_issue_watchers)
+        %span#watchers_inputs
+          -# = watchers_checkboxes(@issue, users_for_new_issue_watchers(@issue))
+        %span.search_for_watchers
+          = link_to l(:label_search_for_watchers),                                        |
+            {:controller => 'watchers', :action => 'new', :project_id => @issue.project}, |
+            :remote => true,                                                              |
+            :method => 'get'
+  .button-group.text-center
+    %a.btn.btn-primary.btn-sm{class: "btn btn-primary btn-sm", id:"faster-creation", remote: true}= l(:button_create)
+    %a{:href => "javascript:;", :class => "get-default-value", :for => "issue"} 保存为模板
+
+:javascript
+  $("#faster-creation").on("click", function(){
+    var data = $("form#issue-form").serialize();
+    $.ajax({
+      url: '/issues.json?key=#{User.current.api_key}',
+      type: "post",
+      data: data,
+      dataType: "json"
+    }).done( function(result){
+      var url = "/issues/"+result.issue.id;
+      window.parent.location.href = url;
+    }).fail(function(xhr, textStatus, errorThrown){
+      var errorText = $.parseJSON(JSON.stringify(xhr.responseText))
+      var errors = eval("(" + errorText + ")").errors;
+
+      var html = '';
+      html = html + "<div id='errorExplanation'><ul>";
+          
+      $.each(errors, function(i, value) {
+        html = html + "<li>" + value + "</li>";
+      });
+
+      html = html + "</ul></div>";
+
+      $("#errorExplanation").remove();
+      $("#faster-new-top #content").prepend(html);
+
+      location.href = "#faster-new-top"
+    });
+  })
+  

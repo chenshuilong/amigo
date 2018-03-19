@@ -1,0 +1,13 @@
+production:
+  email_delivery:
+    delivery_method: :smtp
+    smtp_settings:
+      address: 'smtp.gionee.com'
+      port: 25
+      authentication: :login
+      enable_starttls_auto: false
+      openssl_verify_mode: 'none'
+      domain: 'mail.gionee.com'
+      user_name: 'os-system@gionee.com'
+      password: 'Amigo20171213'
+

@@ -1,0 +1,21 @@
+- provide :nav, (@project.show_by(4)? "4,1" : "2,1")
+- provide :css, "bootstrap"
+
+.top-action-menu.pull-right
+  - if @issue.editable?
+    = link_to edit_issue_path(@issue), :onclick => 'showAndScrollTo("update", "issue_notes"); return false;', :class => 'icon icon-edit issue-edit', :accesskey => accesskey(:edit) do
+      = icon "edit"
+      = l(:button_edit)
+  -# - if User.current.allowed_to?(:log_time, @project)
+  -#   = link_to new_issue_time_entry_path(@issue), :class => 'icon icon-time-add' do
+  -#     = icon "history"
+  -#     = l(:button_log_time)
+  = watcher_link(@issue, User.current)
+  - if User.current.allowed_to?(:copy_issues, @project) && Issue.allowed_target_projects.any?
+    = link_to project_copy_issue_path(@project, @issue), :class => 'icon icon-copy' do
+      = icon "clipboard"
+      = l(:button_copy)
+  - if @issue.deletable?
+    = link_to issue_path(@issue), :data => {:confirm => issues_destroy_confirmation_message(@issue)}, :method => :delete, :class => 'icon icon-del' do
+      = icon "trash"
+      = l(:button_delete)

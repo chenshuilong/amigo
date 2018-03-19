@@ -1,0 +1,9 @@
+= labelled_form_for :repo, @repo do |f|
+  = error_messages_for 'repo'
+  .issue-details#update
+    #all_attributes
+      %p= f.select :category, list_for_select(@repo, :category), :required => true, label: :repo_category
+      %p= f.text_field :url, :required => true, :style => "width: 80%"
+      %p= f.text_area :description, :required => false, :style => "width: 80%; height: 100px"
+  .button-group.text-center
+    = submit_tag l(:button_save), class: "btn btn-primary"

@@ -1,0 +1,25 @@
+- @entries.each do |entry|
+  - tr_id = Digest::MD5.hexdigest(entry.path)
+  - depth = params[:depth].to_i
+  - ent_path = Redmine::CodesetUtil.replace_invalid_utf8(entry.path)
+  - ent_name = Redmine::CodesetUtil.replace_invalid_utf8(entry.name)
+  %tr{:class => "#{params[:parent_id]} entry #{entry.kind}", :id => tr_id}
+    %td.:{:class => "#{@repository.report_last_commit ? "filename" "filename_no_report"}", :style => "padding-left: #{18 * depth}px;"}
+      - if entry.is_dir?
+        %span.expander{:onclick => "scmEntryClick('#{tr_id}', '#{escape_javascript(url_for(
+                       :action => 'show',
+                       :id     => @project,
+                       :repository_id => @repository.identifier_param,
+                       :path   => to_path_param(ent_path),
+                       :rev    => @rev,
+                       :depth  => (depth + 1),
+                       :parent_id => tr_id))}');"}  
+      = link_to ent_name,                                                                                                                                                   |
+        {:action => (entry.is_dir? ? 'show' : 'changes'), :id => @project, :repository_id => @repository.identifier_param, :path => to_path_param(ent_path), :rev => @rev}, |
+        :class => (entry.is_dir? ? 'icon icon-folder' : "icon icon-file #{Redmine::MimeType.css_class_of(ent_name)}")                                                       |
+    %td.size= (entry.size ? number_to_human_size(entry.size) : "?") unless entry.is_dir?
+    - if @repository.report_last_commit
+      %td.revision= link_to_revision(entry.changeset, @repository) if entry.changeset
+      %td.age= distance_of_time_in_words(entry.lastrev.time, Time.now) if entry.lastrev && entry.lastrev.time
+      %td.author= entry.author
+      %td.comments= entry.changeset.comments.truncate(50) if entry.changeset

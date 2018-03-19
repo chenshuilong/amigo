@@ -1,0 +1,32 @@
+%h2= l(:label_bulk_edit_selected_time_entries)
+%ul#bulk-selection
+  - @time_entries.each do |entry|
+    = content_tag 'li',                                                                                                                            |
+      link_to("#{format_date(entry.spent_on)} - #{entry.project}: #{l(:label_f_hour_plural, :value => entry.hours)}", edit_time_entry_path(entry)) |
+= form_tag(bulk_update_time_entries_path, :id => 'bulk_edit_form') do
+  = @time_entries.collect {|i| hidden_field_tag('ids[]', i.id, :id => nil)}.join.html_safe
+  .box.tabular
+    %div
+      %p
+        %label= l(:field_issue)
+        = text_field :time_entry, :issue_id, :size => 6
+      %p
+        %label= l(:field_spent_on)
+        = date_field :time_entry, :spent_on, :size => 10
+        = calendar_for('time_entry_spent_on')
+      %p
+        %label= l(:field_hours)
+        = text_field :time_entry, :hours, :size => 6
+      - if @available_activities.any?
+        %p
+          %label= l(:field_activity)
+          = select_tag('time_entry[activity_id]', content_tag('option', l(:label_no_change_option), :value => '') + options_from_collection_for_select(@available_activities, :id, :name))
+      %p
+        %label= l(:field_comments)
+        = text_field(:time_entry, :comments, :size => 100)
+      - @custom_fields.each do |custom_field|
+        %p
+          %label= h(custom_field.name)
+          = custom_field_tag_for_bulk_edit('time_entry', custom_field, @time_entries)
+      = call_hook(:view_time_entries_bulk_edit_details_bottom, { :time_entries => @time_entries })
+  %p= submit_tag l(:button_submit)

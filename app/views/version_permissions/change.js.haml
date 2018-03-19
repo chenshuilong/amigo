@@ -1,0 +1,33 @@
+:plain
+  $("#ajax-modal").html('#{j render :partial => "form"}')
+    layer.open({
+      type: 1,
+      title: '<b>应用权限配置</b>',
+      area: ['700px', 'auto'],
+      zIndex: 666,
+      moveType: 1,
+      shadeClose: false,
+      content: $("#ajax-modal"),
+      btn: ['取消', '确定'],
+      yes: function(index, layero){
+        layer.close(index)
+      }
+  });
+
+  $(".layui-layer-btn1").on("click", function(){
+    var form = $( "#version-permission-form" )
+    var data = form.serialize();
+    $.ajax({
+       url: '/version_permissions/save_change',
+       type: "post",
+       data: data,
+       success: function (data) { 
+          if(data){
+            window.onbeforeunload = null;
+            window.location.href = "/version_permissions"
+          }else{
+            layer.msg("操作失败!");
+          }
+       }
+    });
+  })

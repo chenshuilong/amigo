@@ -1,0 +1,27 @@
+- provide :nav, "1,1"
+
+.contextual
+  = link_to l(:label_personalize_page), :action => 'page_layout'
+.h2= l(:label_my_page)
+.issue-details
+  #list-top
+    - @blocks['top'].each do |b|
+    - next unless MyController::BLOCKS.keys.include? b
+      .mypage-box
+        = render :partial => "my/blocks/#{b}", :locals => { :user => @user }
+    - end if @blocks['top']
+  #list-left.splitcontentleft
+    - @blocks['left'].each do |b|
+    - next unless MyController::BLOCKS.keys.include? b
+      .mypage-box
+        = render :partial => "my/blocks/#{b}", :locals => { :user => @user }
+    - end if @blocks['left']
+  #list-right.splitcontentright
+    - @blocks['right'].each do |b|
+    - next unless MyController::BLOCKS.keys.include? b
+      .mypage-box
+        = render :partial => "my/blocks/#{b}", :locals => { :user => @user }
+    - end if @blocks['right']
+  .clearfix
+= context_menu issues_context_menu_path
+- html_title(l(:label_my_page))

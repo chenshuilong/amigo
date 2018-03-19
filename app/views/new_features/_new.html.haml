@@ -1,0 +1,11 @@
+= labelled_form_for :new_feature, new_feature, :class => "form-inline" do |f|
+  .row
+    .col-xs-2
+      .form-group= f.select :category, NewFeature::NEWFEATURE_CATEGORY.invert, {}, class: "form-control"
+    .col-xs-10
+      .form-group= f.text_field :description, class: "form-control"
+
+:javascript
+  new SMValidator('#new_new_feature', {fields: {'new_feature[description]': 'required'}});
+
+
