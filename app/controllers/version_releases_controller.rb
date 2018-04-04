@@ -29,34 +29,34 @@ class VersionReleasesController < ApplicationController
         @created_at_start = params[:created_at_start]
         @created_at_end = (Date.parse(params[:created_at_end]) + 1).to_s if params[:created_at_end].present?
 
-        scope = VersionRelease.all
-        scope = scope.where("status in (#{@status.map { |sta| VersionRelease.statuses[sta] }.join(',')})") if @status.present? && @status != [""]
+        scope = $db.slave { VersionRelease.all }
+        scope = $db.slave { scope.where("status in (#{@status.map { |sta| VersionRelease.statuses[sta] }.join(',')})") } if @status.present? && @status != [""]
         if @tested_mobile.present? && @tested_mobile != [""]
           tm_where = @tested_mobile.map { |tm| "tested_mobile = '#{tm}' or tested_mobile like '%,#{tm}' or tested_mobile like '#{tm},%' or tested_mobile like '%,#{tm},%'" }.join(' or ')
-          scope = scope.where(tm_where)
+          scope = $db.slave { scope.where(tm_where) }
         end
-        scope = scope.where(:project_id => @project_id) if @project_id.present?
-        scope = scope.where(:author_id => @author) if @author.present?
-        scope = scope.where(:category => @category) if @category.present?
-        scope = scope.where(:created_at => @created_at_start..@created_at_end) if @created_at_start.present?
-        scope = scope.where(:has_problem => @has_problem) if @has_problem.present?
+        scope = $db.slave { scope.where(:project_id => @project_id) } if @project_id.present?
+        scope = $db.slave { scope.where(:author_id => @author) } if @author.present?
+        scope = $db.slave { scope.where(:category => @category) } if @category.present?
+        scope = $db.slave { scope.where(:created_at => @created_at_start..@created_at_end) } if @created_at_start.present?
+        scope = $db.slave { scope.where(:has_problem => @has_problem) } if @has_problem.present?
 
         if @failed_count.present?
-          scope = @failed_count.to_i > 0 ? scope.where('failed_count > 0') : scope.where(:failed_count => [nil, 0])
+          scope = @failed_count.to_i > 0 ? $db.slave { scope.where('failed_count > 0') } : $db.slave { scope.where(:failed_count => [nil, 0]) }
         end
 
         if @just_adpted.present?
           if @just_adpted == 'true'
-            scope = scope.where(:category => 2, :parent_id => nil)
+            scope = $db.slave { scope.where(:category => 2, :parent_id => nil) }
           else
-            scope = scope.where('category = 2 AND parent_id IS NOT NULL')
+            scope = $db.slave { scope.where('category = 2 AND parent_id IS NOT NULL') }
           end
         end
 
         @release_count = scope.count
         @release_pages = Paginator.new @release_count, @limit, params['page']
         @offset ||= @release_pages.offset
-        @releases = scope.order(sort_clause).limit(@limit).offset(@offset).to_a
+        @releases = $db.slave { scope.order(sort_clause).limit(@limit).offset(@offset).to_a }
       }
       format.api {
         render_api_ok
@@ -118,24 +118,24 @@ class VersionReleasesController < ApplicationController
   end
 
   def version_lists
-    specs = @project.specs.undeleted
-    specs_hash = specs.select(:id, :name) if params[:spec_id].nil? && params[:version_id].nil?
-    spec = Spec.find_by(id: params[:spec_id]) || (specs.first if specs.present?)
+    specs = $db.slave { @project.specs.undeleted }
+    specs_hash = $db.slave { specs.select(:id, :name) } if params[:spec_id].nil? && params[:version_id].nil?
+    spec = $db.slave { Spec.find_by(id: params[:spec_id]) || (specs.first if specs.present?) }
     versions_hash = if params[:version_id].nil?
                       if spec.nil?
                         versions = []
                       else
                         category = VersionRelease.consts[:category].invert[params[:category].to_i]
-                        versions = spec.versions.releasable(category)
+                        versions = $db.slave { spec.versions.releasable(category) }
                         versions.map { |v| {:id => v.id, :name => v.name} }.unshift({:id => 0, :name => "--请选择--"})
                       end
                     end
 
-    version = Version.find_by(id: params[:version_id]) || (versions.first if versions.present?)
+    version = $db.slave { Version.find_by(id: params[:version_id]) || (versions.first if versions.present?) }
     tested_mobile_hash = if version.nil?
                            []
                          else
-                           projects = params[:category].to_i == 1 ? Project.default : version.releasable_projects
+                           projects = params[:category].to_i == 1 ? $db.slave { Project.default } : $db.slave { version.releasable_projects }
                            projects.select(:id, :name).unshift({:id => '', :name => ''})
                          end
 
@@ -175,13 +175,13 @@ class VersionReleasesController < ApplicationController
   end
 
   def version_apks
-    version = Version.find(params[:version_id]) if params[:version_id].to_i > 0
+    version = $db.slave { Version.find(params[:version_id]) } if params[:version_id].to_i > 0
     not_apks = []
     applist_flag = 0
-    if version && ReposHelper.get_repos_by_version_id(version.id).find{|repo| repo['android_platform'].to_i == ApkBase::APK_BASE_ANDROID_PLATFORM[:o_platform]}
+    if version && $db.slave { ReposHelper.get_repos_by_version_id(version.id) }.find{|repo| repo['android_platform'].to_i == ApkBase::APK_BASE_ANDROID_PLATFORM[:o_platform]}
       applist_flag = 1 if version.app_lists.blank?
       version.app_lists.map(&:apk_name).each { |apk|
-        not_apks << apk if ApkBase.joins(:project_apk).where("android_platform = #{ApkBase::APK_BASE_ANDROID_PLATFORM[:o_platform]} and name = '#{apk}' and deleted = 0").blank?
+        not_apks << apk if $db.slave { ApkBase.joins(:project_apk).where("android_platform = #{ApkBase::APK_BASE_ANDROID_PLATFORM[:o_platform]} and name = '#{apk}' and deleted = 0") }.blank?
       }
     end
 

@@ -61,7 +61,13 @@ class ThirdpartyVersionReleasesController < VersionReleasesController
 
   def reupload
     if @third.preload?
+      @third.extract_zip_file
+      sleep(30)
+      @third.make_android_mk_to_zip
+      sleep(30)
       @third.upload_zip_to_server
+    elsif @third.resource?
+      @third.resource_package_upload_sever
     end
 
     render :text => {:message => "成功!"}.to_json

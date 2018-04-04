@@ -125,12 +125,12 @@ class Export < ActiveRecord::Base
   end
 
   def quick
-    User.current = User.find(self.user_id)
+    User.current = $db.slave { User.find(self.user_id) }
     opts   = self.options
     query  = IssueQuery.new opts[:query]
     params = opts[:params]
     export_ids = params[:export_ids]
-    limit = Setting.issues_export_limit.to_i
+    limit = $db.slave { Setting.issues_export_limit.to_i }
     offset = 0
 
     self.update_column :status, EXPORT_STATUS[:processing] # Export start

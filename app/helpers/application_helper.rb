@@ -1970,7 +1970,7 @@ module ApplicationHelper
   end
 
   def notice_tabs
-    tabs = User.current.notices
+    current_user.notices
   end
 
   def render_notice_menu
@@ -1983,13 +1983,73 @@ module ApplicationHelper
                  end)
                  concat(content_tag(:ul, class: "dropdown-menu") do 
                    notice_tabs[:items].values.map{ |tab|
-                     content_tag(:li, link_to("#{tab[:name]}#{'&nbsp;'* 2}<span class='badge'>#{tab[:count]}</span>".html_safe, tab[:url])) 
+                     content_tag(:li, link_to("#{tab[:name]}#{'&nbsp;'* 2}<span class='badge'>#{tab[:count]}</span>".html_safe, tab[:url], :onclick => "_hmt.push(['_trackEvent', 'nav', 'click', '顶部通知-#{tab[:name].remove("&nbsp;").strip}'])"))
                    }.join.html_safe
                  end)
                end
              end
     end
     html.html_safe
+  end
+
+  def render_personal_center
+    content_tag :ul, class: "nav navbar-nav navbar-right" do
+      content_tag :li, class: "dropdown" do
+        if current_user.logged?
+          content_tag(:a, {:class => "dropdown-toggle", "data-toggle" => "dropdown", :href => void_js, :role => "button"}) do
+             "<i class = 'fa fa-user'></i>".html_safe
+          end +
+              content_tag(:ul, class: "dropdown-menu") do
+                8.times.map { |i|
+                  case i + 1
+                    when 1 then
+                      content_tag :li, class: "" do
+                        content_tag(:a, '#') do
+                          content_tag(:i, '', class: "fa fa-user") + current_user.name
+                        end
+                      end
+                    when 2 then
+                      "<li class = 'divider' role = 'separator'></li>".html_safe
+                    when 3 then
+                      content_tag :li, class: "comingsoon" do
+                        content_tag(:a, '#') do
+                          content_tag(:i, '', class: "fa fa-envelope") + '消息'
+                        end
+                      end
+                    when 4 then
+                      content_tag :li, id: "help" do
+                        content_tag(:a, '#') do
+                          content_tag(:i, '', class: "fa fa-exclamation-circle") +'帮助'
+                        end
+                      end
+                    when 5 then
+                      content_tag :li, class: "" do
+                        link_to project_board_path(Project.first.to_param,1) do
+                          content_tag(:i, '', class: "fa fa-comment") + '反馈'
+                        end
+                      end
+                    when 6 then
+                      content_tag :li, class: "" do
+                        link_to my_account_path do
+                          content_tag(:i, '', class: "fa fa-cog") + '设置'
+                        end
+                      end
+                    when 7 then
+                      "<li class = 'divider' role = 'separator'></li>".html_safe
+                    when 8 then
+                      content_tag :li, class: "" do
+                        link_to signout_path do
+                          content_tag(:i, '', class: "fa fa-sign-out") + '退出'
+                        end
+                      end
+                  end
+                }.join.html_safe
+              end
+        else
+          link_to "登录", signin_path, {:class => "dropdown-toggle", :role => "button"}
+        end
+      end
+    end.html_safe
   end
 
   def link_to_member(member, role)

@@ -1,0 +1,776 @@
+# Logfile created on 2018-03-20 09:11:29 +0800 by logger.rb/54362
+  INFO ---------------------------------------------------------------------------
+  INFO START 2018-03-20 09:11:29 +0800 cap pd deploy
+  INFO ---------------------------------------------------------------------------
+ DEBUG [f06ca214] Running [ -d /home/cenx/.rbenv/versions/2.3.1 ] as cenx@18.8.5.8
+ DEBUG [f06ca214] Command: [ -d /home/cenx/.rbenv/versions/2.3.1 ]
+ DEBUG [f06ca214] Finished in 0.528 seconds with exit status 0 (successful).
+  INFO [37ffab61] Running /usr/bin/env mkdir -p /tmp as cenx@18.8.5.8
+ DEBUG [37ffab61] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env mkdir -p /tmp )
+  INFO [37ffab61] Finished in 0.016 seconds with exit status 0 (successful).
+ DEBUG Uploading /tmp/git-ssh-amigo-production-csl.sh 0.0%
+  INFO Uploading /tmp/git-ssh-amigo-production-csl.sh 100.0%
+  INFO [a9fb9bd8] Running /usr/bin/env chmod 700 /tmp/git-ssh-amigo-production-csl.sh as cenx@18.8.5.8
+ DEBUG [a9fb9bd8] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env chmod 700 /tmp/git-ssh-amigo-production-csl.sh )
+  INFO [a9fb9bd8] Finished in 0.011 seconds with exit status 0 (successful).
+  INFO [f2df7e11] Running /usr/bin/env git ls-remote ssh://amige@19.9.0.146:29418/Amige HEAD as cenx@18.8.5.8
+ DEBUG [f2df7e11] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" GIT_ASKPASS="/bin/echo" GIT_SSH="/tmp/git-ssh-amigo-production-csl.sh" ; /usr/bin/env git ls-remote ssh://amige@19.9.0.146:29418/Amige HEAD )
+ DEBUG [f2df7e11] 	2853de0ae5a66f8143eac8cf79fe79447dc74694	HEAD
+  INFO [f2df7e11] Finished in 0.202 seconds with exit status 0 (successful).
+  INFO [379bff06] Running /usr/bin/env mkdir -p /var/www/amigo/shared /var/www/amigo/releases as cenx@18.8.5.8
+ DEBUG [379bff06] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env mkdir -p /var/www/amigo/shared /var/www/amigo/releases )
+  INFO [379bff06] Finished in 0.016 seconds with exit status 0 (successful).
+  INFO [3b41d433] Running /usr/bin/env mkdir -p /var/www/amigo/shared/log /var/www/amigo/shared/files /var/www/amigo/shared/tmp /var/www/amigo/shared/vendor/bundle /var/www/amigo/shared/public/system /var/www/amigo/shared/public/uploads /var/www/amigo/shared/public/assets as cenx@18.8.5.8
+ DEBUG [3b41d433] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env mkdir -p /var/www/amigo/shared/log /var/www/amigo/shared/files /var/www/amigo/shared/tmp /var/www/amigo/shared/vendor/bundle /var/www/amigo/shared/public/system /var/www/amigo/shared/public/uploads /var/www/amigo/shared/public/assets )
+  INFO [3b41d433] Finished in 0.014 seconds with exit status 0 (successful).
+  INFO [366dec09] Running /usr/bin/env mkdir -p /var/www/amigo/shared/config /var/www/amigo/shared/tmp as cenx@18.8.5.8
+ DEBUG [366dec09] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env mkdir -p /var/www/amigo/shared/config /var/www/amigo/shared/tmp )
+  INFO [366dec09] Finished in 0.013 seconds with exit status 0 (successful).
+ DEBUG [b37c66ec] Running [ -f /var/www/amigo/shared/config/database.yml ] as cenx@18.8.5.8
+ DEBUG [b37c66ec] Command: [ -f /var/www/amigo/shared/config/database.yml ]
+ DEBUG [b37c66ec] Finished in 0.009 seconds with exit status 0 (successful).
+ DEBUG [2c5bd51e] Running [ -f /var/www/amigo/shared/config/secrets.yml ] as cenx@18.8.5.8
+ DEBUG [2c5bd51e] Command: [ -f /var/www/amigo/shared/config/secrets.yml ]
+ DEBUG [2c5bd51e] Finished in 0.008 seconds with exit status 0 (successful).
+ DEBUG [bfbebf37] Running [ -f /var/www/amigo/shared/tmp/restart.txt ] as cenx@18.8.5.8
+ DEBUG [bfbebf37] Command: [ -f /var/www/amigo/shared/tmp/restart.txt ]
+ DEBUG [bfbebf37] Finished in 0.018 seconds with exit status 0 (successful).
+ DEBUG [58f1fe74] Running [ -f /var/www/amigo/shared/config/configuration.yml ] as cenx@18.8.5.8
+ DEBUG [58f1fe74] Command: [ -f /var/www/amigo/shared/config/configuration.yml ]
+ DEBUG [58f1fe74] Finished in 0.009 seconds with exit status 0 (successful).
+ DEBUG [8701c350] Running [ -f /var/www/amigo/shared/config/environment.rb ] as cenx@18.8.5.8
+ DEBUG [8701c350] Command: [ -f /var/www/amigo/shared/config/environment.rb ]
+ DEBUG [8701c350] Finished in 0.008 seconds with exit status 0 (successful).
+ DEBUG [c159e8f5] Running [ -f /var/www/amigo/shared/config/shards.yml ] as cenx@18.8.5.8
+ DEBUG [c159e8f5] Command: [ -f /var/www/amigo/shared/config/shards.yml ]
+ DEBUG [c159e8f5] Finished in 0.009 seconds with exit status 0 (successful).
+ DEBUG [0b9a8632] Running [ -f /var/www/amigo/current/REVISION ] as cenx@18.8.5.8
+ DEBUG [0b9a8632] Command: [ -f /var/www/amigo/current/REVISION ]
+ DEBUG [0b9a8632] Finished in 0.009 seconds with exit status 0 (successful).
+ DEBUG [e607734e] Running /usr/bin/env cat /var/www/amigo/current/REVISION 2>/dev/null as cenx@18.8.5.8
+ DEBUG [e607734e] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env cat /var/www/amigo/current/REVISION 2>/dev/null )
+ DEBUG [e607734e] 	2ff6a3cc73e64e4c2e2524abfe490f9b48ef9e5b
+ DEBUG [e607734e] Finished in 0.018 seconds with exit status 0 (successful).
+ DEBUG [67283be5] Running [ -d /var/www/amigo/current ] as cenx@18.8.5.8
+ DEBUG [67283be5] Command: [ -d /var/www/amigo/current ]
+ DEBUG [67283be5] Finished in 0.008 seconds with exit status 0 (successful).
+ DEBUG [a8a6301f] Running if test ! -d /var/www/amigo/current; then echo "Directory does not exist '/var/www/amigo/current'" 1>&2; false; fi as cenx@18.8.5.8
+ DEBUG [a8a6301f] Command: if test ! -d /var/www/amigo/current; then echo "Directory does not exist '/var/www/amigo/current'" 1>&2; false; fi
+ DEBUG [a8a6301f] Finished in 0.008 seconds with exit status 0 (successful).
+ DEBUG [05123b6e] Running /usr/bin/env [ -f /var/www/amigo/shared/tmp/pids/sidekiq-0.pid ] as cenx@18.8.5.8
+ DEBUG [05123b6e] Command: cd /var/www/amigo/current && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env [ -f /var/www/amigo/shared/tmp/pids/sidekiq-0.pid ] )
+ DEBUG [05123b6e] Finished in 0.017 seconds with exit status 0 (successful).
+ DEBUG [de274328] Running /usr/bin/env kill -0 $( cat /var/www/amigo/shared/tmp/pids/sidekiq-0.pid ) as cenx@18.8.5.8
+ DEBUG [de274328] Command: cd /var/www/amigo/current && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env kill -0 $( cat /var/www/amigo/shared/tmp/pids/sidekiq-0.pid ) )
+ DEBUG [de274328] Finished in 0.082 seconds with exit status 0 (successful).
+  INFO [d7a9bc30] Running /home/cenx/.rbenv/bin/rbenv exec bundle exec sidekiqctl quiet /var/www/amigo/shared/tmp/pids/sidekiq-0.pid as cenx@18.8.5.8
+ DEBUG [d7a9bc30] Command: cd /var/www/amigo/current && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /home/cenx/.rbenv/bin/rbenv exec bundle exec sidekiqctl quiet /var/www/amigo/shared/tmp/pids/sidekiq-0.pid )
+  INFO [d7a9bc30] Finished in 0.602 seconds with exit status 0 (successful).
+ DEBUG [4e84ad9b] Running [ -f /var/www/amigo/repo/HEAD ] as cenx@18.8.5.8
+ DEBUG [4e84ad9b] Command: [ -f /var/www/amigo/repo/HEAD ]
+ DEBUG [4e84ad9b] Finished in 0.024 seconds with exit status 0 (successful).
+  INFO The repository mirror is at /var/www/amigo/repo
+ DEBUG [b9297090] Running if test ! -d /var/www/amigo/repo; then echo "Directory does not exist '/var/www/amigo/repo'" 1>&2; false; fi as cenx@18.8.5.8
+ DEBUG [b9297090] Command: if test ! -d /var/www/amigo/repo; then echo "Directory does not exist '/var/www/amigo/repo'" 1>&2; false; fi
+ DEBUG [b9297090] Finished in 0.013 seconds with exit status 0 (successful).
+  INFO [ea3e4b96] Running /usr/bin/env git remote set-url origin ssh://amige@19.9.0.146:29418/Amige as cenx@18.8.5.8
+ DEBUG [ea3e4b96] Command: cd /var/www/amigo/repo && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" GIT_ASKPASS="/bin/echo" GIT_SSH="/tmp/git-ssh-amigo-production-csl.sh" ; /usr/bin/env git remote set-url origin ssh://amige@19.9.0.146:29418/Amige )
+  INFO [ea3e4b96] Finished in 0.093 seconds with exit status 0 (successful).
+  INFO [9b303b17] Running /usr/bin/env git remote update --prune as cenx@18.8.5.8
+ DEBUG [9b303b17] Command: cd /var/www/amigo/repo && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" GIT_ASKPASS="/bin/echo" GIT_SSH="/tmp/git-ssh-amigo-production-csl.sh" ; /usr/bin/env git remote update --prune )
+ DEBUG [9b303b17] 	Fetching origin
+ DEBUG [9b303b17] 	Total 29 (delta 23), reused 29 (delta 23)
+ DEBUG [9b303b17] 	From ssh://19.9.0.146:29418/Amige
+   2ff6a3c..2853de0  master     -> master
+ DEBUG [9b303b17] 	   8f83fee..440eb6d  refs/meta/config -> refs/meta/config
+  INFO [9b303b17] Finished in 3.460 seconds with exit status 0 (successful).
+ DEBUG [36a7a1ae] Running if test ! -d /var/www/amigo/repo; then echo "Directory does not exist '/var/www/amigo/repo'" 1>&2; false; fi as cenx@18.8.5.8
+ DEBUG [36a7a1ae] Command: if test ! -d /var/www/amigo/repo; then echo "Directory does not exist '/var/www/amigo/repo'" 1>&2; false; fi
+ DEBUG [36a7a1ae] Finished in 0.010 seconds with exit status 0 (successful).
+  INFO [7f5a66e6] Running /usr/bin/env mkdir -p /var/www/amigo/releases/20180320011131 as cenx@18.8.5.8
+ DEBUG [7f5a66e6] Command: cd /var/www/amigo/repo && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" GIT_ASKPASS="/bin/echo" GIT_SSH="/tmp/git-ssh-amigo-production-csl.sh" ; /usr/bin/env mkdir -p /var/www/amigo/releases/20180320011131 )
+  INFO [7f5a66e6] Finished in 0.020 seconds with exit status 0 (successful).
+  INFO [e5d17176] Running /usr/bin/env git archive master | /usr/bin/env tar -x -f - -C /var/www/amigo/releases/20180320011131 as cenx@18.8.5.8
+ DEBUG [e5d17176] Command: cd /var/www/amigo/repo && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" GIT_ASKPASS="/bin/echo" GIT_SSH="/tmp/git-ssh-amigo-production-csl.sh" ; /usr/bin/env git archive master | /usr/bin/env tar -x -f - -C /var/www/amigo/releases/20180320011131 )
+  INFO [e5d17176] Finished in 2.246 seconds with exit status 0 (successful).
+ DEBUG [d0d328da] Running if test ! -d /var/www/amigo/repo; then echo "Directory does not exist '/var/www/amigo/repo'" 1>&2; false; fi as cenx@18.8.5.8
+ DEBUG [d0d328da] Command: if test ! -d /var/www/amigo/repo; then echo "Directory does not exist '/var/www/amigo/repo'" 1>&2; false; fi
+ DEBUG [d0d328da] Finished in 0.011 seconds with exit status 0 (successful).
+ DEBUG [daa289e5] Running /usr/bin/env git rev-list --max-count=1 master as cenx@18.8.5.8
+ DEBUG [daa289e5] Command: cd /var/www/amigo/repo && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" GIT_ASKPASS="/bin/echo" GIT_SSH="/tmp/git-ssh-amigo-production-csl.sh" ; /usr/bin/env git rev-list --max-count=1 master )
+ DEBUG [daa289e5] 	2853de0ae5a66f8143eac8cf79fe79447dc74694
+ DEBUG [daa289e5] Finished in 0.025 seconds with exit status 0 (successful).
+ DEBUG [429eba94] Running if test ! -d /var/www/amigo/releases/20180320011131; then echo "Directory does not exist '/var/www/amigo/releases/20180320011131'" 1>&2; false; fi as cenx@18.8.5.8
+ DEBUG [429eba94] Command: if test ! -d /var/www/amigo/releases/20180320011131; then echo "Directory does not exist '/var/www/amigo/releases/20180320011131'" 1>&2; false; fi
+ DEBUG [429eba94] Finished in 0.011 seconds with exit status 0 (successful).
+  INFO [19655516] Running /usr/bin/env echo "2853de0ae5a66f8143eac8cf79fe79447dc74694" >> REVISION as cenx@18.8.5.8
+ DEBUG [19655516] Command: cd /var/www/amigo/releases/20180320011131 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env echo "2853de0ae5a66f8143eac8cf79fe79447dc74694" >> REVISION )
+  INFO [19655516] Finished in 0.012 seconds with exit status 0 (successful).
+  INFO [79124130] Running /usr/bin/env mkdir -p /var/www/amigo/releases/20180320011131/config /var/www/amigo/releases/20180320011131/tmp as cenx@18.8.5.8
+ DEBUG [79124130] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env mkdir -p /var/www/amigo/releases/20180320011131/config /var/www/amigo/releases/20180320011131/tmp )
+  INFO [79124130] Finished in 0.013 seconds with exit status 0 (successful).
+ DEBUG [d7af0b9b] Running [ -L /var/www/amigo/releases/20180320011131/config/database.yml ] as cenx@18.8.5.8
+ DEBUG [d7af0b9b] Command: [ -L /var/www/amigo/releases/20180320011131/config/database.yml ]
+ DEBUG [d7af0b9b] Finished in 0.008 seconds with exit status 1 (failed).
+ DEBUG [98c0d831] Running [ -f /var/www/amigo/releases/20180320011131/config/database.yml ] as cenx@18.8.5.8
+ DEBUG [98c0d831] Command: [ -f /var/www/amigo/releases/20180320011131/config/database.yml ]
+ DEBUG [98c0d831] Finished in 0.008 seconds with exit status 1 (failed).
+  INFO [d3d1a849] Running /usr/bin/env ln -s /var/www/amigo/shared/config/database.yml /var/www/amigo/releases/20180320011131/config/database.yml as cenx@18.8.5.8
+ DEBUG [d3d1a849] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/config/database.yml /var/www/amigo/releases/20180320011131/config/database.yml )
+  INFO [d3d1a849] Finished in 0.019 seconds with exit status 0 (successful).
+ DEBUG [dbe2d2d7] Running [ -L /var/www/amigo/releases/20180320011131/config/secrets.yml ] as cenx@18.8.5.8
+ DEBUG [dbe2d2d7] Command: [ -L /var/www/amigo/releases/20180320011131/config/secrets.yml ]
+ DEBUG [dbe2d2d7] Finished in 0.011 seconds with exit status 1 (failed).
+ DEBUG [3a37f97c] Running [ -f /var/www/amigo/releases/20180320011131/config/secrets.yml ] as cenx@18.8.5.8
+ DEBUG [3a37f97c] Command: [ -f /var/www/amigo/releases/20180320011131/config/secrets.yml ]
+ DEBUG [3a37f97c] Finished in 0.010 seconds with exit status 1 (failed).
+  INFO [5f85baa6] Running /usr/bin/env ln -s /var/www/amigo/shared/config/secrets.yml /var/www/amigo/releases/20180320011131/config/secrets.yml as cenx@18.8.5.8
+ DEBUG [5f85baa6] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/config/secrets.yml /var/www/amigo/releases/20180320011131/config/secrets.yml )
+  INFO [5f85baa6] Finished in 0.015 seconds with exit status 0 (successful).
+ DEBUG [f8a05941] Running [ -L /var/www/amigo/releases/20180320011131/tmp/restart.txt ] as cenx@18.8.5.8
+ DEBUG [f8a05941] Command: [ -L /var/www/amigo/releases/20180320011131/tmp/restart.txt ]
+ DEBUG [f8a05941] Finished in 0.008 seconds with exit status 1 (failed).
+ DEBUG [083a0938] Running [ -f /var/www/amigo/releases/20180320011131/tmp/restart.txt ] as cenx@18.8.5.8
+ DEBUG [083a0938] Command: [ -f /var/www/amigo/releases/20180320011131/tmp/restart.txt ]
+ DEBUG [083a0938] Finished in 0.008 seconds with exit status 1 (failed).
+  INFO [9942625c] Running /usr/bin/env ln -s /var/www/amigo/shared/tmp/restart.txt /var/www/amigo/releases/20180320011131/tmp/restart.txt as cenx@18.8.5.8
+ DEBUG [9942625c] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/tmp/restart.txt /var/www/amigo/releases/20180320011131/tmp/restart.txt )
+  INFO [9942625c] Finished in 0.013 seconds with exit status 0 (successful).
+ DEBUG [8e605ec2] Running [ -L /var/www/amigo/releases/20180320011131/config/configuration.yml ] as cenx@18.8.5.8
+ DEBUG [8e605ec2] Command: [ -L /var/www/amigo/releases/20180320011131/config/configuration.yml ]
+ DEBUG [8e605ec2] Finished in 0.009 seconds with exit status 1 (failed).
+ DEBUG [f664c402] Running [ -f /var/www/amigo/releases/20180320011131/config/configuration.yml ] as cenx@18.8.5.8
+ DEBUG [f664c402] Command: [ -f /var/www/amigo/releases/20180320011131/config/configuration.yml ]
+ DEBUG [f664c402] Finished in 0.009 seconds with exit status 1 (failed).
+  INFO [d27d40fd] Running /usr/bin/env ln -s /var/www/amigo/shared/config/configuration.yml /var/www/amigo/releases/20180320011131/config/configuration.yml as cenx@18.8.5.8
+ DEBUG [d27d40fd] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/config/configuration.yml /var/www/amigo/releases/20180320011131/config/configuration.yml )
+  INFO [d27d40fd] Finished in 0.014 seconds with exit status 0 (successful).
+ DEBUG [20607400] Running [ -L /var/www/amigo/releases/20180320011131/config/environment.rb ] as cenx@18.8.5.8
+ DEBUG [20607400] Command: [ -L /var/www/amigo/releases/20180320011131/config/environment.rb ]
+ DEBUG [20607400] Finished in 0.008 seconds with exit status 1 (failed).
+ DEBUG [5ef839e6] Running [ -f /var/www/amigo/releases/20180320011131/config/environment.rb ] as cenx@18.8.5.8
+ DEBUG [5ef839e6] Command: [ -f /var/www/amigo/releases/20180320011131/config/environment.rb ]
+ DEBUG [5ef839e6] Finished in 0.011 seconds with exit status 1 (failed).
+  INFO [e7393425] Running /usr/bin/env ln -s /var/www/amigo/shared/config/environment.rb /var/www/amigo/releases/20180320011131/config/environment.rb as cenx@18.8.5.8
+ DEBUG [e7393425] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/config/environment.rb /var/www/amigo/releases/20180320011131/config/environment.rb )
+  INFO [e7393425] Finished in 0.012 seconds with exit status 0 (successful).
+ DEBUG [9f94108d] Running [ -L /var/www/amigo/releases/20180320011131/config/shards.yml ] as cenx@18.8.5.8
+ DEBUG [9f94108d] Command: [ -L /var/www/amigo/releases/20180320011131/config/shards.yml ]
+ DEBUG [9f94108d] Finished in 0.009 seconds with exit status 1 (failed).
+ DEBUG [6d91dece] Running [ -f /var/www/amigo/releases/20180320011131/config/shards.yml ] as cenx@18.8.5.8
+ DEBUG [6d91dece] Command: [ -f /var/www/amigo/releases/20180320011131/config/shards.yml ]
+ DEBUG [6d91dece] Finished in 0.009 seconds with exit status 1 (failed).
+  INFO [a1710c9e] Running /usr/bin/env ln -s /var/www/amigo/shared/config/shards.yml /var/www/amigo/releases/20180320011131/config/shards.yml as cenx@18.8.5.8
+ DEBUG [a1710c9e] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/config/shards.yml /var/www/amigo/releases/20180320011131/config/shards.yml )
+  INFO [a1710c9e] Finished in 0.012 seconds with exit status 0 (successful).
+  INFO [e7a7714c] Running /usr/bin/env mkdir -p /var/www/amigo/releases/20180320011131 /var/www/amigo/releases/20180320011131/vendor /var/www/amigo/releases/20180320011131/public as cenx@18.8.5.8
+ DEBUG [e7a7714c] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env mkdir -p /var/www/amigo/releases/20180320011131 /var/www/amigo/releases/20180320011131/vendor /var/www/amigo/releases/20180320011131/public )
+  INFO [e7a7714c] Finished in 0.013 seconds with exit status 0 (successful).
+ DEBUG [8b5a723d] Running [ -L /var/www/amigo/releases/20180320011131/log ] as cenx@18.8.5.8
+ DEBUG [8b5a723d] Command: [ -L /var/www/amigo/releases/20180320011131/log ]
+ DEBUG [8b5a723d] Finished in 0.012 seconds with exit status 1 (failed).
+ DEBUG [edbf41a6] Running [ -d /var/www/amigo/releases/20180320011131/log ] as cenx@18.8.5.8
+ DEBUG [edbf41a6] Command: [ -d /var/www/amigo/releases/20180320011131/log ]
+ DEBUG [edbf41a6] Finished in 0.008 seconds with exit status 1 (failed).
+  INFO [ccfd274d] Running /usr/bin/env ln -s /var/www/amigo/shared/log /var/www/amigo/releases/20180320011131/log as cenx@18.8.5.8
+ DEBUG [ccfd274d] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/log /var/www/amigo/releases/20180320011131/log )
+  INFO [ccfd274d] Finished in 0.012 seconds with exit status 0 (successful).
+ DEBUG [818529e2] Running [ -L /var/www/amigo/releases/20180320011131/files ] as cenx@18.8.5.8
+ DEBUG [818529e2] Command: [ -L /var/www/amigo/releases/20180320011131/files ]
+ DEBUG [818529e2] Finished in 0.008 seconds with exit status 1 (failed).
+ DEBUG [a5cba285] Running [ -d /var/www/amigo/releases/20180320011131/files ] as cenx@18.8.5.8
+ DEBUG [a5cba285] Command: [ -d /var/www/amigo/releases/20180320011131/files ]
+ DEBUG [a5cba285] Finished in 0.008 seconds with exit status 1 (failed).
+  INFO [e3a1e233] Running /usr/bin/env ln -s /var/www/amigo/shared/files /var/www/amigo/releases/20180320011131/files as cenx@18.8.5.8
+ DEBUG [e3a1e233] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/files /var/www/amigo/releases/20180320011131/files )
+  INFO [e3a1e233] Finished in 0.012 seconds with exit status 0 (successful).
+ DEBUG [0e91778a] Running [ -L /var/www/amigo/releases/20180320011131/tmp ] as cenx@18.8.5.8
+ DEBUG [0e91778a] Command: [ -L /var/www/amigo/releases/20180320011131/tmp ]
+ DEBUG [0e91778a] Finished in 0.010 seconds with exit status 1 (failed).
+ DEBUG [21176a1c] Running [ -d /var/www/amigo/releases/20180320011131/tmp ] as cenx@18.8.5.8
+ DEBUG [21176a1c] Command: [ -d /var/www/amigo/releases/20180320011131/tmp ]
+ DEBUG [21176a1c] Finished in 0.011 seconds with exit status 0 (successful).
+  INFO [255cf3cb] Running /usr/bin/env rm -rf /var/www/amigo/releases/20180320011131/tmp as cenx@18.8.5.8
+ DEBUG [255cf3cb] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env rm -rf /var/www/amigo/releases/20180320011131/tmp )
+  INFO [255cf3cb] Finished in 0.012 seconds with exit status 0 (successful).
+  INFO [83b371b7] Running /usr/bin/env ln -s /var/www/amigo/shared/tmp /var/www/amigo/releases/20180320011131/tmp as cenx@18.8.5.8
+ DEBUG [83b371b7] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/tmp /var/www/amigo/releases/20180320011131/tmp )
+  INFO [83b371b7] Finished in 0.012 seconds with exit status 0 (successful).
+ DEBUG [dc7ad586] Running [ -L /var/www/amigo/releases/20180320011131/vendor/bundle ] as cenx@18.8.5.8
+ DEBUG [dc7ad586] Command: [ -L /var/www/amigo/releases/20180320011131/vendor/bundle ]
+ DEBUG [dc7ad586] Finished in 0.008 seconds with exit status 1 (failed).
+ DEBUG [c9f8da5a] Running [ -d /var/www/amigo/releases/20180320011131/vendor/bundle ] as cenx@18.8.5.8
+ DEBUG [c9f8da5a] Command: [ -d /var/www/amigo/releases/20180320011131/vendor/bundle ]
+ DEBUG [c9f8da5a] Finished in 0.008 seconds with exit status 1 (failed).
+  INFO [8bffd003] Running /usr/bin/env ln -s /var/www/amigo/shared/vendor/bundle /var/www/amigo/releases/20180320011131/vendor/bundle as cenx@18.8.5.8
+ DEBUG [8bffd003] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/vendor/bundle /var/www/amigo/releases/20180320011131/vendor/bundle )
+  INFO [8bffd003] Finished in 0.014 seconds with exit status 0 (successful).
+ DEBUG [88ddc2a9] Running [ -L /var/www/amigo/releases/20180320011131/public/system ] as cenx@18.8.5.8
+ DEBUG [88ddc2a9] Command: [ -L /var/www/amigo/releases/20180320011131/public/system ]
+ DEBUG [88ddc2a9] Finished in 0.008 seconds with exit status 1 (failed).
+ DEBUG [36966e66] Running [ -d /var/www/amigo/releases/20180320011131/public/system ] as cenx@18.8.5.8
+ DEBUG [36966e66] Command: [ -d /var/www/amigo/releases/20180320011131/public/system ]
+ DEBUG [36966e66] Finished in 0.009 seconds with exit status 1 (failed).
+  INFO [ebea8b47] Running /usr/bin/env ln -s /var/www/amigo/shared/public/system /var/www/amigo/releases/20180320011131/public/system as cenx@18.8.5.8
+ DEBUG [ebea8b47] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/public/system /var/www/amigo/releases/20180320011131/public/system )
+  INFO [ebea8b47] Finished in 0.013 seconds with exit status 0 (successful).
+ DEBUG [33bf6b2b] Running [ -L /var/www/amigo/releases/20180320011131/public/uploads ] as cenx@18.8.5.8
+ DEBUG [33bf6b2b] Command: [ -L /var/www/amigo/releases/20180320011131/public/uploads ]
+ DEBUG [33bf6b2b] Finished in 0.008 seconds with exit status 1 (failed).
+ DEBUG [a68cf2b0] Running [ -d /var/www/amigo/releases/20180320011131/public/uploads ] as cenx@18.8.5.8
+ DEBUG [a68cf2b0] Command: [ -d /var/www/amigo/releases/20180320011131/public/uploads ]
+ DEBUG [a68cf2b0] Finished in 0.008 seconds with exit status 1 (failed).
+  INFO [213b13fc] Running /usr/bin/env ln -s /var/www/amigo/shared/public/uploads /var/www/amigo/releases/20180320011131/public/uploads as cenx@18.8.5.8
+ DEBUG [213b13fc] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/public/uploads /var/www/amigo/releases/20180320011131/public/uploads )
+  INFO [213b13fc] Finished in 0.013 seconds with exit status 0 (successful).
+ DEBUG [8951b263] Running [ -L /var/www/amigo/releases/20180320011131/public/assets ] as cenx@18.8.5.8
+ DEBUG [8951b263] Command: [ -L /var/www/amigo/releases/20180320011131/public/assets ]
+ DEBUG [8951b263] Finished in 0.009 seconds with exit status 1 (failed).
+ DEBUG [5bd0c775] Running [ -d /var/www/amigo/releases/20180320011131/public/assets ] as cenx@18.8.5.8
+ DEBUG [5bd0c775] Command: [ -d /var/www/amigo/releases/20180320011131/public/assets ]
+ DEBUG [5bd0c775] Finished in 0.009 seconds with exit status 1 (failed).
+  INFO [c726e4be] Running /usr/bin/env ln -s /var/www/amigo/shared/public/assets /var/www/amigo/releases/20180320011131/public/assets as cenx@18.8.5.8
+ DEBUG [c726e4be] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/public/assets /var/www/amigo/releases/20180320011131/public/assets )
+  INFO [c726e4be] Finished in 0.013 seconds with exit status 0 (successful).
+ DEBUG [af81b7ed] Running if test ! -d /var/www/amigo/releases/20180320011131; then echo "Directory does not exist '/var/www/amigo/releases/20180320011131'" 1>&2; false; fi as cenx@18.8.5.8
+ DEBUG [af81b7ed] Command: if test ! -d /var/www/amigo/releases/20180320011131; then echo "Directory does not exist '/var/www/amigo/releases/20180320011131'" 1>&2; false; fi
+ DEBUG [af81b7ed] Finished in 0.009 seconds with exit status 0 (successful).
+ DEBUG [8422a7d9] Running /home/cenx/.rbenv/bin/rbenv exec bundle check --path /var/www/amigo/shared/bundle as cenx@18.8.5.8
+ DEBUG [8422a7d9] Command: cd /var/www/amigo/releases/20180320011131 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /home/cenx/.rbenv/bin/rbenv exec bundle check --path /var/www/amigo/shared/bundle )
+ DEBUG [8422a7d9] 	Your Gemfile lists the gem capistrano-rails (>= 0) more than once.
+You should probably keep only one of them.
+While it's not a problem now, it could cause errors if you change the version of just one of them later.
+ DEBUG [8422a7d9] 	Warning: the running version of Bundler is older than the version that created the lockfile. We suggest you upgrade to the latest version of Bundler by running `gem install bundler`.
+ DEBUG [8422a7d9] 	The following gems are missing
+ * net-ssh (4.1.0)
+ * net-scp (1.2.1)
+ DEBUG [8422a7d9] 	 * sshkit (1.13.0)
+ * airbrussh (1.1.2)
+ DEBUG [8422a7d9] 	 * awesome_print (1.8.0)
+ * better_errors (2.1.1)
+ DEBUG [8422a7d9] 	 * debug_inspector (0.0.2)
+ DEBUG [8422a7d9] 	 * binding_of_caller (0.7.2)
+ * byebug (9.0.6)
+ * capistrano (3.8.0)
+ * capistrano-bundler (1.2.0)
+ * capistrano-rails (1.2.3)
+ * capistrano-rbenv (2.1.0)
+ * capistrano-rvm (0.1.2)
+ * capistrano-sidekiq (0.10.0)
+ * capistrano3-puma (3.1.1)
+ * xpath (2.0.0)
+ * capybara (2.13.0)
+ DEBUG [8422a7d9] 	 * ffi (1.9.18)
+ * childprocess (0.6.3)
+ DEBUG [8422a7d9] 	 * docile (1.1.5)
+ DEBUG [8422a7d9] 	 * erb2haml (0.1.5)
+ * hirb (0.7.3)
+ DEBUG [8422a7d9] 	 * unicode-display_width (0.1.1)
+ DEBUG [8422a7d9] 	 * hirb-unicode (0.0.5)
+ DEBUG [8422a7d9] 	 * metaclass (0.0.4)
+ DEBUG [8422a7d9] 	 * method_source (0.8.2)
+ DEBUG [8422a7d9] 	 * mocha (1.2.1)
+ DEBUG [8422a7d9] 	 * slop (3.6.0)
+ DEBUG [8422a7d9] 	 * pry (0.10.4)
+ DEBUG [8422a7d9] 	 * pry-byebug (3.4.2)
+ DEBUG [8422a7d9] 	 * yard (0.9.8)
+ DEBUG [8422a7d9] 	 * pry-doc (0.10.0)
+ DEBUG [8422a7d9] 	 * pry-rails (0.3.6)
+ DEBUG [8422a7d9] 	 * pry-stack_explorer (0.4.9.2)
+ DEBUG [8422a7d9] 	 * rack-mini-profiler (0.10.2)
+ DEBUG [8422a7d9] 	 * rdoc (5.1.0)
+ DEBUG [8422a7d9] 	 * selenium-webdriver (3.3.0)
+ DEBUG [8422a7d9] 	 * simplecov-html (0.9.0)
+ DEBUG [8422a7d9] 	 * simplecov (0.9.2)
+ DEBUG [8422a7d9] 	Install missing gems with `bundle install`
+ DEBUG [8422a7d9] Finished in 0.447 seconds with exit status 1 (failed).
+  INFO [acec7b49] Running /home/cenx/.rbenv/bin/rbenv exec bundle install --path /var/www/amigo/shared/bundle --without development test --deployment --quiet as cenx@18.8.5.8
+ DEBUG [acec7b49] Command: cd /var/www/amigo/releases/20180320011131 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /home/cenx/.rbenv/bin/rbenv exec bundle install --path /var/www/amigo/shared/bundle --without development test --deployment --quiet )
+  INFO [acec7b49] Finished in 1.154 seconds with exit status 0 (successful).
+ DEBUG [343c1111] Running if test ! -d /var/www/amigo/releases/20180320011131; then echo "Directory does not exist '/var/www/amigo/releases/20180320011131'" 1>&2; false; fi as cenx@18.8.5.8
+ DEBUG [343c1111] Command: if test ! -d /var/www/amigo/releases/20180320011131; then echo "Directory does not exist '/var/www/amigo/releases/20180320011131'" 1>&2; false; fi
+ DEBUG [343c1111] Finished in 0.009 seconds with exit status 0 (successful).
+  INFO [a74a5073] Running /home/cenx/.rbenv/bin/rbenv exec bundle exec rake assets:precompile as cenx@18.8.5.8
+ DEBUG [a74a5073] Command: cd /var/www/amigo/releases/20180320011131 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" RAILS_ENV="production" ; /home/cenx/.rbenv/bin/rbenv exec bundle exec rake assets:precompile )
+ DEBUG [a74a5073] 	I, [2018-03-20T09:11:58.017656 #20769]  INFO -- : Writing /var/www/amigo/releases/20180320011131/public/assets/applications-a5e6f50ad8057cd3422101f42be4cd6f07a564766c53fe98779a4a1e02c58fb8.js
+ DEBUG [a74a5073] 	I, [2018-03-20T09:11:58.018885 #20769]  INFO -- : Writing /var/www/amigo/releases/20180320011131/public/assets/applications-a5e6f50ad8057cd3422101f42be4cd6f07a564766c53fe98779a4a1e02c58fb8.js.gz
+  INFO [a74a5073] Finished in 19.615 seconds with exit status 0 (successful).
+ DEBUG [3eff7cce] Running if test ! -d /var/www/amigo/releases/20180320011131; then echo "Directory does not exist '/var/www/amigo/releases/20180320011131'" 1>&2; false; fi as cenx@18.8.5.8
+ DEBUG [3eff7cce] Command: if test ! -d /var/www/amigo/releases/20180320011131; then echo "Directory does not exist '/var/www/amigo/releases/20180320011131'" 1>&2; false; fi
+ DEBUG [3eff7cce] Finished in 0.009 seconds with exit status 0 (successful).
+  INFO [e0d8d7ff] Running /usr/bin/env mkdir -p /var/www/amigo/releases/20180320011131/assets_manifest_backup as cenx@18.8.5.8
+ DEBUG [e0d8d7ff] Command: cd /var/www/amigo/releases/20180320011131 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env mkdir -p /var/www/amigo/releases/20180320011131/assets_manifest_backup )
+  INFO [e0d8d7ff] Finished in 0.014 seconds with exit status 0 (successful).
+ DEBUG [40a57cf5] Running /usr/bin/env ls /var/www/amigo/releases/20180320011131/public/assets/.sprockets-manifest* as cenx@18.8.5.8
+ DEBUG [40a57cf5] Command: cd /var/www/amigo/releases/20180320011131 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ls /var/www/amigo/releases/20180320011131/public/assets/.sprockets-manifest* )
+ DEBUG [40a57cf5] 	/var/www/amigo/releases/20180320011131/public/assets/.sprockets-manifest-b70824b4fab3a4b4599acd968f8ac7ce.json
+ DEBUG [40a57cf5] Finished in 0.014 seconds with exit status 0 (successful).
+ DEBUG [fca38ce3] Running /usr/bin/env ls /var/www/amigo/releases/20180320011131/public/assets/.sprockets-manifest* as cenx@18.8.5.8
+ DEBUG [fca38ce3] Command: cd /var/www/amigo/releases/20180320011131 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ls /var/www/amigo/releases/20180320011131/public/assets/.sprockets-manifest* )
+ DEBUG [fca38ce3] 	/var/www/amigo/releases/20180320011131/public/assets/.sprockets-manifest-b70824b4fab3a4b4599acd968f8ac7ce.json
+ DEBUG [fca38ce3] Finished in 0.012 seconds with exit status 0 (successful).
+  INFO [8d7bdb02] Running /usr/bin/env cp /var/www/amigo/releases/20180320011131/public/assets/.sprockets-manifest-b70824b4fab3a4b4599acd968f8ac7ce.json /var/www/amigo/releases/20180320011131/assets_manifest_backup as cenx@18.8.5.8
+ DEBUG [8d7bdb02] Command: cd /var/www/amigo/releases/20180320011131 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env cp /var/www/amigo/releases/20180320011131/public/assets/.sprockets-manifest-b70824b4fab3a4b4599acd968f8ac7ce.json /var/www/amigo/releases/20180320011131/assets_manifest_backup )
+  INFO [8d7bdb02] Finished in 0.015 seconds with exit status 0 (successful).
+ DEBUG [ee9eb13e] Running if test ! -d /var/www/amigo/releases/20180320011131; then echo "Directory does not exist '/var/www/amigo/releases/20180320011131'" 1>&2; false; fi as cenx@18.8.5.8
+ DEBUG [ee9eb13e] Command: if test ! -d /var/www/amigo/releases/20180320011131; then echo "Directory does not exist '/var/www/amigo/releases/20180320011131'" 1>&2; false; fi
+ DEBUG [ee9eb13e] Finished in 0.009 seconds with exit status 0 (successful).
+  INFO [8de313df] Running /home/cenx/.rbenv/bin/rbenv exec bundle exec rake 'assets:clean[2]' as cenx@18.8.5.8
+ DEBUG [8de313df] Command: cd /var/www/amigo/releases/20180320011131 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" RAILS_ENV="production" ; /home/cenx/.rbenv/bin/rbenv exec bundle exec rake 'assets:clean[2]' )
+ DEBUG [8de313df] 	I, [2018-03-20T09:12:03.458912 #20855]  INFO -- : Removed applications-df5c6361eee5fcc19cd2892e0f8194a743f1b56888f491e2f9bd95e53b86ce76.js
+  INFO [8de313df] Finished in 4.598 seconds with exit status 0 (successful).
+  INFO [deploy:migrate] Run `rake db:migrate`
+ DEBUG [f5cec185] Running if test ! -d /var/www/amigo/releases/20180320011131; then echo "Directory does not exist '/var/www/amigo/releases/20180320011131'" 1>&2; false; fi as cenx@18.8.5.8
+ DEBUG [f5cec185] Command: if test ! -d /var/www/amigo/releases/20180320011131; then echo "Directory does not exist '/var/www/amigo/releases/20180320011131'" 1>&2; false; fi
+ DEBUG [f5cec185] Finished in 0.010 seconds with exit status 0 (successful).
+  INFO [8fae5043] Running /home/cenx/.rbenv/bin/rbenv exec bundle exec rake db:migrate as cenx@18.8.5.8
+ DEBUG [8fae5043] Command: cd /var/www/amigo/releases/20180320011131 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" RAILS_ENV="production" ; /home/cenx/.rbenv/bin/rbenv exec bundle exec rake db:migrate )
+  INFO [8fae5043] Finished in 5.837 seconds with exit status 0 (successful).
+ DEBUG [b2e357dc] Running if test ! -d /var/www/amigo/releases/20180320011131; then echo "Directory does not exist '/var/www/amigo/releases/20180320011131'" 1>&2; false; fi as cenx@18.8.5.8
+ DEBUG [b2e357dc] Command: if test ! -d /var/www/amigo/releases/20180320011131; then echo "Directory does not exist '/var/www/amigo/releases/20180320011131'" 1>&2; false; fi
+ DEBUG [b2e357dc] Finished in 0.011 seconds with exit status 0 (successful).
+  INFO [4effc8c1] Running /home/cenx/.rbenv/bin/rbenv exec bundle exec whenever --update-crontab amigo --set environment=production --roles=pd,web,app,db as cenx@18.8.5.8
+ DEBUG [4effc8c1] Command: cd /var/www/amigo/releases/20180320011131 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" RAILS_ENV="production" ; /home/cenx/.rbenv/bin/rbenv exec bundle exec whenever --update-crontab amigo --set environment=production --roles=pd,web,app,db )
+ DEBUG [4effc8c1] 	[write] crontab file updated
+  INFO [4effc8c1] Finished in 0.641 seconds with exit status 0 (successful).
+ DEBUG [ecea402a] Running [ -d /var/www/amigo/releases/20180320011131 ] as cenx@18.8.5.8
+ DEBUG [ecea402a] Command: [ -d /var/www/amigo/releases/20180320011131 ]
+ DEBUG [ecea402a] Finished in 0.008 seconds with exit status 0 (successful).
+ DEBUG [5291bfe6] Running if test ! -d /var/www/amigo/releases/20180320011131; then echo "Directory does not exist '/var/www/amigo/releases/20180320011131'" 1>&2; false; fi as cenx@18.8.5.8
+ DEBUG [5291bfe6] Command: if test ! -d /var/www/amigo/releases/20180320011131; then echo "Directory does not exist '/var/www/amigo/releases/20180320011131'" 1>&2; false; fi
+ DEBUG [5291bfe6] Finished in 0.007 seconds with exit status 0 (successful).
+ DEBUG [067520c4] Running /usr/bin/env [ -f /var/www/amigo/shared/tmp/pids/sidekiq-0.pid ] as cenx@18.8.5.8
+ DEBUG [067520c4] Command: cd /var/www/amigo/releases/20180320011131 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env [ -f /var/www/amigo/shared/tmp/pids/sidekiq-0.pid ] )
+ DEBUG [067520c4] Finished in 0.011 seconds with exit status 0 (successful).
+ DEBUG [1ada916d] Running /usr/bin/env kill -0 $( cat /var/www/amigo/shared/tmp/pids/sidekiq-0.pid ) as cenx@18.8.5.8
+ DEBUG [1ada916d] Command: cd /var/www/amigo/releases/20180320011131 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env kill -0 $( cat /var/www/amigo/shared/tmp/pids/sidekiq-0.pid ) )
+ DEBUG [1ada916d] Finished in 0.015 seconds with exit status 0 (successful).
+  INFO [45b69f07] Running /home/cenx/.rbenv/bin/rbenv exec bundle exec sidekiqctl stop /var/www/amigo/shared/tmp/pids/sidekiq-0.pid 10 as cenx@18.8.5.8
+ DEBUG [45b69f07] Command: cd /var/www/amigo/releases/20180320011131 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /home/cenx/.rbenv/bin/rbenv exec bundle exec sidekiqctl stop /var/www/amigo/shared/tmp/pids/sidekiq-0.pid 10 )
+ DEBUG [45b69f07] 	Sidekiq shut down gracefully.
+  INFO [45b69f07] Finished in 2.544 seconds with exit status 0 (successful).
+  INFO [08dd5737] Running /usr/bin/env ln -s /var/www/amigo/releases/20180320011131 /var/www/amigo/releases/current as cenx@18.8.5.8
+ DEBUG [08dd5737] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/releases/20180320011131 /var/www/amigo/releases/current )
+  INFO [08dd5737] Finished in 0.013 seconds with exit status 0 (successful).
+  INFO [0bf9422e] Running /usr/bin/env mv /var/www/amigo/releases/current /var/www/amigo as cenx@18.8.5.8
+ DEBUG [0bf9422e] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env mv /var/www/amigo/releases/current /var/www/amigo )
+  INFO [0bf9422e] Finished in 0.014 seconds with exit status 0 (successful).
+ DEBUG [8b87dbd8] Running [ -d /var/www/amigo/releases/20180320011131 ] as cenx@18.8.5.8
+ DEBUG [8b87dbd8] Command: [ -d /var/www/amigo/releases/20180320011131 ]
+ DEBUG [8b87dbd8] Finished in 0.009 seconds with exit status 0 (successful).
+ DEBUG [7d2d8818] Running if test ! -d /var/www/amigo/releases/20180320011131; then echo "Directory does not exist '/var/www/amigo/releases/20180320011131'" 1>&2; false; fi as cenx@18.8.5.8
+ DEBUG [7d2d8818] Command: if test ! -d /var/www/amigo/releases/20180320011131; then echo "Directory does not exist '/var/www/amigo/releases/20180320011131'" 1>&2; false; fi
+ DEBUG [7d2d8818] Finished in 0.009 seconds with exit status 0 (successful).
+ DEBUG [2b95bdcf] Running /usr/bin/env [ -f /var/www/amigo/shared/tmp/pids/sidekiq-0.pid ] as cenx@18.8.5.8
+ DEBUG [2b95bdcf] Command: cd /var/www/amigo/releases/20180320011131 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env [ -f /var/www/amigo/shared/tmp/pids/sidekiq-0.pid ] )
+ DEBUG [2b95bdcf] Finished in 0.013 seconds with exit status 1 (failed).
+ DEBUG [57333206] Running if test ! -d /var/www/amigo/releases/20180320011131; then echo "Directory does not exist '/var/www/amigo/releases/20180320011131'" 1>&2; false; fi as cenx@18.8.5.8
+ DEBUG [57333206] Command: if test ! -d /var/www/amigo/releases/20180320011131; then echo "Directory does not exist '/var/www/amigo/releases/20180320011131'" 1>&2; false; fi
+ DEBUG [57333206] Finished in 0.008 seconds with exit status 0 (successful).
+ DEBUG [c2430d91] Running /usr/bin/env [ -f /var/www/amigo/shared/tmp/pids/sidekiq-0.pid ] as cenx@18.8.5.8
+ DEBUG [c2430d91] Command: cd /var/www/amigo/releases/20180320011131 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env [ -f /var/www/amigo/shared/tmp/pids/sidekiq-0.pid ] )
+ DEBUG [c2430d91] Finished in 0.012 seconds with exit status 1 (failed).
+  INFO [20b66ee0] Running /home/cenx/.rbenv/bin/rbenv exec bundle exec sidekiq --index 0 --pidfile /var/www/amigo/shared/tmp/pids/sidekiq-0.pid --environment production --logfile /var/www/amigo/shared/log/sidekiq.log --config /var/www/amigo/releases/20180320011131/config/sidekiq.yml --daemon as cenx@18.8.5.8
+ DEBUG [20b66ee0] Command: cd /var/www/amigo/releases/20180320011131 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /home/cenx/.rbenv/bin/rbenv exec bundle exec sidekiq --index 0 --pidfile /var/www/amigo/shared/tmp/pids/sidekiq-0.pid --environment production --logfile /var/www/amigo/shared/log/sidekiq.log --config /var/www/amigo/releases/20180320011131/config/sidekiq.yml --daemon )
+  INFO [20b66ee0] Finished in 0.725 seconds with exit status 0 (successful).
+  INFO [3802cd65] Running /usr/bin/env touch /var/www/amigo/releases/20180320011131/tmp/restart.txt as cenx@18.8.5.8
+ DEBUG [3802cd65] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env touch /var/www/amigo/releases/20180320011131/tmp/restart.txt )
+  INFO [3802cd65] Finished in 0.013 seconds with exit status 0 (successful).
+ DEBUG [f32b77af] Running /usr/bin/env ls -x /var/www/amigo/releases as cenx@18.8.5.8
+ DEBUG [f32b77af] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ls -x /var/www/amigo/releases )
+ DEBUG [f32b77af] 	20180127025226	20180127063412	20180129070857	20180130015244	20180202060928
+20180206013111	20180206015550	20180206024548	20180206031632	20180206055745
+20180208062144	20180209033303	20180223075120	20180224073809	20180301063719
+20180306065351	20180307013436	20180314013430	20180320011131
+ DEBUG [f32b77af] Finished in 0.014 seconds with exit status 0 (successful).
+  INFO Keeping 5 of 19 deployed releases on 18.8.5.8
+  INFO [01b98c8d] Running /usr/bin/env rm -rf /var/www/amigo/releases/20180127025226 /var/www/amigo/releases/20180127063412 /var/www/amigo/releases/20180129070857 /var/www/amigo/releases/20180130015244 /var/www/amigo/releases/20180202060928 /var/www/amigo/releases/20180206013111 /var/www/amigo/releases/20180206015550 /var/www/amigo/releases/20180206024548 /var/www/amigo/releases/20180206031632 /var/www/amigo/releases/20180206055745 /var/www/amigo/releases/20180208062144 /var/www/amigo/releases/20180209033303 /var/www/amigo/releases/20180223075120 /var/www/amigo/releases/20180224073809 as cenx@18.8.5.8
+ DEBUG [01b98c8d] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env rm -rf /var/www/amigo/releases/20180127025226 /var/www/amigo/releases/20180127063412 /var/www/amigo/releases/20180129070857 /var/www/amigo/releases/20180130015244 /var/www/amigo/releases/20180202060928 /var/www/amigo/releases/20180206013111 /var/www/amigo/releases/20180206015550 /var/www/amigo/releases/20180206024548 /var/www/amigo/releases/20180206031632 /var/www/amigo/releases/20180206055745 /var/www/amigo/releases/20180208062144 /var/www/amigo/releases/20180209033303 /var/www/amigo/releases/20180223075120 /var/www/amigo/releases/20180224073809 )
+  INFO [01b98c8d] Finished in 6.016 seconds with exit status 0 (successful).
+ DEBUG [e96ca3fb] Running if test ! -d /var/www/amigo/current; then echo "Directory does not exist '/var/www/amigo/current'" 1>&2; false; fi as cenx@18.8.5.8
+ DEBUG [e96ca3fb] Command: if test ! -d /var/www/amigo/current; then echo "Directory does not exist '/var/www/amigo/current'" 1>&2; false; fi
+ DEBUG [e96ca3fb] Finished in 0.008 seconds with exit status 0 (successful).
+  INFO [33256039] Running /home/cenx/.rbenv/bin/rbenv exec bundle exec whenever --update-crontab amigo as cenx@18.8.5.8
+ DEBUG [33256039] Command: cd /var/www/amigo/current && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /home/cenx/.rbenv/bin/rbenv exec bundle exec whenever --update-crontab amigo )
+ DEBUG [33256039] 	[write] crontab file updated
+  INFO [33256039] Finished in 0.544 seconds with exit status 0 (successful).
+ DEBUG [7d041521] Running if test ! -d /var/www/amigo/releases; then echo "Directory does not exist '/var/www/amigo/releases'" 1>&2; false; fi as cenx@18.8.5.8
+ DEBUG [7d041521] Command: if test ! -d /var/www/amigo/releases; then echo "Directory does not exist '/var/www/amigo/releases'" 1>&2; false; fi
+ DEBUG [7d041521] Finished in 0.010 seconds with exit status 0 (successful).
+  INFO [6e1ec87a] Running /usr/bin/env echo "Branch master (at 2853de0ae5a66f8143eac8cf79fe79447dc74694) deployed as release 20180320011131 by csl" >> /var/www/amigo/revisions.log as cenx@18.8.5.8
+ DEBUG [6e1ec87a] Command: cd /var/www/amigo/releases && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env echo "Branch master (at 2853de0ae5a66f8143eac8cf79fe79447dc74694) deployed as release 20180320011131 by csl" >> /var/www/amigo/revisions.log )
+  INFO [6e1ec87a] Finished in 0.021 seconds with exit status 0 (successful).
+  INFO ---------------------------------------------------------------------------
+  INFO START 2018-03-20 09:12:34 +0800 cap pd2 deploy
+  INFO ---------------------------------------------------------------------------
+ DEBUG [b92e7bf9] Running [ -d /home/cenx/.rbenv/versions/2.3.1 ] as cenx@18.8.5.9
+ DEBUG [b92e7bf9] Command: [ -d /home/cenx/.rbenv/versions/2.3.1 ]
+ DEBUG [b92e7bf9] Finished in 0.474 seconds with exit status 0 (successful).
+  INFO [7dd78a85] Running /usr/bin/env mkdir -p /tmp as cenx@18.8.5.9
+ DEBUG [7dd78a85] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env mkdir -p /tmp )
+  INFO [7dd78a85] Finished in 0.015 seconds with exit status 0 (successful).
+ DEBUG Uploading /tmp/git-ssh-amigo-production-csl.sh 0.0%
+  INFO Uploading /tmp/git-ssh-amigo-production-csl.sh 100.0%
+  INFO [7227bced] Running /usr/bin/env chmod 700 /tmp/git-ssh-amigo-production-csl.sh as cenx@18.8.5.9
+ DEBUG [7227bced] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env chmod 700 /tmp/git-ssh-amigo-production-csl.sh )
+  INFO [7227bced] Finished in 0.013 seconds with exit status 0 (successful).
+  INFO [7baf6d67] Running /usr/bin/env git ls-remote ssh://amige@19.9.0.146:29418/Amige HEAD as cenx@18.8.5.9
+ DEBUG [7baf6d67] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" GIT_ASKPASS="/bin/echo" GIT_SSH="/tmp/git-ssh-amigo-production-csl.sh" ; /usr/bin/env git ls-remote ssh://amige@19.9.0.146:29418/Amige HEAD )
+ DEBUG [7baf6d67] 	2853de0ae5a66f8143eac8cf79fe79447dc74694	HEAD
+  INFO [7baf6d67] Finished in 0.208 seconds with exit status 0 (successful).
+  INFO [f4f2c3b6] Running /usr/bin/env mkdir -p /var/www/amigo/shared /var/www/amigo/releases as cenx@18.8.5.9
+ DEBUG [f4f2c3b6] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env mkdir -p /var/www/amigo/shared /var/www/amigo/releases )
+  INFO [f4f2c3b6] Finished in 0.014 seconds with exit status 0 (successful).
+  INFO [104b36eb] Running /usr/bin/env mkdir -p /var/www/amigo/shared/log /var/www/amigo/shared/files /var/www/amigo/shared/tmp /var/www/amigo/shared/vendor/bundle /var/www/amigo/shared/public/system /var/www/amigo/shared/public/uploads /var/www/amigo/shared/public/assets as cenx@18.8.5.9
+ DEBUG [104b36eb] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env mkdir -p /var/www/amigo/shared/log /var/www/amigo/shared/files /var/www/amigo/shared/tmp /var/www/amigo/shared/vendor/bundle /var/www/amigo/shared/public/system /var/www/amigo/shared/public/uploads /var/www/amigo/shared/public/assets )
+  INFO [104b36eb] Finished in 0.016 seconds with exit status 0 (successful).
+  INFO [b770f396] Running /usr/bin/env mkdir -p /var/www/amigo/shared/config /var/www/amigo/shared/tmp as cenx@18.8.5.9
+ DEBUG [b770f396] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env mkdir -p /var/www/amigo/shared/config /var/www/amigo/shared/tmp )
+  INFO [b770f396] Finished in 0.014 seconds with exit status 0 (successful).
+ DEBUG [221ff151] Running [ -f /var/www/amigo/shared/config/database.yml ] as cenx@18.8.5.9
+ DEBUG [221ff151] Command: [ -f /var/www/amigo/shared/config/database.yml ]
+ DEBUG [221ff151] Finished in 0.009 seconds with exit status 0 (successful).
+ DEBUG [7b722965] Running [ -f /var/www/amigo/shared/config/secrets.yml ] as cenx@18.8.5.9
+ DEBUG [7b722965] Command: [ -f /var/www/amigo/shared/config/secrets.yml ]
+ DEBUG [7b722965] Finished in 0.009 seconds with exit status 0 (successful).
+ DEBUG [77307a46] Running [ -f /var/www/amigo/shared/tmp/restart.txt ] as cenx@18.8.5.9
+ DEBUG [77307a46] Command: [ -f /var/www/amigo/shared/tmp/restart.txt ]
+ DEBUG [77307a46] Finished in 0.009 seconds with exit status 0 (successful).
+ DEBUG [bc3f6f27] Running [ -f /var/www/amigo/shared/config/configuration.yml ] as cenx@18.8.5.9
+ DEBUG [bc3f6f27] Command: [ -f /var/www/amigo/shared/config/configuration.yml ]
+ DEBUG [bc3f6f27] Finished in 0.009 seconds with exit status 0 (successful).
+ DEBUG [7aef12ce] Running [ -f /var/www/amigo/shared/config/environment.rb ] as cenx@18.8.5.9
+ DEBUG [7aef12ce] Command: [ -f /var/www/amigo/shared/config/environment.rb ]
+ DEBUG [7aef12ce] Finished in 0.009 seconds with exit status 0 (successful).
+ DEBUG [05a1ec19] Running [ -f /var/www/amigo/shared/config/shards.yml ] as cenx@18.8.5.9
+ DEBUG [05a1ec19] Command: [ -f /var/www/amigo/shared/config/shards.yml ]
+ DEBUG [05a1ec19] Finished in 0.009 seconds with exit status 0 (successful).
+ DEBUG [c50cf243] Running [ -f /var/www/amigo/current/REVISION ] as cenx@18.8.5.9
+ DEBUG [c50cf243] Command: [ -f /var/www/amigo/current/REVISION ]
+ DEBUG [c50cf243] Finished in 0.009 seconds with exit status 0 (successful).
+ DEBUG [ba028db3] Running /usr/bin/env cat /var/www/amigo/current/REVISION 2>/dev/null as cenx@18.8.5.9
+ DEBUG [ba028db3] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env cat /var/www/amigo/current/REVISION 2>/dev/null )
+ DEBUG [ba028db3] 	2ff6a3cc73e64e4c2e2524abfe490f9b48ef9e5b
+ DEBUG [ba028db3] Finished in 0.012 seconds with exit status 0 (successful).
+ DEBUG [8b64525f] Running [ -d /var/www/amigo/current ] as cenx@18.8.5.9
+ DEBUG [8b64525f] Command: [ -d /var/www/amigo/current ]
+ DEBUG [8b64525f] Finished in 0.009 seconds with exit status 0 (successful).
+ DEBUG [0fdfd532] Running if test ! -d /var/www/amigo/current; then echo "Directory does not exist '/var/www/amigo/current'" 1>&2; false; fi as cenx@18.8.5.9
+ DEBUG [0fdfd532] Command: if test ! -d /var/www/amigo/current; then echo "Directory does not exist '/var/www/amigo/current'" 1>&2; false; fi
+ DEBUG [0fdfd532] Finished in 0.009 seconds with exit status 0 (successful).
+ DEBUG [32c12733] Running /usr/bin/env [ -f /var/www/amigo/shared/tmp/pids/sidekiq-0.pid ] as cenx@18.8.5.9
+ DEBUG [32c12733] Command: cd /var/www/amigo/current && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env [ -f /var/www/amigo/shared/tmp/pids/sidekiq-0.pid ] )
+ DEBUG [32c12733] Finished in 0.013 seconds with exit status 1 (failed).
+ DEBUG [e559c514] Running [ -f /var/www/amigo/repo/HEAD ] as cenx@18.8.5.9
+ DEBUG [e559c514] Command: [ -f /var/www/amigo/repo/HEAD ]
+ DEBUG [e559c514] Finished in 0.009 seconds with exit status 0 (successful).
+  INFO The repository mirror is at /var/www/amigo/repo
+ DEBUG [2e30b1e4] Running if test ! -d /var/www/amigo/repo; then echo "Directory does not exist '/var/www/amigo/repo'" 1>&2; false; fi as cenx@18.8.5.9
+ DEBUG [2e30b1e4] Command: if test ! -d /var/www/amigo/repo; then echo "Directory does not exist '/var/www/amigo/repo'" 1>&2; false; fi
+ DEBUG [2e30b1e4] Finished in 0.009 seconds with exit status 0 (successful).
+  INFO [5db0901b] Running /usr/bin/env git remote set-url origin ssh://amige@19.9.0.146:29418/Amige as cenx@18.8.5.9
+ DEBUG [5db0901b] Command: cd /var/www/amigo/repo && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" GIT_ASKPASS="/bin/echo" GIT_SSH="/tmp/git-ssh-amigo-production-csl.sh" ; /usr/bin/env git remote set-url origin ssh://amige@19.9.0.146:29418/Amige )
+  INFO [5db0901b] Finished in 0.012 seconds with exit status 0 (successful).
+  INFO [d4d5fb99] Running /usr/bin/env git remote update --prune as cenx@18.8.5.9
+ DEBUG [d4d5fb99] Command: cd /var/www/amigo/repo && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" GIT_ASKPASS="/bin/echo" GIT_SSH="/tmp/git-ssh-amigo-production-csl.sh" ; /usr/bin/env git remote update --prune )
+ DEBUG [d4d5fb99] 	Fetching origin
+ DEBUG [d4d5fb99] 	Total 29 (delta 23), reused 29 (delta 23)
+ DEBUG [d4d5fb99] 	From ssh://19.9.0.146:29418/Amige
+   2ff6a3c..2853de0  master     -> master
+ DEBUG [d4d5fb99] 	   8f83fee..440eb6d  refs/meta/config -> refs/meta/config
+  INFO [d4d5fb99] Finished in 0.393 seconds with exit status 0 (successful).
+ DEBUG [b437c9fd] Running if test ! -d /var/www/amigo/repo; then echo "Directory does not exist '/var/www/amigo/repo'" 1>&2; false; fi as cenx@18.8.5.9
+ DEBUG [b437c9fd] Command: if test ! -d /var/www/amigo/repo; then echo "Directory does not exist '/var/www/amigo/repo'" 1>&2; false; fi
+ DEBUG [b437c9fd] Finished in 0.010 seconds with exit status 0 (successful).
+  INFO [88cbfed0] Running /usr/bin/env mkdir -p /var/www/amigo/releases/20180320011235 as cenx@18.8.5.9
+ DEBUG [88cbfed0] Command: cd /var/www/amigo/repo && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" GIT_ASKPASS="/bin/echo" GIT_SSH="/tmp/git-ssh-amigo-production-csl.sh" ; /usr/bin/env mkdir -p /var/www/amigo/releases/20180320011235 )
+  INFO [88cbfed0] Finished in 0.013 seconds with exit status 0 (successful).
+  INFO [8a7ae222] Running /usr/bin/env git archive master | /usr/bin/env tar -x -f - -C /var/www/amigo/releases/20180320011235 as cenx@18.8.5.9
+ DEBUG [8a7ae222] Command: cd /var/www/amigo/repo && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" GIT_ASKPASS="/bin/echo" GIT_SSH="/tmp/git-ssh-amigo-production-csl.sh" ; /usr/bin/env git archive master | /usr/bin/env tar -x -f - -C /var/www/amigo/releases/20180320011235 )
+  INFO [8a7ae222] Finished in 0.686 seconds with exit status 0 (successful).
+ DEBUG [7d14f5d2] Running if test ! -d /var/www/amigo/repo; then echo "Directory does not exist '/var/www/amigo/repo'" 1>&2; false; fi as cenx@18.8.5.9
+ DEBUG [7d14f5d2] Command: if test ! -d /var/www/amigo/repo; then echo "Directory does not exist '/var/www/amigo/repo'" 1>&2; false; fi
+ DEBUG [7d14f5d2] Finished in 0.007 seconds with exit status 0 (successful).
+ DEBUG [55353193] Running /usr/bin/env git rev-list --max-count=1 master as cenx@18.8.5.9
+ DEBUG [55353193] Command: cd /var/www/amigo/repo && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" GIT_ASKPASS="/bin/echo" GIT_SSH="/tmp/git-ssh-amigo-production-csl.sh" ; /usr/bin/env git rev-list --max-count=1 master )
+ DEBUG [55353193] 	2853de0ae5a66f8143eac8cf79fe79447dc74694
+ DEBUG [55353193] Finished in 0.013 seconds with exit status 0 (successful).
+ DEBUG [a2a61e99] Running if test ! -d /var/www/amigo/releases/20180320011235; then echo "Directory does not exist '/var/www/amigo/releases/20180320011235'" 1>&2; false; fi as cenx@18.8.5.9
+ DEBUG [a2a61e99] Command: if test ! -d /var/www/amigo/releases/20180320011235; then echo "Directory does not exist '/var/www/amigo/releases/20180320011235'" 1>&2; false; fi
+ DEBUG [a2a61e99] Finished in 0.016 seconds with exit status 0 (successful).
+  INFO [4f1c64d3] Running /usr/bin/env echo "2853de0ae5a66f8143eac8cf79fe79447dc74694" >> REVISION as cenx@18.8.5.9
+ DEBUG [4f1c64d3] Command: cd /var/www/amigo/releases/20180320011235 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env echo "2853de0ae5a66f8143eac8cf79fe79447dc74694" >> REVISION )
+  INFO [4f1c64d3] Finished in 0.012 seconds with exit status 0 (successful).
+  INFO [f2d27c50] Running /usr/bin/env mkdir -p /var/www/amigo/releases/20180320011235/config /var/www/amigo/releases/20180320011235/tmp as cenx@18.8.5.9
+ DEBUG [f2d27c50] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env mkdir -p /var/www/amigo/releases/20180320011235/config /var/www/amigo/releases/20180320011235/tmp )
+  INFO [f2d27c50] Finished in 0.011 seconds with exit status 0 (successful).
+ DEBUG [08aaa0b9] Running [ -L /var/www/amigo/releases/20180320011235/config/database.yml ] as cenx@18.8.5.9
+ DEBUG [08aaa0b9] Command: [ -L /var/www/amigo/releases/20180320011235/config/database.yml ]
+ DEBUG [08aaa0b9] Finished in 0.007 seconds with exit status 1 (failed).
+ DEBUG [9d0c5d9a] Running [ -f /var/www/amigo/releases/20180320011235/config/database.yml ] as cenx@18.8.5.9
+ DEBUG [9d0c5d9a] Command: [ -f /var/www/amigo/releases/20180320011235/config/database.yml ]
+ DEBUG [9d0c5d9a] Finished in 0.012 seconds with exit status 1 (failed).
+  INFO [4d1dff70] Running /usr/bin/env ln -s /var/www/amigo/shared/config/database.yml /var/www/amigo/releases/20180320011235/config/database.yml as cenx@18.8.5.9
+ DEBUG [4d1dff70] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/config/database.yml /var/www/amigo/releases/20180320011235/config/database.yml )
+  INFO [4d1dff70] Finished in 0.014 seconds with exit status 0 (successful).
+ DEBUG [8a44b3d7] Running [ -L /var/www/amigo/releases/20180320011235/config/secrets.yml ] as cenx@18.8.5.9
+ DEBUG [8a44b3d7] Command: [ -L /var/www/amigo/releases/20180320011235/config/secrets.yml ]
+ DEBUG [8a44b3d7] Finished in 0.008 seconds with exit status 1 (failed).
+ DEBUG [c56710a8] Running [ -f /var/www/amigo/releases/20180320011235/config/secrets.yml ] as cenx@18.8.5.9
+ DEBUG [c56710a8] Command: [ -f /var/www/amigo/releases/20180320011235/config/secrets.yml ]
+ DEBUG [c56710a8] Finished in 0.009 seconds with exit status 1 (failed).
+  INFO [788f6d8e] Running /usr/bin/env ln -s /var/www/amigo/shared/config/secrets.yml /var/www/amigo/releases/20180320011235/config/secrets.yml as cenx@18.8.5.9
+ DEBUG [788f6d8e] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/config/secrets.yml /var/www/amigo/releases/20180320011235/config/secrets.yml )
+  INFO [788f6d8e] Finished in 0.011 seconds with exit status 0 (successful).
+ DEBUG [1e59bf5e] Running [ -L /var/www/amigo/releases/20180320011235/tmp/restart.txt ] as cenx@18.8.5.9
+ DEBUG [1e59bf5e] Command: [ -L /var/www/amigo/releases/20180320011235/tmp/restart.txt ]
+ DEBUG [1e59bf5e] Finished in 0.009 seconds with exit status 1 (failed).
+ DEBUG [33d9ddf7] Running [ -f /var/www/amigo/releases/20180320011235/tmp/restart.txt ] as cenx@18.8.5.9
+ DEBUG [33d9ddf7] Command: [ -f /var/www/amigo/releases/20180320011235/tmp/restart.txt ]
+ DEBUG [33d9ddf7] Finished in 0.008 seconds with exit status 1 (failed).
+  INFO [7f4d6b19] Running /usr/bin/env ln -s /var/www/amigo/shared/tmp/restart.txt /var/www/amigo/releases/20180320011235/tmp/restart.txt as cenx@18.8.5.9
+ DEBUG [7f4d6b19] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/tmp/restart.txt /var/www/amigo/releases/20180320011235/tmp/restart.txt )
+  INFO [7f4d6b19] Finished in 0.011 seconds with exit status 0 (successful).
+ DEBUG [5f3f6d63] Running [ -L /var/www/amigo/releases/20180320011235/config/configuration.yml ] as cenx@18.8.5.9
+ DEBUG [5f3f6d63] Command: [ -L /var/www/amigo/releases/20180320011235/config/configuration.yml ]
+ DEBUG [5f3f6d63] Finished in 0.010 seconds with exit status 1 (failed).
+ DEBUG [cd52ddbb] Running [ -f /var/www/amigo/releases/20180320011235/config/configuration.yml ] as cenx@18.8.5.9
+ DEBUG [cd52ddbb] Command: [ -f /var/www/amigo/releases/20180320011235/config/configuration.yml ]
+ DEBUG [cd52ddbb] Finished in 0.009 seconds with exit status 1 (failed).
+  INFO [15779c49] Running /usr/bin/env ln -s /var/www/amigo/shared/config/configuration.yml /var/www/amigo/releases/20180320011235/config/configuration.yml as cenx@18.8.5.9
+ DEBUG [15779c49] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/config/configuration.yml /var/www/amigo/releases/20180320011235/config/configuration.yml )
+  INFO [15779c49] Finished in 0.011 seconds with exit status 0 (successful).
+ DEBUG [340575bc] Running [ -L /var/www/amigo/releases/20180320011235/config/environment.rb ] as cenx@18.8.5.9
+ DEBUG [340575bc] Command: [ -L /var/www/amigo/releases/20180320011235/config/environment.rb ]
+ DEBUG [340575bc] Finished in 0.009 seconds with exit status 1 (failed).
+ DEBUG [c31acbe0] Running [ -f /var/www/amigo/releases/20180320011235/config/environment.rb ] as cenx@18.8.5.9
+ DEBUG [c31acbe0] Command: [ -f /var/www/amigo/releases/20180320011235/config/environment.rb ]
+ DEBUG [c31acbe0] Finished in 0.011 seconds with exit status 1 (failed).
+  INFO [ede964bf] Running /usr/bin/env ln -s /var/www/amigo/shared/config/environment.rb /var/www/amigo/releases/20180320011235/config/environment.rb as cenx@18.8.5.9
+ DEBUG [ede964bf] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/config/environment.rb /var/www/amigo/releases/20180320011235/config/environment.rb )
+  INFO [ede964bf] Finished in 0.015 seconds with exit status 0 (successful).
+ DEBUG [d3f80e99] Running [ -L /var/www/amigo/releases/20180320011235/config/shards.yml ] as cenx@18.8.5.9
+ DEBUG [d3f80e99] Command: [ -L /var/www/amigo/releases/20180320011235/config/shards.yml ]
+ DEBUG [d3f80e99] Finished in 0.010 seconds with exit status 1 (failed).
+ DEBUG [a1f6ea2a] Running [ -f /var/www/amigo/releases/20180320011235/config/shards.yml ] as cenx@18.8.5.9
+ DEBUG [a1f6ea2a] Command: [ -f /var/www/amigo/releases/20180320011235/config/shards.yml ]
+ DEBUG [a1f6ea2a] Finished in 0.012 seconds with exit status 1 (failed).
+  INFO [d2ef90e1] Running /usr/bin/env ln -s /var/www/amigo/shared/config/shards.yml /var/www/amigo/releases/20180320011235/config/shards.yml as cenx@18.8.5.9
+ DEBUG [d2ef90e1] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/config/shards.yml /var/www/amigo/releases/20180320011235/config/shards.yml )
+  INFO [d2ef90e1] Finished in 0.018 seconds with exit status 0 (successful).
+  INFO [5e6b99af] Running /usr/bin/env mkdir -p /var/www/amigo/releases/20180320011235 /var/www/amigo/releases/20180320011235/vendor /var/www/amigo/releases/20180320011235/public as cenx@18.8.5.9
+ DEBUG [5e6b99af] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env mkdir -p /var/www/amigo/releases/20180320011235 /var/www/amigo/releases/20180320011235/vendor /var/www/amigo/releases/20180320011235/public )
+  INFO [5e6b99af] Finished in 0.016 seconds with exit status 0 (successful).
+ DEBUG [3f27ae89] Running [ -L /var/www/amigo/releases/20180320011235/log ] as cenx@18.8.5.9
+ DEBUG [3f27ae89] Command: [ -L /var/www/amigo/releases/20180320011235/log ]
+ DEBUG [3f27ae89] Finished in 0.008 seconds with exit status 1 (failed).
+ DEBUG [3fa92ef3] Running [ -d /var/www/amigo/releases/20180320011235/log ] as cenx@18.8.5.9
+ DEBUG [3fa92ef3] Command: [ -d /var/www/amigo/releases/20180320011235/log ]
+ DEBUG [3fa92ef3] Finished in 0.009 seconds with exit status 1 (failed).
+  INFO [cbc65f2c] Running /usr/bin/env ln -s /var/www/amigo/shared/log /var/www/amigo/releases/20180320011235/log as cenx@18.8.5.9
+ DEBUG [cbc65f2c] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/log /var/www/amigo/releases/20180320011235/log )
+  INFO [cbc65f2c] Finished in 0.023 seconds with exit status 0 (successful).
+ DEBUG [aa84f0a5] Running [ -L /var/www/amigo/releases/20180320011235/files ] as cenx@18.8.5.9
+ DEBUG [aa84f0a5] Command: [ -L /var/www/amigo/releases/20180320011235/files ]
+ DEBUG [aa84f0a5] Finished in 0.009 seconds with exit status 1 (failed).
+ DEBUG [2b84116c] Running [ -d /var/www/amigo/releases/20180320011235/files ] as cenx@18.8.5.9
+ DEBUG [2b84116c] Command: [ -d /var/www/amigo/releases/20180320011235/files ]
+ DEBUG [2b84116c] Finished in 0.009 seconds with exit status 1 (failed).
+  INFO [58bb3ad6] Running /usr/bin/env ln -s /var/www/amigo/shared/files /var/www/amigo/releases/20180320011235/files as cenx@18.8.5.9
+ DEBUG [58bb3ad6] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/files /var/www/amigo/releases/20180320011235/files )
+  INFO [58bb3ad6] Finished in 0.012 seconds with exit status 0 (successful).
+ DEBUG [8baf8333] Running [ -L /var/www/amigo/releases/20180320011235/tmp ] as cenx@18.8.5.9
+ DEBUG [8baf8333] Command: [ -L /var/www/amigo/releases/20180320011235/tmp ]
+ DEBUG [8baf8333] Finished in 0.012 seconds with exit status 1 (failed).
+ DEBUG [b78e7e5f] Running [ -d /var/www/amigo/releases/20180320011235/tmp ] as cenx@18.8.5.9
+ DEBUG [b78e7e5f] Command: [ -d /var/www/amigo/releases/20180320011235/tmp ]
+ DEBUG [b78e7e5f] Finished in 0.008 seconds with exit status 0 (successful).
+  INFO [a11a0d40] Running /usr/bin/env rm -rf /var/www/amigo/releases/20180320011235/tmp as cenx@18.8.5.9
+ DEBUG [a11a0d40] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env rm -rf /var/www/amigo/releases/20180320011235/tmp )
+  INFO [a11a0d40] Finished in 0.014 seconds with exit status 0 (successful).
+  INFO [1221b96c] Running /usr/bin/env ln -s /var/www/amigo/shared/tmp /var/www/amigo/releases/20180320011235/tmp as cenx@18.8.5.9
+ DEBUG [1221b96c] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/tmp /var/www/amigo/releases/20180320011235/tmp )
+  INFO [1221b96c] Finished in 0.013 seconds with exit status 0 (successful).
+ DEBUG [8a3ac3b0] Running [ -L /var/www/amigo/releases/20180320011235/vendor/bundle ] as cenx@18.8.5.9
+ DEBUG [8a3ac3b0] Command: [ -L /var/www/amigo/releases/20180320011235/vendor/bundle ]
+ DEBUG [8a3ac3b0] Finished in 0.011 seconds with exit status 1 (failed).
+ DEBUG [ac0aa85a] Running [ -d /var/www/amigo/releases/20180320011235/vendor/bundle ] as cenx@18.8.5.9
+ DEBUG [ac0aa85a] Command: [ -d /var/www/amigo/releases/20180320011235/vendor/bundle ]
+ DEBUG [ac0aa85a] Finished in 0.010 seconds with exit status 1 (failed).
+  INFO [38c96ec4] Running /usr/bin/env ln -s /var/www/amigo/shared/vendor/bundle /var/www/amigo/releases/20180320011235/vendor/bundle as cenx@18.8.5.9
+ DEBUG [38c96ec4] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/vendor/bundle /var/www/amigo/releases/20180320011235/vendor/bundle )
+  INFO [38c96ec4] Finished in 0.012 seconds with exit status 0 (successful).
+ DEBUG [38117a97] Running [ -L /var/www/amigo/releases/20180320011235/public/system ] as cenx@18.8.5.9
+ DEBUG [38117a97] Command: [ -L /var/www/amigo/releases/20180320011235/public/system ]
+ DEBUG [38117a97] Finished in 0.009 seconds with exit status 1 (failed).
+ DEBUG [1d0fd86d] Running [ -d /var/www/amigo/releases/20180320011235/public/system ] as cenx@18.8.5.9
+ DEBUG [1d0fd86d] Command: [ -d /var/www/amigo/releases/20180320011235/public/system ]
+ DEBUG [1d0fd86d] Finished in 0.013 seconds with exit status 1 (failed).
+  INFO [8240be38] Running /usr/bin/env ln -s /var/www/amigo/shared/public/system /var/www/amigo/releases/20180320011235/public/system as cenx@18.8.5.9
+ DEBUG [8240be38] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/public/system /var/www/amigo/releases/20180320011235/public/system )
+  INFO [8240be38] Finished in 0.013 seconds with exit status 0 (successful).
+ DEBUG [32cf8306] Running [ -L /var/www/amigo/releases/20180320011235/public/uploads ] as cenx@18.8.5.9
+ DEBUG [32cf8306] Command: [ -L /var/www/amigo/releases/20180320011235/public/uploads ]
+ DEBUG [32cf8306] Finished in 0.011 seconds with exit status 1 (failed).
+ DEBUG [6935e6fb] Running [ -d /var/www/amigo/releases/20180320011235/public/uploads ] as cenx@18.8.5.9
+ DEBUG [6935e6fb] Command: [ -d /var/www/amigo/releases/20180320011235/public/uploads ]
+ DEBUG [6935e6fb] Finished in 0.010 seconds with exit status 1 (failed).
+  INFO [a74e9105] Running /usr/bin/env ln -s /var/www/amigo/shared/public/uploads /var/www/amigo/releases/20180320011235/public/uploads as cenx@18.8.5.9
+ DEBUG [a74e9105] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/public/uploads /var/www/amigo/releases/20180320011235/public/uploads )
+  INFO [a74e9105] Finished in 0.013 seconds with exit status 0 (successful).
+ DEBUG [8739adef] Running [ -L /var/www/amigo/releases/20180320011235/public/assets ] as cenx@18.8.5.9
+ DEBUG [8739adef] Command: [ -L /var/www/amigo/releases/20180320011235/public/assets ]
+ DEBUG [8739adef] Finished in 0.009 seconds with exit status 1 (failed).
+ DEBUG [ed06202e] Running [ -d /var/www/amigo/releases/20180320011235/public/assets ] as cenx@18.8.5.9
+ DEBUG [ed06202e] Command: [ -d /var/www/amigo/releases/20180320011235/public/assets ]
+ DEBUG [ed06202e] Finished in 0.010 seconds with exit status 1 (failed).
+  INFO [511a4b33] Running /usr/bin/env ln -s /var/www/amigo/shared/public/assets /var/www/amigo/releases/20180320011235/public/assets as cenx@18.8.5.9
+ DEBUG [511a4b33] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/shared/public/assets /var/www/amigo/releases/20180320011235/public/assets )
+  INFO [511a4b33] Finished in 0.012 seconds with exit status 0 (successful).
+ DEBUG [b20ff8d5] Running if test ! -d /var/www/amigo/releases/20180320011235; then echo "Directory does not exist '/var/www/amigo/releases/20180320011235'" 1>&2; false; fi as cenx@18.8.5.9
+ DEBUG [b20ff8d5] Command: if test ! -d /var/www/amigo/releases/20180320011235; then echo "Directory does not exist '/var/www/amigo/releases/20180320011235'" 1>&2; false; fi
+ DEBUG [b20ff8d5] Finished in 0.010 seconds with exit status 0 (successful).
+ DEBUG [6e16798b] Running /home/cenx/.rbenv/bin/rbenv exec bundle check --path /var/www/amigo/shared/bundle as cenx@18.8.5.9
+ DEBUG [6e16798b] Command: cd /var/www/amigo/releases/20180320011235 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /home/cenx/.rbenv/bin/rbenv exec bundle check --path /var/www/amigo/shared/bundle )
+ DEBUG [6e16798b] 	The git source `git://github.com/rubycas/rubycas-client.git` uses the `git` protocol, which transmits data without encryption. Disable this warning with `bundle config git.allow_insecure true`, or switch to the `https` protocol to keep your data secure.
+ DEBUG [6e16798b] 	Your Gemfile lists the gem capistrano-rails (>= 0) more than once.
+You should probably keep only one of them.
+While it's not a problem now, it could cause errors if you change the version of one of them later.
+ DEBUG [6e16798b] 	Warning: the running version of Bundler (1.14.6) is older than the version that created the lockfile (1.16.0). We suggest you upgrade to the latest version of Bundler by running `gem install bundler`.
+ DEBUG [6e16798b] 	The following gems are missing
+ * net-ssh (4.1.0)
+ * net-scp (1.2.1)
+ * sshkit (1.13.0)
+ * airbrussh (1.1.2)
+ DEBUG [6e16798b] 	 * awesome_print (1.8.0)
+ * better_errors (2.1.1)
+ DEBUG [6e16798b] 	 * debug_inspector (0.0.2)
+ DEBUG [6e16798b] 	 * binding_of_caller (0.7.2)
+ DEBUG [6e16798b] 	 * byebug (9.0.6)
+ DEBUG [6e16798b] 	 * capistrano (3.8.0)
+ DEBUG [6e16798b] 	 * capistrano-bundler (1.2.0)
+ DEBUG [6e16798b] 	 * capistrano-rails (1.2.3)
+ DEBUG [6e16798b] 	 * capistrano-rbenv (2.1.0)
+ DEBUG [6e16798b] 	 * capistrano-rvm (0.1.2)
+ DEBUG [6e16798b] 	 * capistrano-sidekiq (0.10.0)
+ DEBUG [6e16798b] 	 * capistrano3-puma (3.1.1)
+ DEBUG [6e16798b] 	 * xpath (2.0.0)
+ DEBUG [6e16798b] 	 * capybara (2.13.0)
+ * ffi (1.9.18)
+ DEBUG [6e16798b] 	 * childprocess (0.6.3)
+ DEBUG [6e16798b] 	 * docile (1.1.5)
+ DEBUG [6e16798b] 	 * erb2haml (0.1.5)
+ DEBUG [6e16798b] 	 * hirb (0.7.3)
+ DEBUG [6e16798b] 	 * unicode-display_width (0.1.1)
+ DEBUG [6e16798b] 	 * hirb-unicode (0.0.5)
+ DEBUG [6e16798b] 	 * metaclass (0.0.4)
+ DEBUG [6e16798b] 	 * method_source (0.8.2)
+ DEBUG [6e16798b] 	 * mocha (1.2.1)
+ DEBUG [6e16798b] 	 * multi_json (1.12.1)
+ * slop (3.6.0)
+ DEBUG [6e16798b] 	 * pry (0.10.4)
+ DEBUG [6e16798b] 	 * pry-byebug (3.4.2)
+ DEBUG [6e16798b] 	 * yard (0.9.8)
+ DEBUG [6e16798b] 	 * pry-doc (0.10.0)
+ DEBUG [6e16798b] 	 * pry-rails (0.3.6)
+ DEBUG [6e16798b] 	 * pry-stack_explorer (0.4.9.2)
+ DEBUG [6e16798b] 	 * rack-mini-profiler (0.10.2)
+ DEBUG [6e16798b] 	 * rdoc (5.1.0)
+ DEBUG [6e16798b] 	 * websocket (1.2.4)
+ DEBUG [6e16798b] 	 * selenium-webdriver (3.3.0)
+ DEBUG [6e16798b] 	 * simplecov-html (0.9.0)
+ DEBUG [6e16798b] 	 * simplecov (0.9.2)
+Install missing gems with `bundle install`
+ DEBUG [6e16798b] Finished in 0.409 seconds with exit status 1 (failed).
+  INFO [4e509088] Running /home/cenx/.rbenv/bin/rbenv exec bundle install --path /var/www/amigo/shared/bundle --without development test --deployment --quiet as cenx@18.8.5.9
+ DEBUG [4e509088] Command: cd /var/www/amigo/releases/20180320011235 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /home/cenx/.rbenv/bin/rbenv exec bundle install --path /var/www/amigo/shared/bundle --without development test --deployment --quiet )
+  INFO [4e509088] Finished in 15.973 seconds with exit status 0 (successful).
+ DEBUG [787d27a5] Running if test ! -d /var/www/amigo/releases/20180320011235; then echo "Directory does not exist '/var/www/amigo/releases/20180320011235'" 1>&2; false; fi as cenx@18.8.5.9
+ DEBUG [787d27a5] Command: if test ! -d /var/www/amigo/releases/20180320011235; then echo "Directory does not exist '/var/www/amigo/releases/20180320011235'" 1>&2; false; fi
+ DEBUG [787d27a5] Finished in 0.007 seconds with exit status 0 (successful).
+  INFO [7c9d209f] Running /home/cenx/.rbenv/bin/rbenv exec bundle exec rake assets:precompile as cenx@18.8.5.9
+ DEBUG [7c9d209f] Command: cd /var/www/amigo/releases/20180320011235 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" RAILS_ENV="production" ; /home/cenx/.rbenv/bin/rbenv exec bundle exec rake assets:precompile )
+ DEBUG [7c9d209f] 	I, [2018-03-20T09:13:05.649825 #31321]  INFO -- : Writing /var/www/amigo/releases/20180320011235/public/assets/applications-a5e6f50ad8057cd3422101f42be4cd6f07a564766c53fe98779a4a1e02c58fb8.js
+ DEBUG [7c9d209f] 	I, [2018-03-20T09:13:05.651269 #31321]  INFO -- : Writing /var/www/amigo/releases/20180320011235/public/assets/applications-a5e6f50ad8057cd3422101f42be4cd6f07a564766c53fe98779a4a1e02c58fb8.js.gz
+  INFO [7c9d209f] Finished in 12.929 seconds with exit status 0 (successful).
+ DEBUG [57783b1f] Running if test ! -d /var/www/amigo/releases/20180320011235; then echo "Directory does not exist '/var/www/amigo/releases/20180320011235'" 1>&2; false; fi as cenx@18.8.5.9
+ DEBUG [57783b1f] Command: if test ! -d /var/www/amigo/releases/20180320011235; then echo "Directory does not exist '/var/www/amigo/releases/20180320011235'" 1>&2; false; fi
+ DEBUG [57783b1f] Finished in 0.011 seconds with exit status 0 (successful).
+  INFO [e6a0ddb1] Running /usr/bin/env mkdir -p /var/www/amigo/releases/20180320011235/assets_manifest_backup as cenx@18.8.5.9
+ DEBUG [e6a0ddb1] Command: cd /var/www/amigo/releases/20180320011235 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env mkdir -p /var/www/amigo/releases/20180320011235/assets_manifest_backup )
+  INFO [e6a0ddb1] Finished in 0.013 seconds with exit status 0 (successful).
+ DEBUG [3c891b90] Running /usr/bin/env ls /var/www/amigo/releases/20180320011235/public/assets/.sprockets-manifest* as cenx@18.8.5.9
+ DEBUG [3c891b90] Command: cd /var/www/amigo/releases/20180320011235 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ls /var/www/amigo/releases/20180320011235/public/assets/.sprockets-manifest* )
+ DEBUG [3c891b90] 	/var/www/amigo/releases/20180320011235/public/assets/.sprockets-manifest-be0825bf121e59a316e70f8386b1a732.json
+ DEBUG [3c891b90] Finished in 0.014 seconds with exit status 0 (successful).
+ DEBUG [e8ddf5bc] Running /usr/bin/env ls /var/www/amigo/releases/20180320011235/public/assets/.sprockets-manifest* as cenx@18.8.5.9
+ DEBUG [e8ddf5bc] Command: cd /var/www/amigo/releases/20180320011235 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ls /var/www/amigo/releases/20180320011235/public/assets/.sprockets-manifest* )
+ DEBUG [e8ddf5bc] 	/var/www/amigo/releases/20180320011235/public/assets/.sprockets-manifest-be0825bf121e59a316e70f8386b1a732.json
+ DEBUG [e8ddf5bc] Finished in 0.013 seconds with exit status 0 (successful).
+  INFO [f08424a4] Running /usr/bin/env cp /var/www/amigo/releases/20180320011235/public/assets/.sprockets-manifest-be0825bf121e59a316e70f8386b1a732.json /var/www/amigo/releases/20180320011235/assets_manifest_backup as cenx@18.8.5.9
+ DEBUG [f08424a4] Command: cd /var/www/amigo/releases/20180320011235 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env cp /var/www/amigo/releases/20180320011235/public/assets/.sprockets-manifest-be0825bf121e59a316e70f8386b1a732.json /var/www/amigo/releases/20180320011235/assets_manifest_backup )
+  INFO [f08424a4] Finished in 0.014 seconds with exit status 0 (successful).
+ DEBUG [dddd231c] Running if test ! -d /var/www/amigo/releases/20180320011235; then echo "Directory does not exist '/var/www/amigo/releases/20180320011235'" 1>&2; false; fi as cenx@18.8.5.9
+ DEBUG [dddd231c] Command: if test ! -d /var/www/amigo/releases/20180320011235; then echo "Directory does not exist '/var/www/amigo/releases/20180320011235'" 1>&2; false; fi
+ DEBUG [dddd231c] Finished in 0.008 seconds with exit status 0 (successful).
+  INFO [a611c175] Running /home/cenx/.rbenv/bin/rbenv exec bundle exec rake 'assets:clean[2]' as cenx@18.8.5.9
+ DEBUG [a611c175] Command: cd /var/www/amigo/releases/20180320011235 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" RAILS_ENV="production" ; /home/cenx/.rbenv/bin/rbenv exec bundle exec rake 'assets:clean[2]' )
+  INFO [a611c175] Finished in 4.090 seconds with exit status 0 (successful).
+  INFO [deploy:migrate] Run `rake db:migrate`
+ DEBUG [5d34f246] Running if test ! -d /var/www/amigo/releases/20180320011235; then echo "Directory does not exist '/var/www/amigo/releases/20180320011235'" 1>&2; false; fi as cenx@18.8.5.9
+ DEBUG [5d34f246] Command: if test ! -d /var/www/amigo/releases/20180320011235; then echo "Directory does not exist '/var/www/amigo/releases/20180320011235'" 1>&2; false; fi
+ DEBUG [5d34f246] Finished in 0.008 seconds with exit status 0 (successful).
+  INFO [eda82946] Running /home/cenx/.rbenv/bin/rbenv exec bundle exec rake db:migrate as cenx@18.8.5.9
+ DEBUG [eda82946] Command: cd /var/www/amigo/releases/20180320011235 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" RAILS_ENV="production" ; /home/cenx/.rbenv/bin/rbenv exec bundle exec rake db:migrate )
+  INFO [eda82946] Finished in 4.878 seconds with exit status 0 (successful).
+ DEBUG [ec15adea] Running [ -d /var/www/amigo/releases/20180320011235 ] as cenx@18.8.5.9
+ DEBUG [ec15adea] Command: [ -d /var/www/amigo/releases/20180320011235 ]
+ DEBUG [ec15adea] Finished in 0.009 seconds with exit status 0 (successful).
+ DEBUG [5309f8c4] Running if test ! -d /var/www/amigo/releases/20180320011235; then echo "Directory does not exist '/var/www/amigo/releases/20180320011235'" 1>&2; false; fi as cenx@18.8.5.9
+ DEBUG [5309f8c4] Command: if test ! -d /var/www/amigo/releases/20180320011235; then echo "Directory does not exist '/var/www/amigo/releases/20180320011235'" 1>&2; false; fi
+ DEBUG [5309f8c4] Finished in 0.009 seconds with exit status 0 (successful).
+ DEBUG [433b5e81] Running /usr/bin/env [ -f /var/www/amigo/shared/tmp/pids/sidekiq-0.pid ] as cenx@18.8.5.9
+ DEBUG [433b5e81] Command: cd /var/www/amigo/releases/20180320011235 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env [ -f /var/www/amigo/shared/tmp/pids/sidekiq-0.pid ] )
+ DEBUG [433b5e81] Finished in 0.012 seconds with exit status 1 (failed).
+  INFO [6c2e7826] Running /usr/bin/env ln -s /var/www/amigo/releases/20180320011235 /var/www/amigo/releases/current as cenx@18.8.5.9
+ DEBUG [6c2e7826] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ln -s /var/www/amigo/releases/20180320011235 /var/www/amigo/releases/current )
+  INFO [6c2e7826] Finished in 0.012 seconds with exit status 0 (successful).
+  INFO [32a91750] Running /usr/bin/env mv /var/www/amigo/releases/current /var/www/amigo as cenx@18.8.5.9
+ DEBUG [32a91750] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env mv /var/www/amigo/releases/current /var/www/amigo )
+  INFO [32a91750] Finished in 0.014 seconds with exit status 0 (successful).
+ DEBUG [31c9cefb] Running [ -d /var/www/amigo/releases/20180320011235 ] as cenx@18.8.5.9
+ DEBUG [31c9cefb] Command: [ -d /var/www/amigo/releases/20180320011235 ]
+ DEBUG [31c9cefb] Finished in 0.009 seconds with exit status 0 (successful).
+ DEBUG [1c530b5f] Running if test ! -d /var/www/amigo/releases/20180320011235; then echo "Directory does not exist '/var/www/amigo/releases/20180320011235'" 1>&2; false; fi as cenx@18.8.5.9
+ DEBUG [1c530b5f] Command: if test ! -d /var/www/amigo/releases/20180320011235; then echo "Directory does not exist '/var/www/amigo/releases/20180320011235'" 1>&2; false; fi
+ DEBUG [1c530b5f] Finished in 0.009 seconds with exit status 0 (successful).
+ DEBUG [cef8d2c3] Running /usr/bin/env [ -f /var/www/amigo/shared/tmp/pids/sidekiq-0.pid ] as cenx@18.8.5.9
+ DEBUG [cef8d2c3] Command: cd /var/www/amigo/releases/20180320011235 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env [ -f /var/www/amigo/shared/tmp/pids/sidekiq-0.pid ] )
+ DEBUG [cef8d2c3] Finished in 0.013 seconds with exit status 1 (failed).
+ DEBUG [07fc8944] Running if test ! -d /var/www/amigo/releases/20180320011235; then echo "Directory does not exist '/var/www/amigo/releases/20180320011235'" 1>&2; false; fi as cenx@18.8.5.9
+ DEBUG [07fc8944] Command: if test ! -d /var/www/amigo/releases/20180320011235; then echo "Directory does not exist '/var/www/amigo/releases/20180320011235'" 1>&2; false; fi
+ DEBUG [07fc8944] Finished in 0.010 seconds with exit status 0 (successful).
+ DEBUG [20b4b690] Running /usr/bin/env [ -f /var/www/amigo/shared/tmp/pids/sidekiq-0.pid ] as cenx@18.8.5.9
+ DEBUG [20b4b690] Command: cd /var/www/amigo/releases/20180320011235 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env [ -f /var/www/amigo/shared/tmp/pids/sidekiq-0.pid ] )
+ DEBUG [20b4b690] Finished in 0.012 seconds with exit status 1 (failed).
+  INFO [1240827a] Running /home/cenx/.rbenv/bin/rbenv exec bundle exec sidekiq --index 0 --pidfile /var/www/amigo/shared/tmp/pids/sidekiq-0.pid --environment production --logfile /var/www/amigo/shared/log/sidekiq.log --config /var/www/amigo/releases/20180320011235/config/sidekiq.yml --daemon as cenx@18.8.5.9
+ DEBUG [1240827a] Command: cd /var/www/amigo/releases/20180320011235 && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /home/cenx/.rbenv/bin/rbenv exec bundle exec sidekiq --index 0 --pidfile /var/www/amigo/shared/tmp/pids/sidekiq-0.pid --environment production --logfile /var/www/amigo/shared/log/sidekiq.log --config /var/www/amigo/releases/20180320011235/config/sidekiq.yml --daemon )
+  INFO [1240827a] Finished in 0.561 seconds with exit status 0 (successful).
+  INFO [f527b06d] Running /usr/bin/env touch /var/www/amigo/releases/20180320011235/tmp/restart.txt as cenx@18.8.5.9
+ DEBUG [f527b06d] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env touch /var/www/amigo/releases/20180320011235/tmp/restart.txt )
+  INFO [f527b06d] Finished in 0.014 seconds with exit status 0 (successful).
+ DEBUG [ba81538b] Running /usr/bin/env ls -x /var/www/amigo/releases as cenx@18.8.5.9
+ DEBUG [ba81538b] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env ls -x /var/www/amigo/releases )
+ DEBUG [ba81538b] 	20180309083711	20180313034150	20180313094800	20180313101246	20180314013335
+20180320011235
+ DEBUG [ba81538b] Finished in 0.014 seconds with exit status 0 (successful).
+  INFO Keeping 5 of 6 deployed releases on 18.8.5.9
+  INFO [d9296234] Running /usr/bin/env rm -rf /var/www/amigo/releases/20180309083711 as cenx@18.8.5.9
+ DEBUG [d9296234] Command: ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env rm -rf /var/www/amigo/releases/20180309083711 )
+  INFO [d9296234] Finished in 0.271 seconds with exit status 0 (successful).
+ DEBUG [f33a9cfe] Running if test ! -d /var/www/amigo/releases; then echo "Directory does not exist '/var/www/amigo/releases'" 1>&2; false; fi as cenx@18.8.5.9
+ DEBUG [f33a9cfe] Command: if test ! -d /var/www/amigo/releases; then echo "Directory does not exist '/var/www/amigo/releases'" 1>&2; false; fi
+ DEBUG [f33a9cfe] Finished in 0.008 seconds with exit status 0 (successful).
+  INFO [db36af9f] Running /usr/bin/env echo "Branch master (at 2853de0ae5a66f8143eac8cf79fe79447dc74694) deployed as release 20180320011235 by csl" >> /var/www/amigo/revisions.log as cenx@18.8.5.9
+ DEBUG [db36af9f] Command: cd /var/www/amigo/releases && ( export RBENV_ROOT="/home/cenx/.rbenv" RBENV_VERSION="2.3.1" ; /usr/bin/env echo "Branch master (at 2853de0ae5a66f8143eac8cf79fe79447dc74694) deployed as release 20180320011235 by csl" >> /var/www/amigo/revisions.log )
+  INFO [db36af9f] Finished in 0.010 seconds with exit status 0 (successful).

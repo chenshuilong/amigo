@@ -23,40 +23,38 @@ class ReposController < ApplicationController
       @url = params[:url]
       @limit = per_page_option
       format.html {
-        scope = Repo.active
-        scope = scope.where(:category => @category) if @category.present?
-        scope = scope.where("url LIKE '%#{@url}%'") if @url.present?
+        scope = $db.slave { Repo.active }
+        scope = $db.slave { scope.where(:category => @category) } if @category.present?
+        scope = $db.slave { scope.where("url LIKE '%#{@url}%'") } if @url.present?
         @count = scope.count
         @pages = Paginator.new @count, @limit, params['page']
         @offset ||= @pages.offset
-        @repos = scope.limit(@limit).offset(@offset).to_a
+        @repos = $db.slave { scope.limit(@limit).offset(@offset).to_a }
       }
       format.json {
-        @project = Project.find_by(:id => params[:project_id])
-        scope = Repo.active.select('id, url')
-        scope = scope.where(:category => @category) if @category.present?
-        scope = scope.where("LOCATE('#{params[:name]}', url) > 0") if params[:name].present?
+        @project = $db.slave { Project.find_by(:id => params[:project_id]) }
+        scope = $db.slave { Repo.active.select('id, url') }
+        scope = $db.slave { scope.where(:category => @category) } if @category.present?
+        scope = $db.slave { scope.where("LOCATE('#{params[:name]}', url) > 0") } if params[:name].present?
 
         if @category.to_i == Repo::REPO_CATEGORY[:production] && @project.present?
           if @project.parent
-            scope = scope.where("url LIKE '%#{@project.identifier}%' OR url LIKE '%#{@project.parent.identifier}%'")
-            scope = scope.order(:url => :asc)
+            scope = $db.slave { scope.where("url LIKE '%#{@project.identifier}%' OR url LIKE '%#{@project.parent.identifier}%'").order(:url => :asc) }
           else
-            scope = scope.where("url LIKE '%#{@project.identifier}%'")
-            scope = scope.order(:url => :asc)
+            scope = $db.slave { scope.where("url LIKE '%#{@project.identifier}%'").order(:url => :asc) }
           end
         elsif @category.to_i == Repo::REPO_CATEGORY[:package] && @project.present?
-          scope = scope.where("url LIKE '%#{@project.identifier.to(6)}%'") if @project.category.to_i != Project::PROJECT_CATEGORY["终端项目"].to_i
-          scope = scope.order("case when url LIKE '%#{@project.identifier.to(7)}%' then 1
+          scope = $db.slave { scope.where("url LIKE '%#{@project.identifier.to(6)}%'") } if @project.category.to_i != Project::PROJECT_CATEGORY["终端项目"].to_i
+          scope = $db.slave { scope.order("case when url LIKE '%#{@project.identifier.to(7)}%' then 1
                                     when url LIKE '%#{@project.identifier.to(6)}%' then 2
                                     when url LIKE '%#{@project.identifier.to(5)}%' then 3
                                     when url LIKE '%#{@project.identifier.to(4)}%' then 4
-                                    else 5 end")
+                                    else 5 end") }
         end
 
         page = params[:page] || 1
         offset = (page.to_i - 1) * @limit
-        @repos = scope.uniq.limit(@limit).offset(offset).to_a
+        @repos = $db.slave { scope.uniq.limit(@limit).offset(offset).to_a }
         render :json => @repos, :status => :ok
       }
     end
@@ -147,7 +145,7 @@ class ReposController < ApplicationController
 
   def getlink
     project_id = params['project_id']
-    projects_repos = Repo.get_link(project_id)
+    projects_repos = $db.slave { Repo.get_link(project_id) }
     projects_repos.each do |r|
       puts r
       r['category_name'] = Repo.get_category_name(r['category'])

@@ -4,7 +4,7 @@ class ApprovalsController < ApplicationController
   before_filter :require_admin
 
   def index
-    @approvals = Approval.all.to_a
+    @approvals = $db.slave { Approval.all.to_a }
   end
 
   def new

@@ -45,24 +45,24 @@ class ProjectsController < ApplicationController
   def index
 
     # auth Project
-    scope = request.formats[0].symbol.to_s == "html" ? Project.sorted.visible.default : Project.sorted.default
+    scope = $db.slave { request.formats[0].symbol.to_s == "html" ? Project.sorted.visible.default : Project.sorted.default }
     
     respond_to do |format|
       format.html {
         tab = params[:tab] || "group"
         unless params[:closed]
-          scope = scope.active
+          scope = $db.slave { scope.active }
         end
-        @projects = scope.projects_by_odm(tab).to_a
+        @projects = $db.slave { scope.projects_by_odm(tab).to_a }
       }
       format.api  {
         @offset, @limit = api_offset_and_limit
-        scope = scope.where(:identifier => params[:name]) if params[:name]
+        scope = $db.slave { scope.where(:identifier => params[:name]) } if params[:name]
         @project_count = scope.count
-        @projects = scope.offset(@offset).limit(@limit).to_a
+        @projects = $db.slave { scope.offset(@offset).limit(@limit).to_a }
       }
       format.atom {
-        projects = scope.reorder(:created_on => :desc).limit(Setting.feeds_limit.to_i).to_a
+        projects = $db.slave { scope.reorder(:created_on => :desc).limit(Setting.feeds_limit.to_i).to_a }
         render_feed(projects, :title => "#{Setting.app_title}: #{l(:label_project_latest)}")
       }
     end
@@ -157,26 +157,26 @@ class ProjectsController < ApplicationController
       return
     end
 
-    @users_by_role = @project.users_by_role(21) #limit 21 records
-    @subprojects = @project.children.visible.to_a
-    @news = @project.news.limit(5).includes(:author, :project).reorder("#{News.table_name}.created_on DESC").to_a
-    @trackers = @project.rolled_up_trackers
+    @users_by_role = $db.slave { @project.users_by_role(21) } #limit 21 records
+    @subprojects = $db.slave { @project.children.visible.to_a }
+    @news = $db.slave { @project.news.limit(5).includes(:author, :project).reorder("#{News.table_name}.created_on DESC").to_a }
+    @trackers = $db.slave { @project.rolled_up_trackers }
 
-    cond = @project.project_condition(Setting.display_subprojects_issues?)
+    cond = $db.slave { @project.project_condition(Setting.display_subprojects_issues?) }
 
     # @open_issues_by_tracker = Issue.visible.open.where(cond).group(:tracker).count
     # @total_issues_by_tracker = Issue.visible.where(cond).group(:tracker).count
-    @open_issues_by_tracker = Issue.visible.open.where(cond).group(:tracker_id).count
-    @total_issues_by_tracker = Issue.visible.where(cond).group(:tracker_id).count
+    @open_issues_by_tracker = $db.slave { Issue.visible.open.where(cond).group(:tracker_id).count }
+    @total_issues_by_tracker = $db.slave { Issue.visible.where(cond).group(:tracker_id).count }
 
     if User.current.allowed_to_view_all_time_entries?(@project)
-      @total_hours = TimeEntry.visible.where(cond).sum(:hours).to_f
+      @total_hours = $db.slave { TimeEntry.visible.where(cond).sum(:hours).to_f }
     end
 
     @key = User.current.rss_key
 
     #GMS
-    @approveds = @project.versions.where(status: 7)
+    @approveds = $db.slave { @project.versions.where(status: 7) }
 
     respond_to do |format|
       format.html
@@ -185,10 +185,10 @@ class ProjectsController < ApplicationController
   end
 
   def settings
-    @issue_custom_fields = IssueCustomField.sorted.to_a
+    @issue_custom_fields = $db.slave { IssueCustomField.sorted.to_a }
     @issue_category ||= IssueCategory.new
     @member ||= @project.members.new
-    @trackers = Tracker.sorted.to_a
+    @trackers = $db.slave { Tracker.sorted.to_a }
     @wiki ||= @project.wiki || Wiki.new(:project => @project)
   end
 
@@ -281,18 +281,17 @@ class ProjectsController < ApplicationController
       production_type = params[:production_type]
       project_name = params[:name]
       format.js {
-        scope = Project.active.visible.categories(category)
+        scope = $db.slave { Project.active.visible.categories(category)
                        .where("projects.identifier LIKE '%#{project_name}%'")
-                       .reorder("projects.id asc")
+                       .reorder("projects.id asc") }
 
-        scope = scope.where(production_type: production_type) if production_type.present?
-        scope = scope.joins(:mokuai_ownners).where(mokuai_ownners: {mokuai_id: params[:mokuai_id]}) if params[:mokuai_id].present?
+        scope = $db.slave { scope.where(production_type: production_type) } if production_type.present?
+        scope = $db.slave { scope.joins(:mokuai_ownners).where(mokuai_ownners: {mokuai_id: params[:mokuai_id]}) } if params[:mokuai_id].present?
         
         page     = params[:page] || 1
         limit    = 20
         offset   = (page.to_i - 1) * limit
-        projects = scope.limit(limit)
-                        .offset(offset)
+        projects = $db.slave { scope.limit(limit).offset(offset) }
         render :json => projects.map{|v| {:id => v.id, :name => v.name}}
       }
     end

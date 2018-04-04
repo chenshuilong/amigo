@@ -8,25 +8,25 @@ class ProductionsController < ApplicationController
 
   def index
     @type = params[:type]
-    @active_productions = Production.classify(true)
-    @unactive_productions = Production.classify(false)
+    @active_productions = $db.slave { Production.classify(true) }
+    @unactive_productions = $db.slave { Production.classify(false) }
     @active_total = 0
     @unactive_total = 0
 
     if @type.present?
 
-      @my_productions = User.current.productions
-      @productions = policy(:production).view_all? ? Production.all : @my_productions
+      @my_productions = $db.slave { User.current.productions }
+      @productions = policy(:production).view_all? ? $db.slave { Production.all } : @my_productions
 
-      @productions = @productions.where(:production_type => @type)
-      @my_productions = @my_productions.where(:production_type => @type)
+      @productions = $db.slave { @productions.where(:production_type => @type) }
+      @my_productions = $db.slave { @my_productions.where(:production_type => @type) }
 
       if params[:closed]
-        @productions = @productions.where("status <> #{params[:closed]}")
-        @my_productions = @my_productions.where("status <> #{params[:closed]}")
+        @productions = $db.slave { @productions.where("status <> #{params[:closed]}") }
+        @my_productions = $db.slave { @my_productions.where("status <> #{params[:closed]}") }
       else
-        @productions = @productions.active
-        @my_productions = @my_productions.active
+        @productions = $db.slave { @productions.active }
+        @my_productions = $db.slave { @my_productions.active }
       end
     end
   end
@@ -47,22 +47,22 @@ class ProductionsController < ApplicationController
     @project_ids = params[:project_ids]
     @apk_bases_ids = params[:apk_base_ids]
 
-    scope = Project.app_members
+    scope = $db.slave { Project.app_members }
 
-    scope = scope.where(dev_department: @dev_department)                     if @dev_department.present?
-    scope = scope.where(production_type: @production_type)                   if @production_type.present?
-    scope = scope.where(id: @project_ids)                                    if @project_ids.present?
-    scope = scope.joins(:apk_bases).where(apk_bases:{id: @apk_bases_ids})    if @apk_bases_ids.present?
+    scope = $db.slave { scope.where(dev_department: @dev_department) }                  if @dev_department.present?
+    scope = $db.slave { scope.where(production_type: @production_type) }                if @production_type.present?
+    scope = $db.slave { scope.where(id: @project_ids) }                                 if @project_ids.present?
+    scope = $db.slave { scope.joins(:apk_bases).where(apk_bases:{id: @apk_bases_ids}) } if @apk_bases_ids.present?
 
     @limit = per_page_option
     @count = scope.length
     @pages = Paginator.new @count, @limit, params['page']
     @offset ||= @pages.offset
-    @apps = scope.limit(@limit).offset(@offset).to_a
+    @apps = $db.slave { scope.limit(@limit).offset(@offset).to_a }
 
     @roles = Production::ROLES.collect{|k, v| [v[0], v[1]]}
-    @apks = ApkBase.select("id, name").where(id: @apk_bases_ids)
-    @projects = Project.select("id, identifier").where(id: @project_ids)
+    @apks = $db.slave { ApkBase.select("id, name").where(id: @apk_bases_ids) }
+    @projects = $db.slave { Project.select("id, identifier").where(id: @project_ids) }
 
     respond_to do |format|
       format.html #{ render(:template => 'issues/index', :layout => !request.xhr?) }
@@ -112,16 +112,16 @@ class ProductionsController < ApplicationController
 
   def records
     auth :production
-    scope = AlterRecord.joins(:details)
-                       .includes(:user)
-                       .includes(:alter_for)
-                       .where(alter_for_type: "Project", alter_record_details: {prop_key: %w(has_adapter_report notes)})
+    scope = $db.slave { AlterRecord.joins(:details)
+                            .includes(:user)
+                            .includes(:alter_for)
+                            .where(alter_for_type: "Project", alter_record_details: {prop_key: %w(has_adapter_report notes)}) }
 
     @limit = per_page_option
     @count = scope.length
     @pages = Paginator.new @count, @limit, params['page']
     @offset ||= @pages.offset
-    @records = scope.limit(@limit).offset(@offset).to_a                 
+    @records = $db.slave { scope.limit(@limit).offset(@offset).to_a }
   end
 
   private

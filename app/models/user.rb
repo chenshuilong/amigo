@@ -1157,7 +1157,7 @@ class User < Principal
     commit_status = IssueStatus::COMMIT_STATUS
     @submitted_issue = Issue.select("id, status_id, tfde_id").where(status_id: commit_status, tfde_id: user.id).length
     if @submitted_issue > 0
-      notice_tabs[:items][101] = {:name => "#{'&nbsp;'*4}提交", :url => "/issues?search=issues.tfde_id=#{user.id}+and+issues.status_id+in+(#{commit_status})", :count => @submitted_issue} 
+      notice_tabs[:items][101] = {:name => "#{'&nbsp;'*4}提交", :url => "/issues?search=issues.tfde_id=#{user.id}+and+issues.status_id+in+(#{commit_status})", :count => @submitted_issue}
     end
 
     doubt_status = IssueStatus::DOUBT_STATUS

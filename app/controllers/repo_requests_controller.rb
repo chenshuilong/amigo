@@ -13,7 +13,7 @@ class RepoRequestsController < ApplicationController
     @count = @repo_requests.count
     @pages = Paginator.new @count, @limit, params['page']
     @offset ||= @pages.offset
-    @repo_requests = @repo_requests.limit(@limit).offset(@offset).reorder("created_at desc").to_a
+    @repo_requests = $db.slave { @repo_requests.limit(@limit).offset(@offset).reorder("created_at desc").to_a }
   end
 
   def new
@@ -77,16 +77,16 @@ class RepoRequestsController < ApplicationController
     offset = (page.to_i - 1) * limit
     case params[:category].to_i
     when 1
-      which = Project.active.default
-      which = which.where(ownership: params[:production_type] == "china" ? 1 : 2)  if params[:production_type].present?
+      which = $db.slave { Project.active.default }
+      which = $db.slave { which.where(ownership: params[:production_type] == "china" ? 1 : 2) }  if params[:production_type].present?
     when 2
-      which = Project.active.categories("other").where(production_type: [1, 2, 3])
+      which = $db.slave { Project.active.categories("other").where(production_type: [1, 2, 3]) }
     when 3
       pd_type = params[:production_type] == "apk" ? 1 : 8
-      which = Project.active.categories("other").where(production_type: pd_type)
+      which = $db.slave { Project.active.categories("other").where(production_type: pd_type) }
     end
-    scope = which.where("lower(name) like '%#{params[:name]}%'")
-    projects = scope.limit(limit).offset(offset)
+    scope = $db.slave { which.where("lower(name) like '%#{params[:name]}%'") }
+    projects = $db.slave { scope.limit(limit).offset(offset) }
     @projects = projects.map{|p| {:id => p.id, :name => p.name}}
     render :json => @projects.to_json
   end
@@ -97,14 +97,14 @@ class RepoRequestsController < ApplicationController
       page = params[:page] || 1
       limit = 20
       offset = (page.to_i - 1) * limit
-      @project = Project.find_by(id: params[:project_id])
+      @project = $db.slave { Project.find_by(id: params[:project_id]) }
 
-      scope = @project.hm_versions.compile_status(6).joins(:spec)
+      scope = $db.slave { @project.hm_versions.compile_status(6).joins(:spec)
                   .select("concat(specs.name, '_', versions.name) as name, versions.id")
                   .where("versions.name like '%#{params[:name]}%' OR specs.name like '%#{params[:name]}%' OR concat(specs.name, '_', versions.name) like '%#{params[:name]}%'")
-                  .reorder("name asc")
+                  .reorder("name asc") }
 
-      versions = scope.limit(limit).offset(offset)
+      versions = $db.slave { scope.limit(limit).offset(offset) }
       @versions = versions.map{|p| {:id => p.id, :name => p.name}}
       render :json => @versions.to_json
     else

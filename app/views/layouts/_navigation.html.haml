@@ -10,43 +10,28 @@
         = image_tag("amigo.png")
         = development_env_flag
     #navigation.collapse.navbar-collapse
-      = render_menu :top_menu, nil, "nav navbar-nav"
-      %ul.nav.navbar-nav.navbar-right
-        %li.dropdown
-          - if User.current.logged?
-            %a.dropdown-toggle{ "data-toggle" => "dropdown", :href => void_js, :role => "button"}
-              = User.current.name
-              %span.caret
-            %ul.dropdown-menu
-              %li.comingsoon
-                %a{:href => "#"}
-                  %i.fa.fa-envelope
-                  消息
-              %li#help
-                %a{:href => void_js}
-                  %i.fa.fa-exclamation-circle
-                  帮助
-              %li
-                %a{:href => project_board_path(Project.first.to_param,1)}
-                  %i.fa.fa-comment
-                  反馈
-              %li
-                %a{:href => my_account_path}
-                  %i.fa.fa-cog
-                  设置
-              %li.divider{:role => "separator"}
-              %li
-                %a{:href => signout_path}
-                  %i.fa.fa-sign-out
-                  退出
-          - else
-            %a.dropdown-toggle{:href => signin_path, :role => "button"} 登录
+      - if (menus = $redis.smembers("amigo_main_menus[#{current_user.id}]")).present?
+        = menus.join.html_safe
+      - else
+        = render_menu :top_menu, nil, "nav navbar-nav"
+        - $redis.sadd("amigo_main_menus[#{current_user.id}]", render_menu(:top_menu, nil, "nav navbar-nav"))
+
+      - if (menus = $redis.smembers("amigo_personal_menus[#{current_user.id}]")).present?
+        = menus.join.html_safe
+      - else
+        = render_personal_center
+        - $redis.sadd("amigo_personal_menus[#{current_user.id}]", render_personal_center)
 
       %ul.nav.navbar-nav.navbar-right.nav-faster-new
         %li.dropdown.nav-faster-new
           %a.dropdown-toggle{ "data-toggle" => "dropdown", :href => void_js, :role => "button"}
             %i.fa.fa-plus
-          %ul.dropdown-menu= faster_new_menu
+          %ul.dropdown-menu
+            - if (menus = $redis.smembers("amigo_faster_new_menus[#{current_user.id}]")).present?
+              = menus.join.html_safe
+            - else
+              = faster_new_menu
+              - $redis.sadd("amigo_faster_new_menus[#{current_user.id}]", faster_new_menu)
       %ul.navbar-form.navbar-right
         .nav-downlaod= link_to (icon "download", :class => "export-badge" , "data-badge" => unexport_count), void_js
         .nav-search
@@ -56,13 +41,21 @@
             = icon "search"
         // .nav-notification
         //   = link_to (icon "envelope", :class => "mail-badge", "data-badge" => unread_count), my_notifications_path
-      = render_notice_menu
+      - if (menus = $redis.smembers("amigo_notice_menus[#{current_user.id}]")).present?
+        = menus.join.html_safe
+      - else
+        = render_notice_menu
+        - $redis.sadd("amigo_notice_menus[#{current_user.id}]", render_notice_menu)
 
 
 - if yield(:nav).present?
   .nav-content
     .container.tab-content
-      = render_navigation_sub_menu
+      - if (menus = $redis.smembers("amigo_nav_sub_menus[#{current_user.id}]")).present?
+        = menus.join.html_safe
+      - else
+        = render_navigation_sub_menu
+        - $redis.sadd("amigo_nav_sub_menus[#{current_user.id}]", render_navigation_sub_menu)
 
   - if yield(:bread).present?
     .nav-breadcrumb

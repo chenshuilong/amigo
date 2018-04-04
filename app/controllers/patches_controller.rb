@@ -1,6 +1,6 @@
 class PatchesController < ApplicationController
   before_filter :require_login
-  before_action :find_patch, only: [:infos, :jenkins_url]
+  before_action :find_patch, only: [:infos, :jenkins_url, :export_conflict_files]
   # before_action :authorize, :except => [:index, :infos, :new, :create, :show, :generate_patchno, :files]
 
   accept_api_auth :infos
@@ -102,7 +102,8 @@ class PatchesController < ApplicationController
     when "postcompile"
       @postcompiles = @patch.patch_versions.where(category: "postcompile")
     when "library_files"
-      @library_files = LibraryFile.libraries(@patch.id)
+      # @library_files = LibraryFile.libraries(@patch.id)
+      @library_files = LibraryFile.conflict_files(@patch.id).group_by(&:lib_id)
     when "failed_libraries"
       @faileds = @patch.libraries.where.not(status: %(initial)).group("libraries.name, libraries.path").includes(:user)
     end
@@ -207,6 +208,21 @@ class PatchesController < ApplicationController
     respond_to do |format|
       format.js
     end
+  end
+
+  def export_conflict_files
+    rows = {}
+    @library_files = LibraryFile.conflict_files(@patch.id)
+    columns = [{"lib_name" => "Name"},
+               {"path" => "Path"},
+               {"name" => "File"},
+               {"conflict_type" => "冲突类型"},
+               {"status" => "文件状态"},
+               {"firstname" => "负责人"}]
+    columns.each { |c| rows.merge!({c.keys.first => c.values.first}) }
+    send_data data_to_xlsx(@library_files, rows).to_stream.read, {:disposition => 'attachment', :encoding => 'utf8',
+                                                          :stream => false, :type => 'application/xlsx',
+                                                          :filename => "#{Time.now.strftime('%Y%m%d%H%m%s')}.xlsx"}
   end
 
   private

@@ -291,13 +291,13 @@ non_working_week_days:
 new_project_issue_tab_enabled:
   default: 0
 project_production_type_1_desc:
-  default: '金立内部开发应用及白牌应用'
+  default: '金立内部开发应用'
 project_production_type_2_desc:
   default: 'Modem通讯模块'
 project_production_type_3_desc:
   default: '系统公共框架'
 project_production_type_4_desc:
-  default: '预装三方应用，不包含白牌应用'
+  default: '预装三方应用，包含白牌应用'
 project_production_type_5_desc:
   default: 'SDK'
 project_production_type_6_desc:

@@ -162,21 +162,21 @@ class VersionRelease < ActiveRecord::Base
   def old_release_pathes
     main_version_id = version.find_parent_id
 
-    scope = SpecVersion.joins(spec: :project)
-                       .where(:specs => {:for_new => [1, 2]})
-                       .where(:specs => {:freezed => false})
-                       .where(:spec_versions => {:version_id => main_version_id})
-                       .where(:spec_versions => {:freezed => false})
+    scope = $db.slave { SpecVersion.joins(spec: :project)
+                                   .where(:specs => {:for_new => [1, 2]})
+                                   .where(:specs => {:freezed => false})
+                                   .where(:spec_versions => {:version_id => main_version_id})
+                                   .where(:spec_versions => {:freezed => false}) }
 
     # if VERSION_RELEASE_CATEGORY.values_at(:complete, :adapt).include?(category)
     #   scope = scope.where(:projects => {:id => tested_mobile.split(',')})
     # end
 
-    scope.where("LENGTH(TRIM(REPLACE(REPLACE(spec_versions.release_path, CHAR(10),''), CHAR(13),''))) > 0")
-         .select("release_path,
-                  GROUP_CONCAT(DISTINCT specs.for_new) as release_ways,
-                  GROUP_CONCAT(DISTINCT projects.id) as project_ids")
-         .group("release_path")
+    $db.slave { scope.where("LENGTH(TRIM(REPLACE(REPLACE(spec_versions.release_path, CHAR(10),''), CHAR(13),''))) > 0")
+                     .select("release_path,
+                              GROUP_CONCAT(DISTINCT specs.for_new) as release_ways,
+                              GROUP_CONCAT(DISTINCT projects.id) as project_ids")
+                     .group("release_path") }
   end
 
   def new_release_pathes

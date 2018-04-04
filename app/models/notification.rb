@@ -377,13 +377,13 @@ class Notification < ActiveRecord::Base
       when 'accept'
         self.accept!
         unless category == 4
-          condition = Condition.find_by(:id => self.based_id)
+          condition = $db.slave { Condition.find_by(:id => self.based_id) }
           if condition.blank?
             self.void!
           else
             # condition_folder = User.current.conditions.find_by(:name => "我收到的查询条件")
-            condition_folder = User.current.conditions.find_by_name_and_category("我收到的查询条件", category)
-            condition_folder = User.current.conditions.create(:name => "我收到的查询条件", :is_folder => true, :category => category) if (condition_folder.blank? || !condition_folder.is_folder)
+            condition_folder = $db.slave { User.current.conditions.find_by_name_and_category("我收到的查询条件", category) }
+            condition_folder = $db.slave { User.current.conditions.create(:name => "我收到的查询条件", :is_folder => true, :category => category) } if (condition_folder.blank? || !condition_folder.is_folder)
             condition.dup.update_attributes(:user_id => User.current.id, :folder_id => condition_folder.id)
           end
         end

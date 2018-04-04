@@ -54,7 +54,7 @@ class IssueQuery < Query
     ### Status Histories
     QueryColumn.new(:status_histories, :caption => :field_status_histories),
     ### Dept Name
-    QueryColumn.new(:dept_of_assigned_to, :caption => :field_dept_of_assigned_to),
+    QueryColumn.new(:dept_of_assigned_to, :sortable => lambda {User.fields_for_order_statement}, :caption => :field_dept_of_assigned_to),
     QueryColumn.new(:dept_of_author, :caption => :field_dept_of_author),
     ### TFDE
     QueryColumn.new(:tfde, :caption => :field_tfde),
@@ -491,7 +491,7 @@ class IssueQuery < Query
     # Reoder if options[:reorder] is present
     issue_order = options[:reorder] || order_option
     max_cache_number = Setting.issues_redis_cache_limit.to_i
-    scope = Issue.all
+    # scope = Issue.all
  
     if filters[:condition].blank? && ProjectPolicy.new(User.current, :project).view_all? && options[:offset] <= max_cache_number && !filters[:caijue]
       begin
@@ -508,18 +508,18 @@ class IssueQuery < Query
             redis.mapped_hmset("amigo_issue_latest", {"id" => lateset_id, "expired_on" => Time.now + 10.minutes}) # set latest issue
           end
         else
-          redis.sadd("amigo_issues", scope.select(:id).order(id: :desc).limit(max_cache_number).pluck(:id))
+          redis.sadd("amigo_issues", Issue.select(:id).order(id: :desc).limit(max_cache_number).pluck(:id))
         end
       rescue => e
         logger.info("\nRedisError #{e}: (#{File.expand_path(__FILE__)})\n")
       end
     end
 
-    scope = scope.caijue if filters[:caijue]
+    scope = (scope || Issue).caijue if filters[:caijue]
 
     ###
-    scope = scope.visible if filters[:is_html]
-    scope = scope.#visible.
+    scope = (scope || Issue).visible if filters[:is_html]
+    scope = (scope || Issue).#visible.
       # joins(:status, :project, :watchers).
       where(statement).
       includes(([:status, :project] + (options[:include] || [])).uniq).
@@ -534,21 +534,11 @@ class IssueQuery < Query
       offset(options[:offset])
 
     scope = scope.preload(:custom_values)
-    if has_column?(:author)
-      scope = scope.preload(:author)
-    end
-
+    scope = scope.preload(:author) if has_column?(:author)
     issues = scope.to_a
-
-    if has_column?(:spent_hours)
-      Issue.load_visible_spent_hours(issues)
-    end
-    if has_column?(:total_spent_hours)
-      Issue.load_visible_total_spent_hours(issues)
-    end
-    if has_column?(:relations)
-      Issue.load_visible_relations(issues)
-    end
+    Issue.load_visible_spent_hours(issues) if has_column?(:spent_hours)
+    Issue.load_visible_total_spent_hours(issues) if has_column?(:total_spent_hours)
+    Issue.load_visible_relations(issues) if has_column?(:relations)
     issues
   rescue ::ActiveRecord::StatementInvalid => e
     raise StatementInvalid.new(e.message)

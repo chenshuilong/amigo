@@ -7,6 +7,7 @@ class Repo < ActiveRecord::Base
 
   after_save :update_name_and_branch
 
+  default_scope { order(created_at: :desc) }
   scope :active, -> { where(abandoned: false) }
 
   def Repo.get_category_name(category)

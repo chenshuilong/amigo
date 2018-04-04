@@ -10,6 +10,15 @@ class LibraryFile < ActiveRecord::Base
     .reorder("library_files.created_at desc")
   }
 
+  scope :conflict_files, lambda{ |patch_id|
+    select("libraries.id lib_id, libraries.name lib_name, libraries.path, users.firstname,
+            #{table_name}.library_id, #{table_name}.name, #{table_name}.conflict_type, #{table_name}.user_id,
+            case when #{table_name}.status = 'success' then '成功' else '失败' end status ")
+    .joins(:library, :user)
+    .where("libraries.container_id = #{patch_id} AND libraries.container_type = 'Patch'")
+    .reorder("library_files.created_at desc")
+  }
+
   def update_file_infos(new_status)
     result = LibraryFile.transaction do 
       self.update(status: new_status)

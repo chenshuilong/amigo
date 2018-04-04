@@ -46,20 +46,20 @@ class UsersController < ApplicationController
 
     @status = params[:status] || 1
 
-    scope = User.logged.status(@status).preload(:email_address)
-    scope = scope.like(params[:name].to_s.strip) if params[:name].present?
-    scope = scope.in_group(params[:group_id]) if params[:group_id].present?
+    scope = $db.slave { User.logged.status(@status).preload(:email_address) }
+    scope = $db.slave { scope.like(params[:name].to_s.strip) } if params[:name].present?
+    scope = $db.slave { scope.in_group(params[:group_id]) } if params[:group_id].present?
 
     @user_count = scope.count
     @user_pages = Paginator.new @user_count, @limit, params['page']
     @offset ||= @user_pages.offset
-    @users =  scope.order(sort_clause).limit(@limit).offset(@offset).to_a
+    @users =  $db.slave { scope.order(sort_clause).limit(@limit).offset(@offset).to_a }
 
-    @repeat_name = User.select(:firstname).where("length(firstname)>0 and status=1").group(:firstname).having("count(id)>1")
+    @repeat_name = $db.slave { User.select(:firstname).where("length(firstname)>0 and status=1").group(:firstname).having("count(id)>1") }
 
     respond_to do |format|
       format.html {
-        @groups = Group.givable.sort
+        @groups = $db.slave { Group.givable.sort }
         render :layout => !request.xhr?
       }
       format.api
@@ -73,7 +73,7 @@ class UsersController < ApplicationController
     end
 
     # show projects based on current user visibility
-    @memberships = @user.memberships.where(Project.visible_condition(User.current)).to_a
+    @memberships = $db.slave { @user.memberships.where(Project.visible_condition(User.current)).to_a }
 
     respond_to do |format|
       format.js

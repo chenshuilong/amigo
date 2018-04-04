@@ -7,9 +7,9 @@ class NotificationsController < ApplicationController
     @tab = selected_tab
     @pages = (params['page'] || 1).to_i
     @limit = (params['per_page'] || 10).to_i
-    @notice_count = Notification.cate(@tab[:name]).mine.count
+    @notice_count = $db.slave { Notification.cate(@tab[:name]).mine.count }
     @notice_pages = Paginator.new @notice_count, @limit, @pages
-    @notices = Notification.mine.cate(@tab[:name]).limit(@limit).offset(@limit*(@pages-1))
+    @notices = $db.slave { Notification.mine.cate(@tab[:name]).limit(@limit).offset(@limit*(@pages-1)) }
   end
 
   def handle

@@ -14,10 +14,14 @@
     - if @issue.rom_version.present?
       %p= f.select :project_id, project_tree_options_for_select(Project.where(:rom_version => @issue.rom_version), :selected => @issue.project), {:required => true}, |
         :onchange => "updateIssueFrom('#{escape_javascript update_issue_form_path(@project, @issue)}', this)"
+        -#= f.select :project_id, only_selected_options_for_select(Project.where(:rom_version => @issue.rom_version), @issue.project), {:include_blank => true, :required => true}
+        -#= select2_remote("issue_project_id", @issue, nil, {:url => '/projects/search'})
     - else
       %p
         = f.select :project_id, project_tree_options_for_select(@issue.allowed_target_projects, :selected => @issue.project), {:required => true}, |
           :onchange => "updateIssueFrom('#{escape_javascript update_issue_form_path(@project, @issue)}', this)"
+        -#= f.select :project_id, only_selected_options_for_select(@issue.allowed_target_projects, @issue.project), {:include_blank => true, :required => true}
+        -#= select2_remote("issue_project_id", @issue, nil, {:url => '/projects/search'})
     = select2_for 'issue_project_id', nil, :no_select2_class => true
 
   - if @issue.safe_attribute? 'tracker_id'

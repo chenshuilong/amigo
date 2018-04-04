@@ -344,6 +344,7 @@ Rails.application.routes.draw do
   post '/issues/new', :to => 'issues#new'
   post '/projects/new', :to => 'projects#new'
   match '/issues', :controller => 'issues', :action => 'destroy', :via => :delete
+  match '/issues/:id/statuses_history', :to => 'issues#statuses_history', :via => :post
 
   resources :queries, :except => [:show]
 
@@ -784,6 +785,8 @@ Rails.application.routes.draw do
     get :search_spec, :on => :collection
     get :conflict_files, :on => :collection
   end
+
+  get 'patches/export_conflict_files/:id', :to => 'patches#export_conflict_files', :id => /\d+/
 
   # beijing ftp log
   get '/ftp_log', :to => 'ftp_log#index'

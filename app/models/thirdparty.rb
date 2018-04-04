@@ -16,6 +16,7 @@ class Thirdparty < ActiveRecord::Base
   THIRDPARTY_PATH    = "#{Rails.root}/files/thirdparty"
   THIRDPARTY_32LABEL = ['armeabi-v7a', 'armeabi']
   THIRDPARTY_64LABEL = ['arm64-v8a']
+  THIRDPARTY_PRIVILEGED_MODULE = ['BalanceAnalytics', 'IndusCoreSettings', 'IndusCoreServices', 'MinusOne', 'IndusEssentials']
 
   Thirdparty_STATUS = {:submitted => 1, :releasing => 3, :completed => 5, :failed => 7}
   Thirdparty_CATEGORY = {:preload => 1, :resource => 2}
@@ -157,31 +158,34 @@ class Thirdparty < ActiveRecord::Base
         file_path = apk_file.to_s.split('/')
         product = production_name(file_path[-2])
         mk_file = "#{file_path[0..-2].join('/')}/Android.mk"
-        mk_text = android_mk_content(product.identifier)
-        mk_text.pop if self.release_type.to_i == 2
+
+        unless THIRDPARTY_PRIVILEGED_MODULE.include?(product.identifier)
+          mk_text = android_mk_content(product.identifier)
+          mk_text.pop if self.release_type.to_i == 2
+
+          # List all so files in a apk
+          so_files = list_so_files(cmd, apk_file)
+          unless so_files.blank?
+            # Check 32bit or 64bit
+            so_files = so_files.map { |so| so.to_s.split('/')[1] }
+            if (THIRDPARTY_32LABEL.first.in?(so_files) || THIRDPARTY_32LABEL.last.in?(so_files)) && THIRDPARTY_64LABEL.first.in?(so_files)
+              mk_text.insert(-1, 'LOCAL_MULTILIB := both')
+            elsif (THIRDPARTY_32LABEL.in?(so_files) || THIRDPARTY_32LABEL.last.in?(so_files)) && !THIRDPARTY_64LABEL.first.in?(so_files)
+              mk_text.insert(-1, 'LOCAL_MULTILIB := 32')
+            elsif !(THIRDPARTY_32LABEL.in?(so_files) || THIRDPARTY_32LABEL.last.in?(so_files)) && THIRDPARTY_64LABEL.first.in?(so_files)
+              mk_text.insert(-1, 'LOCAL_MULTILIB := 64')
+            end
+          end
+
+          mk_text.insert(-1, 'PRODUCT_COPY_FILES += $(LOCAL_PATH)/' + product.config_info.to_s + ':system/etc/' + product.config_info.to_s) unless product.config_info.blank?
+          mk_text.insert(-1, 'include $(BUILD_PREBUILT)', 'endif')
+
+          # Write content to Android.mk
+          write_mk_file(mk_file, mk_text.join("\r\n"))
+        end
 
         # Rename apk file
         File.rename(apk_file, "#{file_path[0..-2].join('/')}/#{product.identifier}#{File.extname(apk_file)}")
-
-        # List all so files in a apk
-        so_files = list_so_files(cmd, apk_file)
-        unless so_files.blank?
-          # Check 32bit or 64bit
-          so_files = so_files.map { |so| so.to_s.split('/')[1] }
-          if (THIRDPARTY_32LABEL.first.in?(so_files) || THIRDPARTY_32LABEL.last.in?(so_files)) && THIRDPARTY_64LABEL.first.in?(so_files)
-            mk_text.insert(-1, 'LOCAL_MULTILIB := both')
-          elsif (THIRDPARTY_32LABEL.in?(so_files) || THIRDPARTY_32LABEL.last.in?(so_files)) && !THIRDPARTY_64LABEL.first.in?(so_files)
-            mk_text.insert(-1, 'LOCAL_MULTILIB := 32')
-          elsif !(THIRDPARTY_32LABEL.in?(so_files) || THIRDPARTY_32LABEL.last.in?(so_files)) && THIRDPARTY_64LABEL.first.in?(so_files)
-            mk_text.insert(-1, 'LOCAL_MULTILIB := 64')
-          end
-        end
-
-        mk_text.insert(-1, 'PRODUCT_COPY_FILES += $(LOCAL_PATH)/' + product.config_info.to_s + ':system/etc/' + product.config_info.to_s) unless product.config_info.blank?
-        mk_text.insert(-1, 'include $(BUILD_PREBUILT)', 'endif')
-
-        # Write content to Android.mk
-        write_mk_file(mk_file, mk_text.join("\r\n"))
 
         # Generate version for production
         project_version = product.versions.find_by_name(ver_name)

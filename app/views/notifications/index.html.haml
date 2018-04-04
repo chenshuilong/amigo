@@ -8,7 +8,7 @@
       %ul.tab-group
         - notification_tabs.each do |tab|
           %li.tab-group-item{:class => (tab == @tab ? "active" : nil), :id => "notification-#{tab[:name]}"}
-            = link_to l(tab[:label]), {:tab => tab[:name]}
+            = link_to l(tab[:label]), {:tab => tab[:name]}, :onclick => "_hmt.push(['_trackEvent', 'nav', 'click', '我的通知-#{l(tab[:label])}'])"
             %span.badge= unread_count(tab[:name])
     .col-md-10.notification-right
       %p.h2= l(@tab[:label])

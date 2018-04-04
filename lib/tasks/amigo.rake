@@ -98,7 +98,7 @@ namespace :amigo do
                   user.status = 3
                   user.mail = ""
                 else
-                  user.mail = u["mailAddr"] if user.mails.reject(&:blank?).blank?
+                  user.mail = u["mailAddr"] # if user.mails.reject(&:blank?).blank?
                   user.attributes = (user.attributes.keys & u.keys).reject { |r| %w(id status gender mobile phone).include?(r) }.inject({}) { |r, e| r[e] = u[e]; r }
                   user.mobile = u["mobile"] if user.mobile.blank?
                   user.phone = u["phone"] if user.phone.blank?
@@ -403,11 +403,11 @@ namespace :amigo do
   desc 'Running periodic tasks, eg: periodic versions'
   task :periodic_task => :environment do
     # Periodic versions
-    pves = VersionPeriodicTask.where("status = 1 AND
+    pves = $db.slave { VersionPeriodicTask.where("status = 1 AND
                                       weekday LIKE '%#{Date.current.wday}%' AND (
                                       last_running_on < '#{Date.current.midnight}' OR
                                       last_running_on IS NULL ) AND
-                                      TIME(time) <= '#{Time.now.to_s(:time)}'").order(time: :asc)
+                                      TIME(time) <= '#{Time.now.to_s(:time)}'").order(time: :asc) }
     abort if pves.blank?
 
     puts "---------------- Periodic version tasks start at #{Time.now.to_s(:db)} ----------------"
@@ -534,6 +534,12 @@ namespace :amigo do
       autotest_log = "description LIKE '%ftp://autotest:autotest@%'"
       ActiveRecord::Base.connection.execute("update issues set description = REPLACE(description, 'ftp://autotest:autotest@', 'http://') where #{autotest_log}")
 
+      # Update all spec_versons when production_id is null
+      SpecVersion.where(:production_id => nil).each { |sv|
+        sv.production_id = Version.find(sv.version_id).project_id
+        sv.save
+      }
+
     rescue => e
       puts "=======#{e.message.to_s}========"
     end
@@ -543,7 +549,14 @@ namespace :amigo do
   task :upload_thirdparty_files => :environment do
     begin
 
-      Thirdparty.preload_apps.where("status = 1 and length(version_ids) = 7 and release_ids is null").each { |tdp| tdp.upload_zip_to_server }
+      # Handle zip to remote server
+      Thirdparty.preload_apps.where("status = 1 and length(version_ids) = 7 and release_ids is null").each { |tdp|
+        tdp.extract_zip_file
+        sleep(30)
+        tdp.make_android_mk_to_zip
+        sleep(30)
+        tdp.upload_zip_to_server
+      }
 
     rescue => e
       puts "=======#{e.message.to_s}========"

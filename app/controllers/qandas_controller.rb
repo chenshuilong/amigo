@@ -5,15 +5,15 @@ class QandasController <  ApplicationController
   def index
     search = params[:q]
     if search.present?
-      scope = Qanda.where("subject like ? OR tag like ?", "%#{search}%", "%#{search}%")
+      scope = $db.slave { Qanda.where("subject like ? OR tag like ?", "%#{search}%", "%#{search}%") }
     else
-      scope = Qanda.all
+      scope = $db.slave { Qanda.all }
     end
     @pages = (params['page'] || 1).to_i
     @limit = (params['per_page'] || 15).to_i
     @qanda_count = scope.count
     @qanda_pages = Paginator.new @qanda_count, @limit, @pages
-    @qandas = scope.limit(@limit).offset(@limit*(@pages-1))
+    @qandas = $db.slave { scope.order("created_at desc").limit(@limit).offset(@limit*(@pages-1)) }
   end
 
   def new

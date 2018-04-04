@@ -26,7 +26,7 @@
           .notification-acton.select2-rectify{:style => "display:block;"}
             = form_tag({}, {method: :get, class: 'form-horizontal'}) do |f|
               .form-group
-                = label_tag 'spec_id', l(:version_release_project), class: "col-sm-2 control-label"
+                = label_tag 'spec_id', l(:version_spec_id), class: "col-sm-2 control-label"
                 .col-sm-3
                   = select_tag 'spec_id', options_for_select(@specs.unshift([l(:label_all), '']), @spec_id), class: "form-control", :onchange => "this.form.submit(); return false;"
                   = select2_for "spec_id"
@@ -36,6 +36,7 @@
                     class: "form-control", :multiple => true, :onchange => "this.form.submit(); return false;"
                   = select2_for 'status'
                 .col-sm-2
+                  = hidden_field_tag 'cate', @category
                   = submit_tag l(:button_query), :name => nil, class: "btn btn-primary btn-sm"
 
     .roadmap-table
@@ -43,7 +44,7 @@
         %thead
           %tr
             = sort_header_tag('id', :caption => "#")
-            %th= @category == Thirdparty::Thirdparty_CATEGORY[:resource] ? l(:thirdparty_version_release_resource_version_name) : l(:field_project)
+            %th= @category == Thirdparty::Thirdparty_CATEGORY[:resource] ? l(:thirdparty_version_release_resource_version_name) : l(:version_spec_id)
             = sort_header_tag('status', :caption => l(:field_status))
             = sort_header_tag('note', :caption => l(:thirdparty_version_release_note))
             = sort_header_tag('created_at', :caption => l(:thirdparty_version_release_created_at))
@@ -79,7 +80,7 @@
             %label.radio-inline
               %input#type_two{:name => "thirdparty[release_type]", :type => "radio", :value => "2"} 内置
       .form-group
-        = label_tag :spec_id, @category == Thirdparty::Thirdparty_CATEGORY[:resource] ? l(:spec_name) : l(:field_project), class: 'control-label col-sm-3'
+        = label_tag :spec_id, @category == Thirdparty::Thirdparty_CATEGORY[:resource] ? l(:spec_name) : l(:version_spec_id), class: 'control-label col-sm-3'
         .col-xs-9
           = select_tag 'thirdparty[spec_id]', @category == Thirdparty::Thirdparty_CATEGORY[:resource] ? [] : options_for_select(@specs.unshift([l(:label_all), ''])), { class: 'form-control', style: 'width:100%'}
           = select2_for "thirdparty_spec_id"
@@ -134,4 +135,4 @@
     fillSpecs($(this).val(), $(this).val(), 'thirdparty_spec_id');
   })
 
-- html_title(l(:project_production_type_3rd_version_release))
+- html_title(title_by_category(@category))

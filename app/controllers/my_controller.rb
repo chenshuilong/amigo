@@ -237,7 +237,8 @@ class MyController < ApplicationController
   def staffs
     auth :my
 
-    @depts = Dept.active.select("id,orgNo,orgNm,parentNo")
+    Dept.new.update_dept_cache if $redis.smembers("amigo_depts").blank?
+    @depts = $redis.smembers("amigo_depts")
   end
 
   def export_staffs
@@ -254,52 +255,45 @@ class MyController < ApplicationController
   end
 
   def tasks
-    if params[:type] == "issue_to_special_test_task"
-      scope = Task.issue_to_special_test_tasks
+    if params[:type].present?
       @limit = per_page_option
-      @count = scope.to_a.count
-      @pages = Paginator.new @count, @limit, params['page']
-      @offset ||= @pages.offset
-      @tasks = scope.limit(@limit).offset(@offset).reorder("created_at desc").to_a
-    elsif params[:type] == "personal_task"
-      if params[:person_type] == "author_id"
-        sql = "tasks.author_id = #{User.current.id}"
-      elsif params[:person_type] == "assigned_to_id"
-        sql = "tasks.author_id <> #{User.current.id} AND tasks.assigned_to_id = #{User.current.id}"
+      case params[:type]
+        when "issue_to_special_test_task"
+          scope = $db.slave { Task.issue_to_special_test_tasks }
+        when "personal_task"
+          sql = if params[:person_type] == "author_id"
+                  "tasks.author_id = #{User.current.id}"
+                elsif params[:person_type] == "assigned_to_id"
+                  "tasks.author_id <> #{User.current.id} AND tasks.assigned_to_id = #{User.current.id}"
+                end
+          scope = $db.slave { Task.personal_tasks(sql) }
+        when "apk_base"
+          scope = $db.slave { Task.apk_bases }
+        when "patch_version_task"
+          scope = $db.slave { Task.patch_versions }
       end
-      scope = Task.personal_tasks(sql)
-      @limit = per_page_option
-      @count = scope.to_a.count
-      @pages = Paginator.new @count, @limit, params['page']
-      @offset ||= @pages.offset
-      @tasks = scope.limit(@limit).offset(@offset).reorder("created_at desc").to_a
-    elsif  params[:type] == "library_update_task"
-      library_files = Task.library_files
-      libraries = Task.update_libraries
 
-      @tasks = libraries.concat(library_files)
-    elsif params[:type] == "apk_base"
-      scope = Task.apk_bases
-      @limit = per_page_option
       @count = scope.to_a.count
       @pages = Paginator.new @count, @limit, params['page']
       @offset ||= @pages.offset
-      @tasks = scope.limit(@limit).offset(@offset).reorder("created_at desc").to_a
-    elsif params[:type] == "patch_version_task"
-      scope = Task.patch_versions
-      @limit = per_page_option
-      @count = scope.to_a.count
-      @pages = Paginator.new @count, @limit, params['page']
-      @offset ||= @pages.offset
-      @tasks = scope.limit(@limit).offset(@offset).to_a  
-    elsif params[:type] == "library_merge_task"    
-    else
-      @plan_tasks = Task.assigned_to_me(User.current.id, init_status_sql, "")
-      # @status = {:data => Task::ASSIGNED_STATUS.to_a.map { |status| {:name => status[1][1], :id => status[1][0]} }}.to_json
-      @status = {:data => Task::TASK_STATUS.to_a.map { |status| {:name => status[1][1], :id => status[1][0]} }}.to_json
-      @assigned_status = {:data => PlanTask::ASSIGNED_STATUS.to_a.map { |status| {:name => status[1][1], :id => status[1][0]} }}.to_json
-      @spm_status = {:data => PlanTask::SPM_STATUS.to_a.map { |status| {:name => status[1][1], :id => status[1][0]} }}.to_json
-      @checker_status = {:data => PlanTask::CONFIRM_STATUS.to_a.map { |status| {:name => status[1][1], :id => status[1][0]} }}.to_json
+      @tasks = $db.slave { scope.limit(@limit).offset(@offset).reorder("created_at desc").to_a } if scope && params[:type] != "patch_version_task"
+
+      if params[:type] == "library_update_task"
+        library_files = $db.slave { Task.library_files }
+        libraries = $db.slave { Task.update_libraries }
+
+        @tasks = libraries.concat(library_files)
+      elsif params[:type] == "patch_version_task"
+        @tasks = $db.slave { scope.limit(@limit).offset(@offset).to_a } if scope
+      elsif params[:type] == "library_merge_task"
+      else
+        @plan_tasks = $db.slave { Task.assigned_to_me(User.current.id, init_status_sql, "") }
+        # @status = {:data => Task::ASSIGNED_STATUS.to_a.map { |status| {:name => status[1][1], :id => status[1][0]} }}.to_json
+        @status = {:data => Task::TASK_STATUS.to_a.map { |status| {:name => status[1][1], :id => status[1][0]} }}.to_json
+        @assigned_status = {:data => PlanTask::ASSIGNED_STATUS.to_a.map { |status| {:name => status[1][1], :id => status[1][0]} }}.to_json
+        @spm_status = {:data => PlanTask::SPM_STATUS.to_a.map { |status| {:name => status[1][1], :id => status[1][0]} }}.to_json
+        @checker_status = {:data => PlanTask::CONFIRM_STATUS.to_a.map { |status| {:name => status[1][1], :id => status[1][0]} }}.to_json
+      end
     end
   end
 

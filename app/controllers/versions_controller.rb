@@ -1,3 +1,4 @@
+
 # Redmine - project management software
 # Copyright (C) 2006-2016  Jean-Philippe Lang
 #
@@ -53,20 +54,20 @@ class VersionsController < ApplicationController
         @created_at_start = params[:created_at_start]
         @created_at_end = (Date.parse(params[:created_at_end]) + 1).to_s if params[:created_at_end].present?
 
-        scope = @project.versions.includes(:releases).compile_status(@compile_status)
-        scope = scope.where(:as_increase_version => @as_increase_version) if @as_increase_version.present?
-        scope = scope.where(:spec_id => @spec) if @spec.present?
-        scope = scope.where("name LIKE '%#{params[:name]}%'") if params[:name].present?
-        scope = scope.where(:created_on => @created_at_start..@created_at_end) if @created_at_start.present?
-        scope = scope.where(:status => @status) if @status.present?
-        scope = scope.where("ifnull(signature, 0) = #{@signature}") if @signature.present?
-        scope = scope.where("ifnull(ota_whole_compile, 0) = #{@ota_whole_compile}") if @ota_whole_compile.present?
-        scope = scope.where("ifnull(ota_increase_compile, 0) = #{@ota_increase_compile}") if @ota_increase_compile.present?
+        scope = $db.slave { @project.versions.includes(:releases).compile_status(@compile_status) }
+        scope = $db.slave { scope.where(:as_increase_version => @as_increase_version) } if @as_increase_version.present?
+        scope = $db.slave { scope.where(:spec_id => @spec) } if @spec.present?
+        scope = $db.slave { scope.where("name LIKE '%#{params[:name]}%'") } if params[:name].present?
+        scope = $db.slave { scope.where(:created_on => @created_at_start..@created_at_end) } if @created_at_start.present?
+        scope = $db.slave { scope.where(:status => @status) } if @status.present?
+        scope = $db.slave { scope.where("ifnull(signature, 0) = #{@signature}") } if @signature.present?
+        scope = $db.slave { scope.where("ifnull(ota_whole_compile, 0) = #{@ota_whole_compile}") } if @ota_whole_compile.present?
+        scope = $db.slave { scope.where("ifnull(ota_increase_compile, 0) = #{@ota_increase_compile}") } if @ota_increase_compile.present?
 
         @version_count = scope.count
         @version_pages = Paginator.new @version_count, @limit, params['page']
         @offset ||= @version_pages.offset
-        @versions =  scope.reorder(sort_clause).limit(@limit).offset(@offset).to_a
+        @versions =  $db.slave { scope.reorder(sort_clause).limit(@limit).offset(@offset).to_a }
 
         # @trackers = @project.trackers.sorted.to_a
         # retrieve_selected_tracker_ids(@trackers, @trackers.select {|t| t.is_in_roadmap?})
@@ -93,7 +94,7 @@ class VersionsController < ApplicationController
         # @versions.reject! {|version| !project_ids.include?(version.project_id) && @issues_by_version[version].blank?}
       }
       format.api {
-        @versions = @project.shared_versions.to_a
+        @versions = $db.slave { @project.shared_versions.to_a }
       }
     end
   end
@@ -105,8 +106,8 @@ class VersionsController < ApplicationController
         #   includes(:status, :tracker, :priority).
         #   reorder("#{Tracker.table_name}.position, #{Issue.table_name}.id").
         #   to_a
-        @issues    = @version.issues
-        @app_lists = VersionApplist.infos_by_apk_base(@version.id)
+        @issues    = $db.slave { @version.issues }
+        @app_lists = $db.slave { VersionApplist.infos_by_apk_base(@version.id) }
       }
       format.api
     end
@@ -218,15 +219,20 @@ class VersionsController < ApplicationController
       # Remove rule_id from params
       attributes.delete("rule_id") if attributes.has_key?('rule_id')
 
-      @version.safe_attributes = attributes
-
       if @version.free_edit?
         @version.compile_status = attributes[:compile_due_on].present?? Version.consts[:compile_status][:submitted] : Version.consts[:compile_status][:queued]
       end
+
+      # Check only description can be updated when compiling
+      attributes = attributes.reject { |k, v| k != "description" } if @version.is_compiling?
+
+      @version.safe_attributes = attributes
+
       if @version.save
         respond_to do |format|
           format.html {
-            attributes == params[:version] ? flash[:notice] = l(:notice_successful_update) : flash[:error] = l(:version_failed_to_update)
+            # !@version.is_compiling? ? flash[:notice] = l(:notice_successful_update) : flash[:error] = l(:version_failed_to_update)
+            flash[:notice] = l(:notice_successful_update)
             redirect_back_or_default version_path(@version)
           }
           format.api  { render_api_ok }
@@ -347,7 +353,7 @@ class VersionsController < ApplicationController
   def specs
     @project_category = params[:category]
     @project_name = params[:name]
-    @select_specs = Spec.version_search(@project_category, @project_name)
+    @select_specs = $db.slave { Spec.version_search(@project_category, @project_name) }
 
     respond_to do |format|
       format.js
@@ -485,9 +491,9 @@ class VersionsController < ApplicationController
   def choose
     @category   = params[:category]
     
-    @projects = Project.categories(@category)
+    @projects = $db.slave { Project.categories(@category) }
     view_all = policy("#{params[:category] == 'terminal'? 'project' : 'production'}".to_sym).view_all?
-    @projects = @projects.joins("inner join members on members.project_id = projects.id and members.user_id = #{User.current.id}") unless view_all
+    @projects = $db.slave { @projects.joins("inner join members on members.project_id = projects.id and members.user_id = #{User.current.id}") } unless view_all
 
     if params[:category] == 'terminal'
       @project_1 = params[:project_1]
@@ -496,19 +502,19 @@ class VersionsController < ApplicationController
       @spec_2 = params[:spec_2]
 
       if @project_1.present?
-        scope_spec1 = @projects.find_by(id: @project_1.to_i).specs.undeleted.reorder("name")
+        scope_spec1 = $db.slave { @projects.find_by(id: @project_1.to_i).specs.undeleted.reorder("name") }
         @specs_1 = scope_spec1.pluck(:name, :id)
 
-        @spec1 = scope_spec1.find_by(id: @spec_1) if @spec_1.present?
-        @versions_1 = @spec1.versions.success_versions.pluck(:name, :id) if @spec1.present?
+        @spec1 = $db.slave { scope_spec1.find_by(id: @spec_1) } if @spec_1.present?
+        @versions_1 = $db.slave { @spec1.versions.success_versions.pluck(:name, :id) } if @spec1.present?
       end
 
       if @project_2.present?
-        scope_spec2 = @projects.find_by(id: @project_2.to_i).specs.undeleted.reorder("name")
+        scope_spec2 = $db.slave { @projects.find_by(id: @project_2.to_i).specs.undeleted.reorder("name") }
         @specs_2 = scope_spec2.pluck(:name, :id)
 
-        @spec2 = scope_spec2.find_by(id: @spec_2) if @spec_2.present?
-        @versions_2 = @spec2.versions.success_versions.pluck(:name, :id) if @spec2.present?
+        @spec2 = $db.slave { scope_spec2.find_by(id: @spec_2) } if @spec_2.present?
+        @versions_2 = $db.slave { @spec2.versions.success_versions.pluck(:name, :id) } if @spec2.present?
       end
 
     elsif params[:category] == 'other'
@@ -520,8 +526,8 @@ class VersionsController < ApplicationController
         sql2 = sql1 + " and specs.name = '#{@spec_1.split("_")[0]}' and replace(versions.name, CONCAT('.',SUBSTRING_INDEX(versions.name,'.',-1)), ' ') = '#{@spec_1.split("_")[1]}'" if @spec_1.present?
       end
 
-      @specs_1 = Version.compare_choose(sql1).map(&:spec_list).join(",").split(",") if sql1.present?
-      @versions_1 = Version.success_versions.compare_choose(sql2).map(&:version_list).join(",").split(",").each_slice(2).to_a if sql2.present?
+      @specs_1 = $db.slave { Version.compare_choose(sql1) }.map(&:spec_list).join(",").split(",") if sql1.present?
+      @versions_1 = $db.slave { Version.success_versions.compare_choose(sql2) }.map(&:version_list).join(",").split(",").each_slice(2).to_a if sql2.present?
     end
 
     render :choose, :layout => 'faster_new'
@@ -534,36 +540,36 @@ class VersionsController < ApplicationController
     @version_idb = params[:version_idb].to_i
     @version_ids = [@version_ida, @version_idb]
 
-    @versions = Version.includes(:project).where(id: @version_ids)
-    @va = @versions.find_by(id: @version_ida)
-    @vb = @versions.find_by(id: @version_idb)
+    @versions = $db.slave { Version.includes(:project).where(id: @version_ids) }
+    @va = $db.slave { @versions.find_by(id: @version_ida) }
+    @vb = $db.slave { @versions.find_by(id: @version_idb) }
 
     if @version_ids.present? && @version_ids.uniq.count == 2
       if @category == 'terminal' && @type == 'app' || @category == 'other'
         if @category == "terminal"
           sql = "version_id in (#{@version_ids.join(',')})"
-          @applists = VersionApplist.two_version_compare(sql).compare_list_hash
+          @applists = $db.slave { VersionApplist.two_version_compare(sql).compare_list_hash }
         elsif @category == "other"
-          @app = @versions.first.project
+          @app = $db.slave { @versions.first.project }
         end  
 
         result = can_compare_issues?(@versions)  
 
         unless result.include?(false)
-          @start = @versions.first.created_on
-          @end = @versions.last.created_on
-          @issues = VersionIssue.includes(:issue).where(version_id: result).group("issue_id").reorder("created_at")
+          @start = $db.slave { @versions.first.created_on }
+          @end = $db.slave { @versions.last.created_on }
+          @issues = $db.slave { VersionIssue.includes(:issue).where(version_id: result).group("issue_id").reorder("created_at") }
         end
       elsif @category == 'terminal' && %w(apk system).include?(@type)
         case @type
         when 'apk'
           sql = "version_id in (#{@version_ids.join(',')}) AND apk_name <> ''"
-          @apklists = VersionApplist.apk_size_compare(sql).reorder("apk_name").apk_version_list(@version_ida, @version_idb)
+          @apklists = $db.slave { VersionApplist.apk_size_compare(sql).reorder("apk_name").apk_version_list(@version_ida, @version_idb) }
         when 'system'          
           @systems = @versions.system_space_compare(@version_ida, @version_idb)
           
           sql = "version_id in (#{@version_ids.join(',')}) AND apk_name <> '' AND apk_size_comparable = 1"
-          @apklists = VersionApplist.apk_size_compare(sql).apk_size_list(@version_ida, @version_idb)
+          @apklists = $db.slave { VersionApplist.apk_size_compare(sql).apk_size_list(@version_ida, @version_idb) }
         end
       end
     end
@@ -590,8 +596,8 @@ class VersionsController < ApplicationController
     @app_ids = params[:app_ids]
     @version_ids = params[:version_ids]
 
-    @apps = Project.categories('other').where(id: @app_ids) if @app_ids.present?
-    @versions = Version.terminal_versions.where(compile_status: 6, id: @version_ids).reorder("id asc") if @version_ids.present?
+    @apps = $db.slave { Project.categories('other').where(id: @app_ids) } if @app_ids.present?
+    @versions = $db.slave { Version.terminal_versions.where(compile_status: 6, id: @version_ids).reorder("id asc") } if @version_ids.present?
 
     if @versions.present? && @apps.present?
       @app_infos = @versions.app_infos(@apps.pluck(:name))

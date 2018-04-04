@@ -1321,15 +1321,18 @@ $(document).ready(function(){
   /////Issue Show and Edit page
 
   $(".status-history").click(function(){
-    layer.open({
-      type: 1,
-      title: '<b>当前问题的历史状态</b>',
-      area: ['500px', 'auto'],
-      zIndex: 666,
-      moveType: 1,
-      shadeClose: false,
-      content: $('.status-show-history')
-    });
+    remote('/issues/' + $('#copyIssueID').attr('data-clipboard-text') + '/statuses_history', 'POST', {}, function (res) {
+        $('.status-history-wraper').empty().append(res.histories);
+        layer.open({
+            type: 1,
+            title: '<b>当前问题的历史状态</b>',
+            area: ['500px', 'auto'],
+            zIndex: 666,
+            moveType: 1,
+            shadeClose: false,
+            content: $('.status-show-history')
+        });
+    })
   })
 
   // Reverse Mokuai

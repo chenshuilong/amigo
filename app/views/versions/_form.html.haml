@@ -122,6 +122,19 @@
         $("#version_ota_increase_compile").prop("disabled", false).trigger("change");
       }
     } else if (this.id == "version_ota_increase_compile" || this.id == "version_spec_id") {
+      if (this.id == "version_spec_id") {
+        var selected = $(this).find("option:selected").text();
+        if (selected && selected.indexOf('platform') > -1) {
+          $("#version_repo_one_id option").each(function () {
+             var gionee_platform = $(this).text();
+             if (gionee_platform.indexOf('gionee_platform') > -1) {
+              $("#version_repo_one_id").val($(this).val());
+             }
+           });
+        } else {
+          $("#version_repo_one_id").get(0).selectedIndex = 0;
+        }
+      }
       $ota_increase_compile = $("#version_ota_increase_compile");
       if(!~~$ota_increase_compile.length) {return}
       $inline = $ota_increase_compile.siblings(".inline");

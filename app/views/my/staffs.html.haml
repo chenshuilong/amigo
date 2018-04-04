@@ -185,7 +185,7 @@
                         { name: 'parentNo' }
                     ],
                     id: 'id',
-                    localdata: #{raw_json(@depts)}
+                    localdata: JSON.parse(#{@depts})
                 };
   var dataAdapter = new $.jqx.dataAdapter(source);
   dataAdapter.dataBind();

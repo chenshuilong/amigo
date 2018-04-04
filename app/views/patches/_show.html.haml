@@ -17,11 +17,40 @@
     #history.tab-pane.fade{:class => ("in active") }
       .history-details
         - if tab == "library_files"
-          - if @library_files.present?
-            - @library_files.each do |lib|
-              .journal.has-notes
-                %div
-                  .note-title= library_file_title(lib)
+          .col-sm-6
+          .col-sm-6.issues-head-title-new.text-right
+            - if @library_files.present?
+              %a.btn.btn-primary.btn-sm{:href => "/patches/export_conflict_files/#{@patch.id}"}
+                %i.fa.fa-file-excel-o
+                  = "导出#{l(:patch_label_library_file)}"
+          %table.table.table-bordered{:style => "table-layout: fixed;"}
+            %thead
+              %tr
+                %th= "Name"
+                %th= "Path"
+                %th= l(:library_file_name)
+                %th= l(:library_file_conflict_type)
+                %th= l(:library_file_status)
+                %th= l(:library_file_user_id)
+            %tbody
+              - @library_files.each do |lib_id, files|
+                %tr
+                  %td{:class => "module", :rowspan => "#{files.length + 1}",:style =>"text-align:center;vertical-align:middle;word-wrap:break-word;word-break:break-all;"}
+                    = Library.find(lib_id).name
+                  %td{:class => "module", :rowspan => "#{files.length + 1}",:style =>"text-align:center;vertical-align:middle;word-wrap:break-word;word-break:break-all;"}
+                    = Library.find(lib_id).path
+                - files.each do |file|
+                  %tr
+                    %td{:style => "word-wrap:break-word;word-break:break-all;"}= file.name
+                    %td{:style => "word-wrap:break-word;word-break:break-all;"}= file.conflict_type
+                    %td{:style => "word-wrap:break-word;word-break:break-all;"}= file.status
+                    %td= link_to_user(User.find(file.user_id))
+
+          -#- if @library_files.present?
+          -#  - @library_files.each do |lib|
+          -#    .journal.has-notes
+          -#      %div
+          -#        .note-title= library_file_title(lib)
         - if tab == "precompile"
           - if @precompiles.present?
             %table.table.table-striped.table-bordered

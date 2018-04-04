@@ -1,6 +1,9 @@
 class Dept < ActiveRecord::Base
   include Redmine::SafeAttributes
 
+  after_save :update_dept_cache
+  after_destroy :update_dept_cache
+
   # Dept statuses
   STATUS_ACTIVE     = 2
   STATUS_LOCKED     = 1
@@ -284,6 +287,11 @@ class Dept < ActiveRecord::Base
 
   def name
     orgNm
+  end
+
+  def update_dept_cache
+    $redis.del("amigo_depts") if $redis.exists("amigo_depts")
+    $redis.sadd("amigo_depts", Dept.active.select("id,orgNo,orgNm,parentNo").to_json)
   end
 
 end

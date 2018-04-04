@@ -21,24 +21,24 @@ class ApkBasesController < ApplicationController
 
     @limit = per_page_option
 
-    scope = ApkBase.search
-    scope = scope.where(android_platform: 2) if @type.present?
-    scope = scope.where(removable: (@removable == 'none' ? nil : @removable)) if @removable.present?
-    scope = scope.where("apk_bases.name LIKE '%#{@name}%'") if @name.present?
-    scope = scope.where("enumerations.id = #{@category_id} and enumerations.type ='ApkBaseCategory'") if @category_id.present?
-    scope = scope.where(app_category: @app_category) if @app_category.present?
-    scope = scope.where("projects.id = #{@project_id}") if @project_id.present?
-    scope = scope.where("package_name LIKE '%#{@package_name}%'") if @package_name.present?
-    scope = scope.where(integrated: @integrated) if @integrated.present?
-    scope = scope.where(android_platform: @android_platform) if @android_platform.present?
+    scope = $db.slave { ApkBase.search }
+    scope = $db.slave { scope.where(android_platform: 2) } if @type.present?
+    scope = $db.slave { scope.where(removable: (@removable == 'none' ? nil : @removable)) } if @removable.present?
+    scope = $db.slave { scope.where("apk_bases.name LIKE '%#{@name}%'") } if @name.present?
+    scope = $db.slave { scope.where("enumerations.id = #{@category_id} and enumerations.type ='ApkBaseCategory'") } if @category_id.present?
+    scope = $db.slave { scope.where(app_category: @app_category) } if @app_category.present?
+    scope = $db.slave { scope.where("projects.id = #{@project_id}") } if @project_id.present?
+    scope = $db.slave { scope.where("package_name LIKE '%#{@package_name}%'") } if @package_name.present?
+    scope = $db.slave { scope.where(integrated: @integrated) } if @integrated.present?
+    scope = $db.slave { scope.where(android_platform: @android_platform) } if @android_platform.present?
 
     @count = scope.length
     @pages = Paginator.new @count, @limit, params['page']
     @offset ||= @pages.offset
-    @apks = scope.limit(@limit).offset(@offset).to_a
+    @apks = $db.slave { scope.limit(@limit).offset(@offset).to_a }
 
-    @project_apks = ProjectApk.joins(:project).select("projects.name, project_id").uniq
-    @categories = ApkBaseCategory.all
+    @project_apks = $db.slave { ProjectApk.joins(:project).select("projects.name, project_id").uniq }
+    @categories = $db.slave { ApkBaseCategory.all }
     respond_to do |format|
       format.html #{ render(:template => 'issues/index', :layout => !request.xhr?) }
       format.xlsx do
@@ -69,12 +69,12 @@ class ApkBasesController < ApplicationController
   def apks
     @limit = per_page_option
 
-    scope = @project.apk_bases
+    scope = $db.slave { @project.apk_bases }
 
     @count = scope.count
     @pages = Paginator.new @count, @limit, params['page']
     @offset ||= @pages.offset
-    @apks = scope.includes(:project_apk, :apk_base_category).limit(@limit).offset(@offset)
+    @apks = $db.slave { scope.includes(:project_apk, :apk_base_category).limit(@limit).offset(@offset) }
   end
 
   def new

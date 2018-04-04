@@ -18,9 +18,9 @@
 class IssuesController < ApplicationController
   default_search_scope :issues
 
-  before_filter :find_issue, :only => [:show, :edit, :update, :breifly]
+  before_filter :find_issue, :only => [:show, :edit, :update, :breifly, :statuses_history]
   before_filter :find_issues, :only => [:bulk_edit, :bulk_update, :destroy]
-  before_filter :authorize, :except => [:index, :new, :create, :gerrit, :batch, :breifly]
+  before_filter :authorize, :except => [:index, :new, :create, :gerrit, :batch, :breifly, :statuses_history]
   before_filter :find_optional_project, :only => [:index, :new, :create]
   before_filter :build_new_issue_from_params, :only => [:new, :create]
   before_filter :check_condition_id, :only => :index # Check Condion_id is own by User.current
@@ -492,6 +492,19 @@ class IssuesController < ApplicationController
     else
       render :text => "Token is invalid!"
     end
+  end
+
+  def statuses_history
+    histories = status_history(@issue)
+    html = "<table class = 'table table-bordered table-hover'><tbody>"
+    histories.each_with_index do |h, i|
+      html << "<tr><td>#{l("field_created_on") if i == 0}</td><td> #{h[:created_on]} </td><td> #{h[:status_name]} </td><td> #{h[:user_name]} </td></tr>"
+    end
+    html << "<tr><td>#{l(:no_data)}</td></tr>" if histories.blank?
+    html << "</tbody></table>"
+    render :json => {:histories => html}
+  rescue => e
+    render :json => {:histories => "<table class = 'table table-bordered table-hover'><tbody><tr><td>#{e}</td></tr></tbody></table>"}
   end
 
   private
