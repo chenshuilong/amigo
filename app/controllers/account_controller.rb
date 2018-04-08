@@ -20,7 +20,7 @@ class AccountController < ApplicationController
   include CustomFieldsHelper
 
   # Use CAS
-  before_action :set_current_url, CASClient::Frameworks::Rails::Filter, :only => :login
+  # before_action :set_current_url, CASClient::Frameworks::Rails::Filter, :only => :login
 
   # prevents login action to be filtered by check_if_login_required application scope filter
   skip_before_filter :check_if_login_required, :check_password_change
@@ -37,14 +37,9 @@ class AccountController < ApplicationController
   def login
     if request.get?
       if User.current.logged?
-        back_url = params[:back_url] || cookies[:current_url] || my_path
-        redirect_to back_url, :referer => true
-      elsif session[:cas_extra_attributes].present?
-        authenticate_user
-      else
-        render :text => "Sorry, you have no permission to access this website."
+        redirect_to home_url
       end
-    else  # Redmine basic login
+    else
       authenticate_user
     end
   rescue AuthSourceException => e
@@ -221,30 +216,29 @@ class AccountController < ApplicationController
   end
 
   def password_authentication
-    # user = User.try_to_login(params[:username], params[:password], false)
+    user = User.try_to_login(params[:username], params[:password], false)
 
-    # if user.nil?
-    #   invalid_credentials
-    # elsif user.new_record?
-    #   onthefly_creation_failed(user, {:login => user.login, :auth_source_id => user.auth_source_id })
-    # else
-    #   # Valid user
-    #   if
-    #     successful_authentication(user)
-    #     update_sudo_timestamp! # activate Sudo Mode
-    #   else
-    #     handle_inactive_user(user)
-    #   end
-    # end
-    user = User.find_by_login(session[:cas_extra_attributes][:globalId])
-    if user && user.active?
-      user.update_attribute(:last_login_on, Time.now) if !user.new_record?
-      successful_authentication user
-      update_sudo_timestamp!
+    if user.nil?
+      invalid_credentials
+    elsif user.new_record?
+      onthefly_creation_failed(user, {:login => user.login, :auth_source_id => user.auth_source_id })
     else
-      # logout_user
-      render plain: "Sorry, you have no permission to access this website."
+      # Valid user
+      if user.active?
+        successful_authentication(user)
+      else
+        handle_inactive_user(user)
+      end
     end
+    # user = User.find_by_login(session[:cas_extra_attributes][:globalId])
+    # if user && user.active?
+    #   user.update_attribute(:last_login_on, Time.now) if !user.new_record?
+    #   successful_authentication user
+    #   update_sudo_timestamp!
+    # else
+    #   # logout_user
+    #   render plain: "Sorry, you have no permission to access this website."
+    # end
 
   end
 

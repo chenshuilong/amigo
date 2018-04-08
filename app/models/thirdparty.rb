@@ -181,7 +181,7 @@ class Thirdparty < ActiveRecord::Base
           mk_text.insert(-1, 'include $(BUILD_PREBUILT)', 'endif')
 
           # Write content to Android.mk
-          write_mk_file(mk_file, mk_text.join("\r\n"))
+          write_mk_file(mk_file, mk_text.join("\n"))
         end
 
         # Rename apk file

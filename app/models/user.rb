@@ -81,6 +81,7 @@ class User < Principal
 
   KEY = "test"
   CATEGORY = %w(member external supervisor manager majordomo vice_president)
+  DEFAULT_PASSWORD = '123456'
 
   has_and_belongs_to_many :groups,
                           :join_table   => "#{table_name_prefix}groups_users#{table_name_suffix}",
@@ -1260,6 +1261,12 @@ class User < Principal
     notice_tabs[:total_count] = @total
 
     return notice_tabs
+  end
+
+  def reset_password(pwd = DEFAULT_PASSWORD)
+    if self.type == "User"
+      self.update_attribute(:hashed_password, User.hash_password("#{salt}#{User.hash_password pwd}"))
+    end
   end
 
   ###################

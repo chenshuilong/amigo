@@ -1,0 +1,37 @@
+# Ignore bundler config.
+/.bundle
+
+# Ignore all logfiles and tempfiles.
+/log
+!/log/.keep
+/tmp
+
+# Rails
+capybara-*.html
+.rspeclog
+
+files/*
+/db/*.sqlite3*
+/db/*.sqlite3-journal
+/public/system
+/public/assets
+/public/uploads
+
+/coverage/
+/spec/tmp
+
+/config/database.yml
+/config/secrets.yml
+/config/environment.rb
+/config/configuration.yml
+/config/shards.yml
+
+# ide
+/.idea/*
+/.project
+/nbproject
+/nbproject/private/
+
+
+# nodejs
+/extra/*/node_modules
