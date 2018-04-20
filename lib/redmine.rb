@@ -238,7 +238,7 @@ end
 
 Redmine::MenuManager.map :top_menu do |menu|
   # menu.push :home, :home_path
-  menu.push :my_page, { :controller => 'my', :action => 'page' }, :html => {"data-toggle" => "tabs"}, :if => Proc.new { User.current.logged? }
+  menu.push :my_page, { :controller => 'my', :action => 'homepage' }, :html => {"data-toggle" => "tabs"}, :if => Proc.new { User.current.logged? }
   menu.push :projects, { :controller => 'projects', :action => 'index' }, :html => {"data-toggle" => "tabs"}, :caption => :label_project_plural
   menu.push :defectives, :issues_path, :html => {"data-toggle" => "tabs"}, :caption => :label_defectives
   menu.push :productions, :productions_path, :caption => :label_productions, :html => {"data-toggle" => "tabs"}

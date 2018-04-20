@@ -1255,7 +1255,7 @@ module ApplicationHelper
       formatDateTime:'YYYY-MM-DD HH:mm',
       lang: current_language.to_s
     }
-    opts = options.merge(default_options).compact.to_json[1..-2]
+    opts = default_options.merge(options).compact.to_json[1..-2]
     if timepicker
       javascript_tag("$(function() { $('##{field_id}').attr('type', 'text').periodpicker({
         cells: [1, 1], yearsLine: false, timepicker: true, #{opts},
@@ -1839,6 +1839,35 @@ module ApplicationHelper
     end
   end
 
+  def okrs_tabs
+    tabs = [{controller: 'okrs', :action => 'my', :path => my_okrs_path, :label => l(:label_my_okrs), :type => nil},
+            {controller: 'okrs', :action => 'index', :path => okrs_path, :label => l(:label_okrs), :type => nil}]
+  end
+
+  def okrs_sidebar
+    content_tag :ul, class: 'tab-group' do
+      okrs_tabs.map do |tab|
+        clazz = ''
+        case tab[:action]
+        when 'my'
+          clazz = 'active' if action_name == 'new'
+          clazz = 'active' if params[:category] == tab[:action]
+          clazz = 'active' if action_name == 'my'
+          clazz = 'active' if controller_name == "okrs_settings"
+        when 'index'
+          clazz = 'active' if params[:category] == tab[:action]
+          clazz = 'active' if action_name == 'index'
+        end
+        allowed = true
+        if allowed
+          content_tag :li, class: clazz, :id => "#{tab[:controller]}-#{tab[:action]}" do
+            link_to tab[:label], tab[:path]
+          end
+        end
+      end.join.html_safe
+    end
+  end
+
   def development_env_flag
     if Rails.env.development?
       content_tag :div, "Dev", :class => "tag tag-danger development_env_flag"
@@ -1849,13 +1878,15 @@ module ApplicationHelper
   def render_navigation_sub_menu
     [{
          :tab => "my-page",
-         :lis => [{:name => "首页", :href => my_path, :allowed => true},
+         :lis => [{:name => "首页", :href => home_path, :allowed => true},
+                  {:name => "个性化", :href => my_path, :allowed => true},
                   {:name => "内网聚合", :href => my_links_path, :allowed => true},
                   {:name => l(:notification_my), :href => my_notifications_path, :allowed => true},
                   {:name => "我的账号", :href => my_account_path, :allowed => true},
                   {:name => "找人", :href => my_staffs_path, :allowed => true},
-                  {:name => "我的会议", :href => void_js, :allowed => true},
-                  {:name => "我的调研", :href => void_js, :allowed => true},
+                  {:name => "我的OKR", :href => my_okrs_path, :allowed => true},
+                  # {:name => "我的会议", :href => void_js, :allowed => true},
+                  # {:name => "我的调研", :href => void_js, :allowed => true},
                   {:name => "我的任务", :href => my_tasks_path, :allowed => true}]
      }, {
          :tab => "projects",

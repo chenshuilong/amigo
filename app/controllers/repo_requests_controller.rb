@@ -129,7 +129,7 @@ class RepoRequestsController < ApplicationController
   private
   def repo_request_params
     require_params = params.require(:repo_request).permit(:server_ip, :android_repo, :package_repo, :project_id, :notes, :version_id, :branch, :tag_number, :notes,
-    	                              :production_type, :repo_name, :status, :category, :use, :write_users => [], :read_users => [], :submit_users => [])
+                                    :production_type, :repo_name, :status, :category, :use, :write_users => [], :read_users => [], :submit_users => [])
     require_params[:branch]       = 'branch_' + require_params[:branch] if require_params[:branch].present?
     require_params[:project_id]   = "" if require_params[:category] == "3" && (require_params[:production_type] == "other")
     require_params[:repo_name]    = "" if require_params[:category] == "3" && (require_params[:production_type] != "other")

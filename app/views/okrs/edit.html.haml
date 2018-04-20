@@ -1,0 +1,9 @@
+- provide :nav, "1,6"
+- provide :css, "bootstrap"
+
+.top-action-menu.pull-right
+  %button#okr_desc.btn.btn-default{'data-content': render_okr_desc, 'data-placement': 'auto'} ?
+
+= rend_okr_title(@okr, @type)
+%hr
+= render_okr_edit_page(@okr)

@@ -16,6 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 class AccountController < ApplicationController
+  layout 'account'
   helper :custom_fields
   include CustomFieldsHelper
 
@@ -46,7 +47,7 @@ class AccountController < ApplicationController
     logger.error "An error occured when authenticating #{params[:username]}: #{e.message}"
     render_error :message => e.message
 
-  # render :plain => session[:cas_extra_attributes][:globalId]
+    # render :plain => session[:cas_extra_attributes][:globalId]
 
     # user = User.find_by_login(session[:cas_extra_attributes][:globalId])
     # if user
@@ -162,12 +163,12 @@ class AccountController < ApplicationController
         end
 
         case Setting.self_registration
-        when '1'
-          register_by_email_activation(@user)
-        when '3'
-          register_automatically(@user)
-        else
-          register_manually_by_administrator(@user)
+          when '1'
+            register_by_email_activation(@user)
+          when '3'
+            register_automatically(@user)
+          else
+            register_manually_by_administrator(@user)
         end
       end
     end
@@ -245,8 +246,8 @@ class AccountController < ApplicationController
   def open_id_authenticate(openid_url)
     back_url = signin_url(:autologin => params[:autologin])
     authenticate_with_open_id(
-          openid_url, :required => [:nickname, :fullname, :email],
-          :return_to => back_url, :method => :post
+        openid_url, :required => [:nickname, :fullname, :email],
+        :return_to => back_url, :method => :post
     ) do |result, identity_url, registration|
       if result.successful?
         user = User.find_or_initialize_by_identity_url(identity_url)
@@ -260,18 +261,18 @@ class AccountController < ApplicationController
           user.random_password
           user.register
           case Setting.self_registration
-          when '1'
-            register_by_email_activation(user) do
-              onthefly_creation_failed(user)
-            end
-          when '3'
-            register_automatically(user) do
-              onthefly_creation_failed(user)
-            end
-          else
-            register_manually_by_administrator(user) do
-              onthefly_creation_failed(user)
-            end
+            when '1'
+              register_by_email_activation(user) do
+                onthefly_creation_failed(user)
+              end
+            when '3'
+              register_automatically(user) do
+                onthefly_creation_failed(user)
+              end
+            else
+              register_manually_by_administrator(user) do
+                onthefly_creation_failed(user)
+              end
           end
         else
           # Existing record
@@ -305,11 +306,11 @@ class AccountController < ApplicationController
       secure = request.ssl?
     end
     cookie_options = {
-      :value => token.value,
-      :expires => 1.year.from_now,
-      :path => (Redmine::Configuration['autologin_cookie_path'] || RedmineApp::Application.config.relative_url_root || '/'),
-      :secure => secure,
-      :httponly => true
+        :value => token.value,
+        :expires => 1.year.from_now,
+        :path => (Redmine::Configuration['autologin_cookie_path'] || RedmineApp::Application.config.relative_url_root || '/'),
+        :secure => secure,
+        :httponly => true
     }
     cookies[autologin_cookie_name] = cookie_options
   end

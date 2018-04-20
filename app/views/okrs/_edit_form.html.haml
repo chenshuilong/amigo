@@ -1,0 +1,162 @@
+= labelled_form_for @okr, :url => @okr.new_record? ? okrs_path : okr_update_path(id: @okr.id),:html => {:id => 'okrsForm'} do |f|
+  = error_messages_for 'okrs_record'
+  .issue-details#update
+    #all_attributes
+      %p{style: "padding-left: 0;text-align:center"}
+        %strong
+          = select_tag "okrs_record[name][year]", okr_year_option_for_select(@okr), style: "min-width: 0;width: 100px"
+          = " 年 "
+          = select_tag "okrs_record[name][month]", okr_month_option_for_select(@okr), :style => "min-width: 0;width: 80px"
+          = " 月 "
+          = select_tag "okrs_record[name][dept]", okr_dept_option_for_select(@okr), id: "dept_no"
+          = " #{User.current.firstname}OKRS"
+      %hr
+      .okrs-object-lists
+        - if @okr.new_record?
+          - uniq_key = Time.now.to_i*1000
+          .okrs-object-item{id: "okrs-object-#{uniq_key}"}
+            %a.okrs-object-del
+              %i.fa.fa-close
+            .okrs-object-item-head
+              %p
+                %label= "目标"
+                = text_area_tag "okrs_record[object][#{uniq_key}][name]", nil, style: "width: 60%;height: 50px"
+            .okrs-object-item-body
+              .okrs-key-result-lists
+                .okrs-key-result-item
+                  %a.okrs-key-result-del
+                    %i.fa.fa-close
+                  %p
+                    %label= "关键结果"
+                    = text_area_tag "okrs_record[object][#{uniq_key}][key_results][#{uniq_key}][name]", nil, style: "width: 60%;height: 50px"
+                  %p
+                    %label= "需要的支持方"
+                    = select_tag "okrs_record[object][#{uniq_key}][key_results][#{uniq_key}][supported_by]", nil, class: "supported_by", multiple: true
+                    = select2_remote("okrs_record_object_#{uniq_key}_key_results_#{uniq_key}_supported_by", nil, nil, {withme: false})
+              .add-okrs-key-result{"data-uniq-key": "#{uniq_key}"}
+                %a
+                  %i.fa.fa-plus= l(:label_okrs_add_key_result)
+        - else
+          - @okr.objects.each do |object|
+            .okrs-object-item{id: "okrs-object-#{object.uniq_key}"}
+              %a.okrs-object-del
+                %i.fa.fa-close
+              .okrs-object-item-head
+                %p
+                  %label= "目标"
+                  = text_area_tag "okrs_record[object][#{object.uniq_key}][name]", object.name, style: "width: 60%;height: 50px"
+              .okrs-object-item-body
+                .okrs-key-result-lists
+                  - object.results.each do |result|
+                    .okrs-key-result-item
+                      %a.okrs-key-result-del
+                        %i.fa.fa-close
+                      %p
+                        %label= "关键结果"
+                        = text_area_tag "okrs_record[object][#{object.uniq_key}][key_results][#{result.uniq_key}][name]", result.name, style: "width: 60%;height: 50px"
+                      %p
+                        %label= "需要的支持方"
+                        = select_tag "okrs_record[object][#{object.uniq_key}][key_results][#{result.uniq_key}][supported_by]", supported_option_for_select(result), class: "supported_by", multiple: true
+                        = select2_remote("okrs_record_object_#{object.uniq_key}_key_results_#{result.uniq_key}_supported_by", nil, nil, {withme: false})
+                .add-okrs-key-result{"data-uniq-key": "#{object.uniq_key}"}
+                  %a
+                    %i.fa.fa-plus
+                    %span= l(:label_okrs_add_key_result)
+      .add-okrs-object
+        %a
+          %i.fa.fa-plus
+          %span= l(:label_okrs_add_object)
+
+      = render :partial => 'notes', :locals => {:f => f}
+    .text-center
+      %a.btn.btn-primary.btn-sm{class: "btn btn-primary btn-sm", class: 'okrs-form-submit', remote: true, "data-operate": "submit"}= l(:button_save)
+      %a.btn.btn-primary.btn-sm{class: "btn btn-primary btn-sm", class: 'okrs-form-submit', remote: true, "data-operate": "approve"}= l(:button_create_and_approver)
+
+- unless @okr.new_record?
+  %hr
+  = render :partial => 'history'
+
+
+:css
+  #all_attributes .select2-container {width: 50% !important;}
+  
+:javascript
+  $('#dept_no').select2();
+
+  $(document).on("click", ".add-okrs-object",function() {
+    var object_uniq_key = new Date().getTime();
+    var id="okrs-object-"+object_uniq_key;
+    var new_slt_id = "okrs_record_object_"+object_uniq_key+"_key_results_"+object_uniq_key+"_supported_by";
+    $(".okrs-object-lists").append('<div class="okrs-object-item" id="okrs-object-'+object_uniq_key+'"><a class="okrs-object-del"><i class="fa fa-close"></i></a><div class="okrs-object-item-head"><p><label>目标</label><textarea name="okrs_record[object]['+object_uniq_key+'][name]" style="width: 60%;height: 50px"/></textarea></p></div><div class="okrs-object-item-body"><div class="okrs-key-result-lists"><div class="okrs-key-result-item"><a class="okrs-key-result-del"><i class="fa fa-close"></i></a><p><label>关键结果</label><textarea name="okrs_record[object]['+object_uniq_key+'][key_results]['+object_uniq_key+'][name]" style="width: 60%;height: 50px"></textarea></p><p><label>需要的支持方</label><select name="okrs_record[object]['+object_uniq_key+'][key_results]['+object_uniq_key+'][supported_by][]" id='+new_slt_id+' class="supported_by" multiple="true"></select></p></div></div><div class="add-okrs-key-result" data-uniq-key="'+object_uniq_key+'"><a><i class="fa fa-plus"></i><span>增加Key Results</span></a></div></div></div>');
+    $('#'+new_slt_id).select2_remote({withme: false});
+  });  
+
+  $(document).on("click",".add-okrs-key-result",function(){
+    //修改成这样的写法  
+    var object_uniq_key = $(this).attr("data-uniq-key");
+    var current_object_id = "#okrs-object-"+object_uniq_key;
+    var result_uniq_key =  new Date().getTime();
+    var resultLists = current_object_id+" .okrs-key-result-lists";
+    var new_slt_id = "okrs_record_object_"+object_uniq_key+"_key_results_"+result_uniq_key+"_supported_by";
+    $(resultLists).append('<div class="okrs-key-result-item"><a class="okrs-key-result-del"><i class="fa fa-close"></i></a><p><label>关键结果</label><textarea name="okrs_record[object]['+object_uniq_key+'][key_results]['+result_uniq_key+'][name]" style="width: 60%;height: 50px"></textarea></p><p><label>需要的支持方</label><select name="okrs_record[object]['+object_uniq_key+'][key_results]['+result_uniq_key+'][supported_by][]" id='+new_slt_id+' class="supported_by" multiple="true"></select></p></div>');
+    $('#'+new_slt_id).select2_remote({withme: false});
+  }); 
+
+  $(document).on("click", ".okrs-object-del", function(){
+    var $del = $(this).parent();
+    var content = "<div>";
+      content = content + "<div style='text-align: center'>删除Object会同时删除该Object下的所有Key Results</div></br>";
+      content = content + "<div style='color: red;text-align: center'><strong>确认删除？</strong></div></br>"
+      content = content + "</div>";
+    layer.confirm(content, {btn: ['取消', '确定'], icon: 3, title:'提示', area: ['400px', 'auto']},
+      function (cancal) {
+        layer.close(cancal);
+      },
+      function () {
+        $del.remove();
+      }
+    );
+  })
+
+  $(document).on("click", ".okrs-key-result-del", function(){
+    var $del = $(this).parent();
+    var content = "<div>";
+    content = content + "<div style='text-align: center'>删除该Key Results</div></br>";
+    content = content + "<div style='color: red;text-align: center'><strong>确认删除？</strong></div></br>"
+    content = content + "</div>";
+    layer.confirm(content, {btn: ['取消', '确定'], icon: 3, title:'提示'},
+      function (cancal) {
+        layer.close(cancal);
+      },
+      function () {
+        $del.remove();
+      }
+    );
+  })
+
+  $(".okrs-form-submit").on("click", function(){
+    window.onbeforeunload = null;
+    
+    var $Form = $("form#okrsForm")
+    var data = $Form.serialize();
+    var action = $Form.attr("action");
+    var method = $Form.attr("method");
+    var operate = $(this).data("operate");
+    if(operate == 'approve'){data = data + "&okrs_record[status]=approving" }
+    var url = action + '.json?key=#{User.current.api_key}&category=#{@type}';
+    $.ajax({
+      url: url,
+      type: method,
+      data: data,
+      dataType: "json"
+    }).done( function(result){
+      success = result.success;
+      messages = result.message;
+      if(success == 1){
+        var url = "/#{@type}/okrs/"+result.id+"/edit";
+        location.href = url;
+      }else if(success == 0){
+        layer.msg(result.message[0])
+      }
+    });
+  })

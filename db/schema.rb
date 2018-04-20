@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180205070654) do
+ActiveRecord::Schema.define(version: 20180412025720) do
 
   create_table "alter_record_details", force: :cascade do |t|
     t.integer  "alter_record_id", limit: 4
@@ -727,17 +727,6 @@ ActiveRecord::Schema.define(version: 20180205070654) do
     t.integer  "integration_version_id", limit: 4
     t.text     "umpirage_approver_id",   limit: 65535
     t.integer  "umpire_id",              limit: 4
-    t.text     "test_emphasis",          limit: 65535
-    t.text     "releate_mokuai",         limit: 65535
-    t.string   "solve_version",          limit: 255
-    t.string   "discovery_version",      limit: 255
-    t.string   "phenomena_category",     limit: 255
-    t.string   "releate_case",           limit: 255
-    t.string   "verificate_version",     limit: 255
-    t.string   "releate_quality_case",   limit: 255
-    t.string   "quality_category",       limit: 255
-    t.string   "blueprint_issue",        limit: 255
-    t.string   "back_log",               limit: 255
   end
 
   add_index "issues", ["app_version_id"], name: "index_issues_on_app_version_id", using: :btree
@@ -801,13 +790,13 @@ ActiveRecord::Schema.define(version: 20180205070654) do
 
   create_table "library_files", force: :cascade do |t|
     t.integer  "library_id",    limit: 4
-    t.text     "name",          limit: 16777215
+    t.text     "name",          limit: 65535
     t.string   "status",        limit: 255
-    t.text     "conflict_type", limit: 16777215
+    t.text     "conflict_type", limit: 65535
     t.string   "email",         limit: 255
     t.integer  "user_id",       limit: 4
-    t.datetime "created_at",                     null: false
-    t.datetime "updated_at",                     null: false
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
   end
 
   add_index "library_files", ["library_id", "user_id"], name: "index_library_files_on_library_id_and_user_id", using: :btree
@@ -926,6 +915,68 @@ ActiveRecord::Schema.define(version: 20180205070654) do
 
   add_index "notifications", ["category", "to_user_id"], name: "idx_on_category", using: :btree
 
+  create_table "okrs_key_results", force: :cascade do |t|
+    t.text     "name",           limit: 65535
+    t.integer  "container_id",   limit: 4
+    t.string   "container_type", limit: 255
+    t.float    "self_score",     limit: 24
+    t.float    "other_score",    limit: 24
+    t.text     "supported_by",   limit: 65535
+    t.string   "uniq_key",       limit: 255
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  create_table "okrs_objects", force: :cascade do |t|
+    t.text     "name",           limit: 65535
+    t.integer  "container_id",   limit: 4
+    t.string   "container_type", limit: 255
+    t.string   "uniq_key",       limit: 255
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  create_table "okrs_records", force: :cascade do |t|
+    t.text     "title",          limit: 65535
+    t.string   "year_of_title",  limit: 255
+    t.string   "month_of_title", limit: 255
+    t.string   "dept_of_title",  limit: 255
+    t.string   "status",         limit: 255
+    t.text     "notes",          limit: 65535
+    t.integer  "author_id",      limit: 4
+    t.integer  "dept_id",        limit: 4
+    t.integer  "approver_id",    limit: 4
+    t.string   "record_type",    limit: 255
+    t.integer  "parent_id",      limit: 4
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  create_table "okrs_settings", force: :cascade do |t|
+    t.string   "cycle",           limit: 255
+    t.string   "interval",        limit: 255
+    t.string   "interval_type",   limit: 255
+    t.string   "date",            limit: 255
+    t.string   "time",            limit: 255
+    t.datetime "last_running_at"
+    t.integer  "author_id",       limit: 4
+    t.integer  "closed_by_id",    limit: 4
+    t.datetime "closed_at"
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
+
+  create_table "okrs_supports", force: :cascade do |t|
+    t.integer  "user_id",        limit: 4
+    t.string   "user_name",      limit: 255
+    t.integer  "okrs_record_id", limit: 4
+    t.integer  "okrs_object_id", limit: 4
+    t.integer  "container_id",   limit: 4
+    t.string   "container_type", limit: 255
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+  end
+
   create_table "open_id_authentication_associations", force: :cascade do |t|
     t.integer "issued",     limit: 4
     t.integer "lifetime",   limit: 4
@@ -947,8 +998,8 @@ ActiveRecord::Schema.define(version: 20180205070654) do
     t.string   "name",                limit: 255
     t.integer  "object_id",           limit: 4
     t.string   "object_name",         limit: 255
-    t.text     "version_url",         limit: 16777215
-    t.text     "version_log",         limit: 16777215
+    t.text     "version_url",         limit: 65535
+    t.text     "version_log",         limit: 65535
     t.string   "status",              limit: 255
     t.string   "result",              limit: 255
     t.string   "operate_type",        limit: 255
@@ -957,8 +1008,8 @@ ActiveRecord::Schema.define(version: 20180205070654) do
     t.integer  "user_id",             limit: 4
     t.string   "role_type",           limit: 255
     t.datetime "due_at"
-    t.datetime "created_at",                           null: false
-    t.datetime "updated_at",                           null: false
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
   end
 
   add_index "patch_versions", ["patch_id"], name: "index_patch_versions_on_patch_id", using: :btree
@@ -1412,17 +1463,17 @@ ActiveRecord::Schema.define(version: 20180205070654) do
   add_index "templates", ["role_id"], name: "templates_role_id", using: :btree
 
   create_table "thirdparties", force: :cascade do |t|
-    t.integer  "spec_id",     limit: 4
-    t.integer  "author_id",   limit: 4
-    t.integer  "status",      limit: 4,     default: 1
-    t.text     "version_ids", limit: 65535
-    t.text     "note",        limit: 65535
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
-    t.text     "result",      limit: 65535
-    t.integer  "category",    limit: 4
-    t.text     "release_ids", limit: 65535
-    t.integer  "type",        limit: 4
+    t.integer  "spec_id",      limit: 4
+    t.integer  "author_id",    limit: 4
+    t.integer  "status",       limit: 4,     default: 1
+    t.text     "version_ids",  limit: 65535
+    t.text     "note",         limit: 65535
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+    t.text     "result",       limit: 65535
+    t.integer  "category",     limit: 4
+    t.text     "release_ids",  limit: 65535
+    t.integer  "release_type", limit: 4
   end
 
   create_table "time_entries", force: :cascade do |t|
@@ -1505,6 +1556,18 @@ ActiveRecord::Schema.define(version: 20180205070654) do
     t.integer "fields_bits",       limit: 4,  default: 0
     t.integer "default_status_id", limit: 4
   end
+
+  create_table "user_favors", force: :cascade do |t|
+    t.integer  "user_id",    limit: 4
+    t.string   "title",      limit: 255
+    t.string   "url",        limit: 255
+    t.integer  "sort",       limit: 4
+    t.integer  "status",     limit: 4,   default: 1
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "user_favors", ["user_id"], name: "index_user_favors_on_user_id", using: :btree
 
   create_table "user_preferences", force: :cascade do |t|
     t.integer "user_id",   limit: 4,     default: 0,    null: false
@@ -1662,13 +1725,13 @@ ActiveRecord::Schema.define(version: 20180205070654) do
   create_table "version_release_sdks", force: :cascade do |t|
     t.integer  "version_id",          limit: 4
     t.integer  "status",              limit: 4
-    t.text     "result",              limit: 65535
-    t.text     "maven_result",        limit: 65535
-    t.text     "release_project_ids", limit: 65535
+    t.text     "result",              limit: 16777215
+    t.text     "maven_result",        limit: 16777215
+    t.text     "release_project_ids", limit: 16777215
     t.integer  "author_id",           limit: 4
-    t.text     "note",                limit: 65535
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
+    t.text     "note",                limit: 16777215
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
   end
 
   create_table "version_releases", force: :cascade do |t|
@@ -1902,4 +1965,5 @@ ActiveRecord::Schema.define(version: 20180205070654) do
   add_foreign_key "risks", "projects"
   add_foreign_key "risks", "users"
   add_foreign_key "specs", "projects"
+  add_foreign_key "user_favors", "users"
 end

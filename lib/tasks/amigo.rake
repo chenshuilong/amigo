@@ -562,4 +562,28 @@ namespace :amigo do
       puts "=======#{e.message.to_s}========"
     end
   end
+
+  desc 'Notice user submit new okr record'
+  task :okrs_submit_notice => :environment do 
+    begin
+      @setting = OkrsSetting.last
+      @setting.send_notice if @setting.present?
+    rescue
+      puts "=======#{e.message.to_s}========"
+    end
+  end
+
+  desc 'Refresh menus for all users'
+  task :refresh_user_redis => :environment do
+    begin
+      menus = ['amigo_main_menus', 'amigo_personal_menus', 'amigo_faster_new_menus', 'amigo_notice_menus']
+      User.active.each { |user|
+        menus.each { |menu|
+          $redis.del("#{menu}[#{user.id}]") if $redis.smembers("#{menu}[#{user.id}]").present?
+        }
+      }
+    rescue
+      puts "=======#{e.message.to_s}========"
+    end
+  end
 end

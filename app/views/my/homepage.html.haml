@@ -1,0 +1,55 @@
+- provide :nav, "1,1"
+
+.clearfix
+
+.page-main
+  .search.radius6
+    = form_tag({:controller => 'search', :action => 'index', :id => @project}, :method => :get ) do
+      = hidden_field_tag(controller.default_search_scope, 1, :id => nil) if controller.default_search_scope
+      = hidden_field_tag 'titles_only', 1, :id => nil
+      = text_field_tag "q", @question, {:placeholder => "搜索从这里开始", :accesskey => accesskey(:quick_search), :class => "inp-srh"}
+      = submit_tag "站内搜索", {:class => "btn-srh"}
+      %input{:class => "btn-baidu", :value => "百度一下", :type => "button", :onclick => "searchBaidu()"}
+
+  .clearfix
+
+  .mode-container
+    .wrap-nav{"style" => "display: block;"}
+      .dial.clearfix
+        %ul.mosts{"data-pid" => "mosts_new", "style" => "display: block;"}
+          - @favors.each_with_index do |fav, i|
+            %li.tile
+              %a.link{"href" => "#{fav.url}", "pinned_type" => 0, "target" => "_blank", "title" => "#{fav.title}"}
+                %span{"class" => "logo-bg default-logo-bg-#{(i % 4) + 1}"}
+                  %i= fav.title.first
+                %p= "#{fav.title}"
+              = image_tag "delete.png", class: "del-icon", onclick: "deleteApp(#{fav.id})"
+          %li.tile
+            %a.link{"href" => "javascript:addMore();", "pinned_type" => 0, "title" => "添加更多"}
+              %span{"class" => "logo-bg default-logo-bg-plus"}
+                %i= ""
+              %p= "添加"
+
+.addForm{:style => "display:none;width:400px;height:160px;padding:22px;"}
+  = form_tag("/my/add_favor",:id => "addForm", :remote => true, :class => "form-horizontal") do
+    .form-group
+      .col-xs-2.text-center
+        = label_tag :title, '标题<span class="required">*</span>'.html_safe
+      .col-xs-10
+        = text_field_tag 'favors[title]', nil, {:placeholder => "显示的名称，为了美观建议6个字以内", class: "form-control"}
+    .form-group
+      .col-xs-2.text-center
+        = label_tag :url, '网址<span class="required">*</span>'.html_safe
+      .col-xs-10
+        = text_field_tag 'favors[url]', nil, {:placeholder => "点击跳转地址，如https://os.gionee.com", class: "form-control"}
+
+- html_title(l(:label_my_page))
+
+:javascript
+  new SMValidator('#addForm', {fields: {'favors[title]': 'required', 'favors[url]': 'required'}});
+
+  $(".tile").hover(function() {
+    // $(this).find(".del-icon").show();
+  }, function() {
+    // $(this).find(".del-icon").hide();
+  });

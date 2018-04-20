@@ -372,6 +372,57 @@ class Notification < ActiveRecord::Base
     end
   end
 
+  def self.send_okr_record_approve_notification(okr)
+    subject = "OKR审批通知 \n"
+    content = "[立即查看](/my/okrs/#{okr.id}/edit)"
+
+    admin_id = User.find_by(login: 'admin').id
+    Notification.create(:category => "system",
+                    :from_user_id => admin_id,
+                    :to_user_id => okr.approver_id,
+                    :subject => subject,
+                    :content => content)
+  end
+
+  def self.send_okr_record_supported_notification(recipients, options={})
+    subject = "OKR需要您的支持通知"
+    content = "[立即查看](/index/okrs/#{options[:okr].id}/edit)"
+
+    admin_id = User.find_by(login: 'admin').id
+    recipients.each do |recipient|
+      Notification.create(:category => "system",
+                      :from_user_id => admin_id,
+                      :to_user_id => recipient,
+                      :subject => subject,
+                      :content => content)     
+    end
+  end
+
+  def self.send_user_submit_okrs_record(recipients, options={})
+    subject = "OKR填写通知"
+
+    admin_id = options[:admin_id]
+    recipients.each do |recipient|
+      puts "---------------send notice to user id: #{recipient}-------------------"
+      Notification.create(:category => "system",
+                      :from_user_id => admin_id,
+                      :to_user_id => recipient,
+                      :subject => subject)     
+    end
+  end
+
+  def self.send_okr_record_recall_notification(okr)
+    subject = "OKR审批撤回通知 \n"
+    content = "[立即查看](/my/okrs/#{okr.id}/edit)"
+
+    admin_id = User.find_by(login: 'admin').id
+    Notification.create(:category => "system",
+                    :from_user_id => admin_id,
+                    :to_user_id => okr.approver_id,
+                    :subject => subject,
+                    :content => content)    
+  end
+
   def update_depend_on(key, category = 1)
     case key
       when 'accept'

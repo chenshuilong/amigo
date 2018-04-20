@@ -1,0 +1,20 @@
+.issue-details
+  .attributes     
+    .allchange
+      %ul.nav.nav-tabs
+        %li{:class => "active" }
+          %a{"data-toggle" => "tab", :href => "#history"}= l(:field_notes)
+      .tab-content
+        #history.tab-pane{:class => "in active fade"}
+          - if @records.present?
+            .history-details
+              .journal.has_details
+                - @records.each_with_index do |r, idx|
+                  #note
+                    .note-title
+                      = authoring_at r.created_at, r.user, {:label => :label_updated_time_at}
+                    %ul.details
+                      - okrs_details(r.details).each do |string|
+                        %li= string
+          - else
+            %p 暂无任何记录。

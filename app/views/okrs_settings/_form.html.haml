@@ -1,0 +1,34 @@
+= labelled_form_for :okrs_setting, @setting, html: {id: "okrs_setting_form"} do |f|
+  = error_messages_for 'repo_request'
+  .issue-details#update
+    #all_attributes
+      %p
+        %label= '周期'
+        = select_tag 'okrs_settings[interval]', options_for_select(cycle_options, @setting.interval), style: 'width: 100px; min-width: 100px'
+        = hidden_field_tag 'okrs_settings[cycle]', @setting.cycle
+      %p
+        %label= '日期'
+        - if @setting.cycle.to_s == 'none'
+          = text_field_tag 'okrs_settings[date]', @setting.date, style: 'width: 200px; min-width: 200px;'
+          = calendar_for("okrs_settings_date", timepicker = false, options = {formatDate: 'YYYY-MM-DD', minDate: (Time.now+1.day).strftime("%F")})
+        - else
+          = select_tag 'okrs_settings[date]', options_for_select(cycle_date_options, @setting.date), style: 'width: 100px; min-width: 100px'
+  .text-center
+    = submit_tag l(:button_save), class: "btn btn-primary"
+
+
+:javascript
+  $(document).on("change", "#okrs_settings_interval", function(){
+    var val = $(this).val();
+    var $Form = $("form#okrs_setting_form");
+    var data = $Form.serialize()+"&format=js";
+    var action = "#{params[:action]}";
+    var cycle;
+    if(val == 0){cycle = "none"}else{cycle = "cycle"};
+    if(action == "new"){
+      path = "/okrs_settings/new";
+    }else if(action == "edit"){
+      path = "/okrs_settings/#{@setting.id}/edit";
+    }
+    $.get(path, data);
+  })

@@ -19,6 +19,23 @@
     = stylesheet_link_tag 'applications'
     = heads_for_theme if (yield :css).empty?
     = yield :header_tags
+    %link{:href => "/amg/ace/font-awesome/4.5.0/css/font-awesome.min.css", :rel => "stylesheet"}
+    %link{:href => "/amg/ace/css/fonts.googleapis.com.css", :rel => "stylesheet"}
+    %link{:href => "/amg/ace/css/ace.min.css", :rel => "stylesheet", :class => "ace-main-stylesheet", :id => "main-ace-style"}
+    %link{:href => "/amg/ace/css/ace-skins.min.css", :rel => "stylesheet"}
+    %link{:href => "/amg/ace/css/ace-rtl.min.css", :rel => "stylesheet"}
+
+    %script{:src => "/amg/ace/js/ace-extra.min.js", :type => "text/javascript"}
+    %script{:src => "/amg/ace/js/jquery-ui.custom.min.js", :type => "text/javascript"}
+    %script{:src => "/amg/ace/js/jquery.ui.touch-punch.min.js", :type => "text/javascript"}
+    %script{:src => "/amg/ace/js/jquery.easypiechart.min.js", :type => "text/javascript"}
+    %script{:src => "/amg/ace/js/jquery.sparkline.index.min.js", :type => "text/javascript"}
+    %script{:src => "/amg/ace/js/jquery.flot.min.js", :type => "text/javascript"}
+    %script{:src => "/amg/ace/js/jquery.flot.pie.min.js", :type => "text/javascript"}
+    %script{:src => "/amg/ace/js/jquery.flot.resize.min.js", :type => "text/javascript"}
+
+    %script{:src => "/amg/ace/js/ace-elements.min.js", :type => "text/javascript"}
+    %script{:src => "/amg/ace/js/ace.min.js", :type => "text/javascript"}
     = call_hook :view_layouts_base_html_head
     / page specific tags
   %body{:class => body_css_classes}
@@ -54,6 +71,16 @@
               .col-md-2.notification-left
                 %p.project-menu-info 工具
                 = tools_sidebar
+              
+              .col-md-10
+                = render_flash_messages
+                = yield
+                = call_hook :view_layouts_base_content
+          - elsif (controller_name == "okrs" || controller_name == "okrs_settings")
+            .row.seamless.notification
+              .col-md-2.notification-left
+                %p.project-menu-info 我的OKR
+                = okrs_sidebar
               
               .col-md-10
                 = render_flash_messages

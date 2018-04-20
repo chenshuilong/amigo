@@ -22,7 +22,7 @@ class SearchController < ApplicationController
   def index
     @question = params[:q] || ""
     @question.strip!
-    @all_words = params[:all_words] ? params[:all_words].present? : true
+    @all_words = params[:all_words] ? params[:all_words].present? : false
     @titles_only = params[:titles_only] ? params[:titles_only].present? : false
     @search_attachments = params[:attachments].presence || '0'
     @open_issues = params[:open_issues] ? params[:open_issues].present? : false
@@ -55,6 +55,7 @@ class SearchController < ApplicationController
       end
 
     @object_types = Redmine::Search.available_search_types.dup
+    @object_types = @object_types & ["issues", "projects"] # Only take issues and projects module
     if projects_to_search.is_a? Project
       # don't search projects
       @object_types.delete('projects')

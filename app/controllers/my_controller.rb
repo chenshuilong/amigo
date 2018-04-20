@@ -21,6 +21,7 @@ class MyController < ApplicationController
   before_filter :require_admin, :only => :destroy
   # let user change user's password when user has to
   skip_before_filter :check_password_change, :only => :password
+  before_filter :raise_error_without_logged, :only => [:add_favor, :remove_favor]
 
   require_sudo_mode :account, only: :post
   require_sudo_mode :reset_rss_key, :reset_api_key, :show_api_key, :destroy
@@ -54,9 +55,12 @@ class MyController < ApplicationController
 
   # Show user's page
   def page
-    @user = User.current
-    @blocks = @user.pref[:my_page_layout] || DEFAULT_LAYOUT
+    @blocks = current_user.pref[:my_page_layout] || DEFAULT_LAYOUT
     session[:return_to] = url_for(params)
+  end
+
+  def homepage
+    @favors = current_user.favors
   end
 
   # Edit user's account
@@ -297,10 +301,42 @@ class MyController < ApplicationController
     end
   end
 
+  def add_favor
+    current_user.favors << UserFavor.new(handle_url_without_prefix)
+
+    render :text => {:success => 1, :message => "操作成功!"}.to_json
+  rescue => e
+    render :text => {:success => 0, :message => e.to_s}.to_json
+  end
+
+  def remove_favor
+    favor = UserFavor.find(params[:id])
+    favor.destroy if favor
+
+    render :text => {:success => 1, :message => "操作成功!"}.to_json
+  rescue => e
+    render :text => {:success => 0, :message => e.to_s}.to_json
+  end
+
   private
+
   def init_status_sql
     init_sql = ""
     init_sql << "tasks.status in (#{params[:status].to_s})" if params[:status]
     init_sql
+  end
+
+  def favor_add_params
+    params.require(:favors).permit(:title, :url)
+  end
+
+  def handle_url_without_prefix
+    favor_params = favor_add_params.dup
+    if favor_params[:url].start_with?("http://") || favor_params[:url].start_with?("https://")
+
+    else
+      favor_params[:url] = "http://" + favor_params[:url]
+    end
+    favor_params
   end
 end

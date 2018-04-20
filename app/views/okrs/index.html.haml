@@ -1,0 +1,50 @@
+- provide :nav, "1,6"
+- provide :css, "bootstrap"
+
+.top-action-menu.pull-right
+  = link_to(l(:label_export_to), void_js, :class => 'btn btn-primary btn-sm', id: "export_okrs")
+
+.h2= "OKR查询"
+
+.clearfix
+.issue-details
+  .roadmap-query{:style => "width:100%;"}
+    %ul.notification-list
+      %li.notification-list-item
+        .notification-menu
+          %i.fa.fa-chevron-up
+        .notification-content
+          %p
+            %strong= "查询条件"
+        .clearfix
+        .notification-acton.select2-rectify{:style => "display:block;"}
+          = form_tag({}, {method: :get, class: 'form-horizontal'}) do |f|
+            .form-group
+              = label_tag 'dept', '部门', class: "col-sm-1 control-label"
+              .col-sm-7
+                = select_tag 'dept', options_for_select(@depts, @dept), class: "form-control", id: "dept_no", :onchange => "this.form.submit(); return false;"
+            .form-group
+              = label_tag 'user', '用户', class: "col-sm-1 control-label"
+              .col-sm-3
+                = select_tag 'user', options_for_select(@users.unshift([l(:label_all), nil]), @user), class: "form-control", id: "user_no", :onchange => "this.form.submit(); return false;"
+              = label_tag 'date', '年月', class: "col-sm-1 control-label"
+              .col-sm-3
+                = text_field_tag 'date', @date, class: "form-control"
+                = calendar_for("date", timepicker = false, options = {formatDate: 'YYYY-MM'})
+              = label_tag 'status', l(:version_status), class: "col-sm-1 control-label"
+              .col-sm-3
+                = select_tag 'status', options_for_select(status_text, @status), class: "form-control", :onchange => "this.form.submit(); return false;"
+            .form-group
+              .col-sm-2.col-sm-offset-2
+                = submit_tag l(:button_query), :name => nil, class: "btn btn-primary btn-sm"
+
+#roadmap
+  - if @okrs.empty?
+    %p.nodata= l(:label_no_data)
+  - else
+    =render :partial => 'list', :locals => {:okrs => @okrs, :category => "index"}
+    %span.pagination= pagination_links_full @pages, @count
+
+:javascript
+  $('#dept_no').select2();
+  $('#user_no').select2();

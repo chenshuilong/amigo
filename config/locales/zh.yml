@@ -670,6 +670,7 @@ zh:
   label_password_lost: 忘记密码
   label_home: 主页
   label_my_page: 我的地盘
+  label_my_personalization: 个性化
   label_my_account: 我的帐号
   label_my_projects: 我的项目
   label_my_page_block: 我的地盘模块
@@ -914,6 +915,7 @@ zh:
   label_theme: 主题
   label_default: 默认
   label_search_titles_only: 仅在标题中搜索
+  label_search_type: 类型
   label_user_mail_option_all: "收取我的项目的所有通知"
   label_user_mail_option_selected: "收取选中项目的所有通知..."
   label_user_mail_option_none: "不收取任何通知"
@@ -1034,6 +1036,15 @@ zh:
   label_google_tool_manage: 管理
   label_tool: 工具分享
   label_tool_new: 新建工具
+  label_okrs: OKR查询
+  label_my_okrs: 我的OKR
+  label_okrs_search_result: 查询结果
+  label_okrs_edit: 编辑OKR
+  label_okrs_new: 新增OKR
+  label_okrs_setting: 提醒时间设置
+  label_okrs_add_key_result: 增加Key Results
+  label_okrs_add_object: 增加Object
+  label_okrs_recall: 撤回
 
   label_remark: 备注
   label_repo_request_project_branch: 项目分支申请
@@ -1061,6 +1072,7 @@ zh:
   button_delete: 删除
   button_create: 创建
   button_create_and_continue: 创建并继续
+  button_create_and_approver: 保存并去评审
   button_test: 测试
   button_edit: 编辑
   button_edit_associated_wikipage: "编辑相关wiki页面: %{page_title}"
@@ -1596,6 +1608,8 @@ zh:
 
 
 ############ We customize adding ###############
+
+  error_user_without_logged: 用户未登录
 
   field_external_name: 外部型号
   field_project_name: 内部型号
@@ -2359,3 +2373,20 @@ zh:
   sdk_version_release_projects: 发布项目
   sdk_version_release_maven_result: Maven更新结果
   sdk_version_release_note: 备注
+
+  okrs_objects_name: 目标
+  okrs_key_result_name: 关键结果
+  okrs_key_result_supported_by: 需要的支持方
+  okrs_key_result_self_score: 自评
+  okrs_key_result_other_score: 他评
+
+  okrs_records_status_submitted: 提交
+  okrs_records_status_approving: 评审中
+  okrs_records_status_failed: 不合格
+  okrs_records_status_success: 合格
+  okrs_records_status_self_scoring: 自评 
+  okrs_records_status_other_scoring: 他评
+  okrs_records_status_finished: 完成
+
+  okrs_support_user: 需求支持方
+  okrs_support_record_author: 需求方 

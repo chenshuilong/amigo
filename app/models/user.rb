@@ -108,6 +108,8 @@ class User < Principal
   has_many :tasks, :class_name => "Task", foreign_key: "assigned_to_id", :primary_key => "id"
   has_many :custom_permissions, foreign_key: "user_id"
   has_many :views, :class_name => "ViewRecord", foreign_key: 'user_id'
+  has_many :okrs_records, :class_name => "OkrsRecord", foreign_key: 'author_id'
+  has_many :favors, :class_name => "UserFavor", foreign_key: 'user_id'
 
   scope :logged, lambda { where("#{User.table_name}.status <> #{STATUS_ANONYMOUS}") }
   scope :status, lambda {|arg| where(arg.blank? ? nil : {:status => arg.to_i})}
@@ -946,6 +948,19 @@ class User < Principal
   def dept_leader
     # User.find_by_empId(self.group_fujingli_empId || self.group_bmjl_empId || self.group_zgfz_empId || self.group_zhuguan_empId || self.group_zongjian_empId)
     User.find_by_empId [:manager_number, :manager2_number, :sub_manager_number, :sub_manager2_number, :majordomo_number].map{|attr| self.dept.send(attr)}.select{|id| id.to_i > 0}.first || 'csl'
+  end
+
+  #TODO find dept leader
+  def find_okr_approver
+    if dept.blank? || dept_leader.blank?
+      User.find(602) 
+    else
+      if dept_leader == self
+        User.find_by(empId: dept.parent.vice_president_number) || User.find(602)
+      else
+        dept_leader
+      end
+    end
   end
 
   def is_platform_driver?(project)

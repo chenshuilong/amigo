@@ -1,59 +1,164 @@
-%h2= l(:label_search)
-= form_tag({}, :method => :get, :id => 'search-form') do
-  .box
-    = label_tag "search-input", l(:description_search), :class => "hidden-for-sighted"
-    %p
-      = text_field_tag 'q', @question, :size => 60, :id => 'search-input'
-      = project_select_tag
-      = hidden_field_tag 'all_words', '', :id => nil
-      %label
-        = check_box_tag 'all_words', 1, @all_words
-        = l(:label_all_words)
-      = hidden_field_tag 'titles_only', '', :id => nil
-      %label
-        = check_box_tag 'titles_only', 1, @titles_only
-        = l(:label_search_titles_only)
-    %p#search-types
-      - @object_types.each do |t|
-        %label
-          = check_box_tag t, 1, @scope.include?(t)
-          = link_to type_label(t), "#"
-    %fieldset.collapsible.collapsed
-      %legend{:onclick => "toggleFieldset(this);"}= l(:label_options)
-      #options-content{:style => "display:none;"}
+- provide :nav, "1,1"
+- provide :css, "bootstrap"
+
+
+.clearfix
+
+.search-details
+  .h2= l(:label_search)
+  %ul.notification-list
+    %li.notification-list-item
+      .notification-menu
+        %i.fa.fa-chevron-up
+      .notification-content
         %p
-          %label
-            = check_box_tag 'open_issues', 1, @open_issues
-            = l(:label_search_open_issues_only)
-        %p
-          %label
-            = radio_button_tag 'attachments', '0', @search_attachments == '0'
-            = l(:label_search_attachments_no)
-          %label
-            = radio_button_tag 'attachments', '1', @search_attachments == '1'
-            = l(:label_search_attachments_yes)
-          %label
-            = radio_button_tag 'attachments', 'only', @search_attachments == 'only'
-            = l(:label_search_attachments_only)
-    = hidden_field_tag 'options', '', :id => 'show-options'
-  %p= submit_tag l(:button_submit)
-- if @results
-  #search-results-counts
-    = render_results_by_type(@result_count_by_type) unless @scope.size == 1
-  %h3
-    = l(:label_result_plural)
-    (#{@result_count})
-  %dl#search-results
-    - @results.each do |e|
-      %dt{:class => "#{e.event_type}"}
-        = content_tag('span', e.project, :class => 'project') unless @project == e.project
-        = link_to(highlight_tokens(e.event_title.truncate(255), @tokens), e.event_url)
-      %dd
-        %span.description= highlight_tokens(e.event_description, @tokens)
-        %span.author= format_time(e.event_datetime)
-- if @result_pages
-  %span.pagination= pagination_links_full @result_pages, @result_count, :per_page_links => false
-- html_title(l(:label_search))
+          %strong= ""
+      .clearfix
+      .notification-acton.select2-rectify{:style => "display:block;"}
+        = form_tag({}, :method => :get, :id => 'search-form', class: 'form-horizontal') do
+          .form-group
+            .col-sm-2
+              = project_select_tag
+              = select2_for 'scope'
+              = hidden_field_tag 'titles_only', 1, :id => nil
+            .col-sm-8
+              = text_field_tag 'q', @question, :size => 60, class: "form-control", :id => 'search-input'
+            .col-sm-2
+              = submit_tag l(:label_search), :name => nil, class: "btn btn-primary btn-sm"
+          .form-group
+            .col-sm-2
+              -#= l(:label_search_type)
+            .col-sm-10
+              %p#search-types
+                - @object_types.each do |t|
+                  %label
+                    = check_box_tag t, 1, @scope.include?(t)
+                    = link_to type_label(t), "#"
+          .form-group
+            .col-sm-2
+            .col-sm-8
+              %fieldset.collapsible.collapsed
+                %legend{:onclick => "toggleFieldset(this);"}
+                  %i.fa.fa-angle-down
+                  = l(:label_options)
+                #options-content{:style => "display:none;"}
+                  %p
+                    %label
+                      = check_box_tag 'open_issues', 1, @open_issues
+                      = l(:label_search_open_issues_only)
+                  %p
+                    %label
+                      = radio_button_tag 'attachments', '0', @search_attachments == '0'
+                      = l(:label_search_attachments_no)
+                    %label
+                      = radio_button_tag 'attachments', '1', @search_attachments == '1'
+                      = l(:label_search_attachments_yes)
+                    %label
+                      = radio_button_tag 'attachments', 'only', @search_attachments == 'only'
+                      = l(:label_search_attachments_only)
+              = hidden_field_tag 'options', '', :id => 'show-options'
+
+  .row#qanda
+    %div.col-md-8
+      %span.h2
+        = l(:label_result_plural)
+        (#{@result_count})
+      %section.section-wrapper
+        %section.QandA
+          - if @results.present?
+            - @results.each do |e|
+              %dl#search-results
+                %dt{:class => "#{e.event_type}"}
+                  = content_tag('span', e.project, :class => 'project') unless @project == e.project
+                  = link_to(highlight_tokens(e.event_title.truncate(255), @tokens), e.event_url)
+                %dd
+                  %span.description= highlight_tokens(e.event_description, @tokens)
+                  %span.author= format_time(e.event_datetime)
+            %span.pagination= pagination_links_full @result_pages, @result_count, :per_page_links => false
+          - else
+            %p.nodata= l(:label_no_data)
+    %div.col-md-4
+      %span.h2= "分类"
+      %section.hotQuestion.section-wrapper
+        = render_results_by_type(@result_count_by_type) if @result_count_by_type.present? # unless @scope.size == 1
+
+  -#.box
+  -#  = label_tag "search-input", l(:description_search), :class => "hidden-for-sighted"
+  -#  %p
+  -#    = text_field_tag 'q', @question, :size => 60, :id => 'search-input'
+  -#    = project_select_tag
+  -#    = hidden_field_tag 'all_words', '', :id => nil
+  -#    %label
+  -#      = check_box_tag 'all_words', 1, @all_words
+  -#      = l(:label_all_words)
+  -#    = hidden_field_tag 'titles_only', '', :id => nil
+  -#    %label
+  -#      = check_box_tag 'titles_only', 1, @titles_only
+  -#      = l(:label_search_titles_only)
+  -#  %p#search-types
+  -#    - @object_types.each do |t|
+  -#      %label
+  -#        = check_box_tag t, 1, @scope.include?(t)
+  -#        = link_to type_label(t), "#"
+  -#  %fieldset.collapsible.collapsed
+  -#    %legend{:onclick => "toggleFieldset(this);"}= l(:label_options)
+  -#    #options-content{:style => "display:none;"}
+  -#      %p
+  -#        %label
+  -#          = check_box_tag 'open_issues', 1, @open_issues
+  -#          = l(:label_search_open_issues_only)
+  -#      %p
+  -#        %label
+  -#          = radio_button_tag 'attachments', '0', @search_attachments == '0'
+  -#          = l(:label_search_attachments_no)
+  -#        %label
+  -#          = radio_button_tag 'attachments', '1', @search_attachments == '1'
+  -#          = l(:label_search_attachments_yes)
+  -#        %label
+  -#          = radio_button_tag 'attachments', 'only', @search_attachments == 'only'
+  -#          = l(:label_search_attachments_only)
+  -#  = hidden_field_tag 'options', '', :id => 'show-options'
+  -#%p= submit_tag l(:button_submit)
+
+  -#- if @results
+  -#  #search-results-counts
+  -#    = render_results_by_type(@result_count_by_type) unless @scope.size == 1
+  -#  %h3
+  -#    = l(:label_result_plural)
+  -#    (#{@result_count})
+  -#  %section.QandA
+  -#    %dl#search-results
+  -#      - @results.each do |e|
+  -#        %dt{:class => "#{e.event_type}"}
+  -#          = content_tag('span', e.project, :class => 'project') unless @project == e.project
+  -#          = link_to(highlight_tokens(e.event_title.truncate(255), @tokens), e.event_url)
+  -#        %dd
+  -#          %span.description= highlight_tokens(e.event_description, @tokens)
+  -#          %span.author= format_time(e.event_datetime)
+  -#- if @result_pages
+  -#  %span.pagination= pagination_links_full @result_pages, @result_count, :per_page_links => false
+  - html_title(l(:label_search))
+
+:css
+  .highlight{
+    background-color: lime;
+  }
+
+  /*fieldset{*/
+    /*padding:.35em .625em .75em;*/
+    /*margin: 0 2px;*/
+    /*border: 1px solid silver;*/
+    /*border-radius: 6px;*/
+  /*}*/
+
+  legend {
+    font-size: 16px;
+    /*padding: .5em;*/
+    /*border: 0;*/
+    /*width: auto;*/
+    /*margin-bottom: 10px*/
+  }
+
 = javascript_tag do
   $("#search-types a").click(function(e){
   e.preventDefault();
@@ -63,7 +168,7 @@
   $("#search-form").submit();
   }
   });
-  
+
   $("#search-form").submit(function(){
   $("#show-options").val($("#options-content").is(":visible") ? '1' : '0');
   });

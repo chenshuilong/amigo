@@ -420,3 +420,134 @@ function showRemoteUrl(title, items){
     }
   );
 }
+
+function editTableInfo(id, bool, info){
+  if(!bool){
+    return false;
+  }
+  var all_input = $("#okrsEditTable input");
+  var all_input_len = all_input.length;
+  for(i=0; i< all_input_len;i++){
+    var ipt = all_input[i];
+    var ipt_obj = $('#'+ipt.id);
+    var ipt_data_id = ipt_obj.data('id');
+    var ipt_value = ipt_obj.val();
+    var ipt_td_id = "td#result-"+info+"-"+ipt_data_id
+    var ipt_td = $(ipt_td_id);
+    var check_data = isPositiveNum(ipt_obj);
+    if(check_data == false){
+      ipt_td.children().remove();
+      ipt_td.val('');
+    }else{
+      clearTableInfo(ipt_td, ipt_value);
+      toSaveScore(ipt_obj);
+    };
+  }
+  var obj = $("td#result-"+info+"-"+id);
+  if(obj.children("div").length == 0){
+    var current_value = obj.html();
+    obj.html('');
+    var div = document.createElement('div')
+    var span = document.createElement('span')
+    var input = document.createElement('input');
+    input.setAttribute('type', 'text');
+    input.setAttribute('name', 'key_result['+id+']')
+    input.setAttribute('data-id', id);
+    input.setAttribute('value', current_value);
+    input.setAttribute('id', 'okr-key-result-input-'+id+'');
+    input.style.width = "60%";
+    div.appendChild(input);
+    div.appendChild(span);
+    obj[0].appendChild(div);
+    obj.unbind("click");
+    input.focus();
+  }else{
+    return false;
+  }
+}
+
+function toSaveScore(obj){
+  var id = obj.data("id");
+  var data = obj.val();
+  var ipt_td = obj.parent().parent();
+  var check_data = isPositiveNum(obj);
+  if(check_data == true){
+    $.ajax({
+      type: "GET",
+      url: '/okrs/score?id='+id+'&data='+data,
+      success: function(result){
+        if(result.status == true){
+          window.location.reload();
+        }else{
+          clearTableInfo(ipt_td, data);
+        }
+      }
+    });
+  }else{
+    obj.focus();
+  }
+}
+
+function clearTableInfo(obj, value){
+  obj.children().remove();
+  obj.html(value);
+}
+
+$(document).on("blur", "#okrsEditTable input", function(){
+  toSaveScore($(this));
+});
+
+$(document).on("click", ".result_score", function(){
+  if($(this).children("div").length == 0){
+    var id = $(this).data('id');
+    var bool = $(this).data('bool');
+    var info = $(this).data('info')
+    editTableInfo(id, bool, info);
+  }else{
+    return false;
+  };
+})
+
+function isPositiveNum(obj){
+  var num = obj.val();
+  var result = true;
+  if(isNaN(num)) {layer.msg("请输入0-10之内的数字！"); result=false;}
+  if(num < 0 || num > 10){ layer.msg("请输入0-10之内的数字！"); result=false} 
+  return result
+}
+
+$(document).on("click", ".check_all", function(){
+   var category = $(this).data("category");
+   var selector = $("table#"+category+"OkrTable");
+   var isChecked = $(this).prop("checked");
+   selector.find("tbody :checkbox").prop("checked", isChecked);
+})
+
+$(document).on("click", "#export_okrs", function(){
+  var $ipts = $("table tbody input:checked");
+  var ids = [];
+  $ipts.each(function(){
+    ids.push($(this).val());
+  });
+  location.href = "/okrs/export?format=pdf&ids="+ids;
+})
+
+$(document).on("click", "#recall_okrs", function(){
+  var $ipts = $("table tbody input:checked");
+  var ids = [];
+  $ipts.each(function(){
+    ids.push($(this).val());
+  });
+  $.ajax({
+    type: "GET",
+    url: "/okrs/recall?format=js&ids="+ids,
+    success: function(result){
+      layer.msg(result.message);
+      if(result.status == true){location.href = "/okrs/my"}
+    }
+  });
+})
+
+$(function () { 
+  $("#okr_desc").popover({html: true});
+});

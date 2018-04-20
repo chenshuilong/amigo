@@ -754,4 +754,8 @@ class ApplicationController < ActionController::Base
     jobs = sidekiq.processes_size + sidekiq.workers_size + sidekiq.retry_size + sidekiq.scheduled_size + sidekiq.dead_size
     Sidekiq::Stats.new.reset if jobs == 0
   end
+
+  def raise_error_without_logged
+    raise l(:error_user_without_logged) unless current_user.logged?
+  end
 end

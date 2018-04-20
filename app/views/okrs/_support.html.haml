@@ -1,0 +1,16 @@
+%table.list.table.table-striped.table-bordered
+  %thead
+    %tr
+      %th{width: 60} #
+      %th{width: 500} Object
+      %th{width: 500} Key Result
+      %th{width: 200}= l(:okrs_support_user)
+      %th{width: 100}= l(:okrs_support_record_author)
+  %tbody
+    - @supports.each_with_index do |support, i|
+      %tr
+        %td= i+1
+        %td= support.okrs_object.name
+        %td= support.container.name
+        %td= support.container.supports.map{|a| link_to a.user_name, user_path(a.user_id)}.join(",").html_safe
+        %td= link_to_user support.okrs_record.author

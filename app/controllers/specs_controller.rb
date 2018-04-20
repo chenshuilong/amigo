@@ -553,7 +553,7 @@ class SpecsController < ApplicationController
   end
 
   def my_productions
-    User.current.is_spm?(@project) ? Production.useful : User.current.productions
+    User.current.is_spm?(@project) ? Production.active.useful : User.current.productions
   end
 
   def find_project(project_id)

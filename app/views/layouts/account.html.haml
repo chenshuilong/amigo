@@ -1,0 +1,40 @@
+!!!
+%html{:lang => current_language}
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %meta{:charset => "utf-8"}/
+    %meta{:content => "IE=edge", "http-equiv" => "X-UA-Compatible"}/
+    %title= html_title
+    %meta{:content => "width=device-width, initial-scale=1, maximum-scale=1", :name => "viewport"}/
+    %meta{:content => "#{Redmine::Info.app_name}", :name => "description"}/
+    %meta{:content => "#{Redmine::Info.app_name}", :name => "keywords"}/
+    %meta{:content => "none", :name => "robots"}/
+    = csrf_meta_tag
+    = favicon
+    = stylesheet_link_tag 'jquery/jquery-ui-1.11.0', 'application', 'responsive', :media => 'all' if (yield :css).empty?
+    = stylesheet_link_tag 'rtl', :media => 'all' if l(:direction) == 'rtl'
+    = javascript_heads
+    = javascript_include_tag "applications"
+    = stylesheet_link_tag 'applications'
+    %link{:href => "/amg/ace/font-awesome/4.5.0/css/font-awesome.min.css", :rel => "stylesheet"}
+    %link{:href => "/amg/ace/css/fonts.googleapis.com.css", :rel => "stylesheet"}
+    %link{:href => "/amg/ace/css/ace.min.css", :rel => "stylesheet", :class => "ace-main-stylesheet", :id => "main-ace-style"}
+    %link{:href => "/amg/ace/css/ace-skins.min.css", :rel => "stylesheet"}
+    %link{:href => "/amg/ace/css/ace-rtl.min.css", :rel => "stylesheet"}
+
+    %script{:src => "/amg/ace/js/ace-extra.min.js", :type => "text/javascript"}
+    %script{:src => "/amg/ace/js/jquery-ui.custom.min.js", :type => "text/javascript"}
+    %script{:src => "/amg/ace/js/jquery.ui.touch-punch.min.js", :type => "text/javascript"}
+    %script{:src => "/amg/ace/js/jquery.easypiechart.min.js", :type => "text/javascript"}
+    %script{:src => "/amg/ace/js/jquery.sparkline.index.min.js", :type => "text/javascript"}
+    %script{:src => "/amg/ace/js/jquery.flot.min.js", :type => "text/javascript"}
+    %script{:src => "/amg/ace/js/jquery.flot.pie.min.js", :type => "text/javascript"}
+    %script{:src => "/amg/ace/js/jquery.flot.resize.min.js", :type => "text/javascript"}
+
+    %script{:src => "/amg/ace/js/ace-elements.min.js", :type => "text/javascript"}
+    %script{:src => "/amg/ace/js/ace.min.js", :type => "text/javascript"}
+
+  %body{:class => "login-layout"}
+    = render_browser_notice
+
+    = yield

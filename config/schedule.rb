@@ -26,6 +26,11 @@ every 10.minutes do
   rake "amigo:periodic_task"
   rake "amigo:change_log_address"
   rake "amigo:upload_thirdparty_files"
+  rake "amigo:okrs_submit_notice"
+end
+
+every 60.minutes do
+  rake "amigo:refresh_user_redis"
 end
 
 

@@ -1,0 +1,10 @@
+- provide :nav, "1,6"
+- provide :css, "bootstrap"
+
+= title([l(:label_my_okrs), my_okrs_path], l(:label_okrs_new))
+
+.top-action-menu.pull-right
+  %button#okr_desc.btn.btn-default{'data-content': render_okr_desc, 'data-placement': 'auto'} ?
+
+%hr
+= render :partial => 'edit_form'

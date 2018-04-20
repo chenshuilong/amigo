@@ -190,7 +190,7 @@
       %p
         = label_tag :tracker, l(:label_tracker_plural)
         - @trackers.each do |tracker|
-          = check_box_tag 'project[tracker_ids][]', tracker.id, @project.trackers.to_a.include?(tracker), :id => nil
+          = check_box_tag 'project[tracker_ids][]', tracker.id, @project.trackers.map(&:name).include?(tracker.name), :id => nil
           = tracker
         = hidden_field_tag 'project[tracker_ids][]', ''
 

@@ -3062,3 +3062,35 @@ function versionApks(vid) {
         }
     })
 }
+
+function addMore() {
+    openLayer("添加", "460px", $('.addForm'), function () {
+        if (SMValidator.validate('#addForm')) {
+            remote("/my/add_favor", "POST", $('#addForm').serializeObject() ,function (res) {
+                layer.msg(res.message.toString())
+                if (res.success.toString() == "1") {
+                    refreshPage();
+                }
+            })
+
+        } else {
+            layer.alert("标题或者网址不能为空！")
+            return false;
+        }
+    })
+}
+
+function deleteApp(id){
+    openConfirmDiaiog("确定要删除吗？", function () {
+        remote("/my/remove_favor", "POST", {id: id} ,function (res) {
+            layer.msg(res.message.toString())
+            if (res.success.toString() == "1") {
+                refreshPage();
+            }
+        })
+    })
+}
+
+function searchBaidu() {
+    window.open("https://www.baidu.com/s?wd=" + $(".inp-srh").val())
+}

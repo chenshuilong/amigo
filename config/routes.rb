@@ -20,7 +20,7 @@ Rails.application.routes.draw do
   require 'sidekiq/web'
   mount Sidekiq::Web => '/background/tasks'
 
-  root :to => 'my#index', :as => 'home'
+  root :to => 'my#homepage', :as => 'home'
 
   get 'welcome', :to => 'welcome#index'
   match 'login', :to => 'account#login', :as => 'signin', :via => [:get, :post]
@@ -94,6 +94,7 @@ Rails.application.routes.draw do
   match 'my/account(/:tab)', :controller => 'my', :action => 'account', :as => 'my_account', :via => [:get, :post]
   match 'my/account/destroy', :controller => 'my', :action => 'destroy', :via => [:post]
   match 'my/page', :controller => 'my', :action => 'page', :via => :get
+  match 'my/homepage', :controller => 'my', :action => 'homepage', :via => :get
   match 'my', :controller => 'my', :action => 'index', :via => :get # Redirects to my/page
   get 'my/api_key', :to => 'my#show_api_key', :as => 'my_api_key'
   post 'my/api_key', :to => 'my#reset_api_key'
@@ -109,6 +110,8 @@ Rails.application.routes.draw do
   match 'my/notifications', :controller => 'notifications', :action => 'index', :via => :get
   match 'my/notifications/:id/handle', :to => 'notifications#handle', :as => "handle_notification", :via => :post
   match 'my/tasks', :controller => 'my', :action => 'tasks', :via => :get
+  match 'my/add_favor', :controller => 'my', :action => 'add_favor', :via => :post
+  match 'my/remove_favor', :controller => 'my', :action => 'remove_favor', :via => :post
 
   resources :users do
     resources :memberships, :controller => 'principal_memberships'
@@ -806,6 +809,20 @@ Rails.application.routes.draw do
   resources :tools do 
     get :operate, :on => :collection
   end
+
+  #TODO
+  resources :okrs_settings, only: [:new, :edit, :create, :update]
+  
+  resources :okrs, except: [:edit, :update] do 
+    get :score, :on => :collection
+    get :my, :on => :collection
+    get :set_to_mine, :on => :collection
+    get :export, :on => :collection
+    get :recall, :on => :collection
+  end
+  match '/okrs/context_menu', :to => 'context_menus#okrs', :as => :okrs_context_menu, :via => [:get, :post]
+  match '/:category/okrs/:id/edit', :controller => 'okrs', :action => 'edit', :via => :get, :as => "edit_okr"
+  match '/:category/okrs/:id/update', :controller => 'okrs', :action => 'update', :via => [:patch, :put, :post], :as => "okr_update"
 
   Dir.glob File.expand_path("plugins/*", Rails.root) do |plugin_dir|
     file = File.join(plugin_dir, "config/routes.rb")

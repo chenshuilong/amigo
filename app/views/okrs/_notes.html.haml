@@ -1,0 +1,4 @@
+%hr
+  - if !@okr.new_record? && @okr.status == "approving" && @okr.approver_id == User.current.id
+    %p= f.select :status, options_for_select([[l(:okrs_records_status_success), 'self_scoring'], [l(:okrs_records_status_failed), 'failed']])
+  %p= f.text_area :notes, value: '', label: :field_notes, :style => "width: 80%; height: 60px"

@@ -294,4 +294,36 @@ class Dept < ActiveRecord::Base
     $redis.sadd("amigo_depts", Dept.active.select("id,orgNo,orgNm,parentNo").to_json)
   end
 
+  def self.options_group_for_select_all(depts = [])
+    opts = []
+    i = 0
+    where(:orgNo => depts).order("orgNo").each do |dept|
+      opts << ["#{dept.orgNm}(#{dept.id})", dept.id]
+      opts = opts + dept.options_of_children_dept(i+1, dept.orgNm)
+    end
+    opts
+  end
+
+  def options_of_children_dept(i, name)
+    dept = self
+    opts = []
+    if dept.children.active.present?
+      dept.children.active.each do |d|
+        full_name = i > 1 ? "#{name}>#{d.orgNm}(#{d.id})" : "#{d.orgNm}(#{d.id})"
+        opts << [full_name, d.id]
+        opts = opts + d.options_of_children_dept(i+1, full_name)
+      end
+    end
+    opts
+  end
+
+  def self.get_dept_tree_by_orgNo(list)
+    org_list = list.join(".")
+    unless (depts = $redis.smembers("build_dept_tree_by_orgNo[#{org_list}]")).present?
+      $redis.sadd("build_dept_tree_by_orgNo[#{org_list}]", self.options_group_for_select_all(list).to_yaml)
+      depts = $redis.smembers("build_dept_tree_by_orgNo[#{org_list}]")
+    end
+    YAML.load(depts[0])
+  end
+
 end

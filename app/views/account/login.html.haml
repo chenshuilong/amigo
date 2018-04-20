@@ -1,40 +1,250 @@
+- provide :css, 'bootstrap'
+
 = call_hook :view_account_login_top
-#login-form
-  = form_tag(signin_path, onsubmit: 'return keepAnchorOnSignIn(this);') do
-    = back_url_hidden_field_tag
-    %table
-      %tr
-        %td{:style => "text-align:right;"}
-          %label{:for => "username"}
-            = l(:field_login)
-            \:
-        %td{:style => "text-align:left;"}= text_field_tag 'username', params[:username], :tabindex => '1'
-      %tr
-        %td{:style => "text-align:right;"}
-          %label{:for => "password"}
-            = l(:field_password)
-            \:
-        %td{:style => "text-align:left;"}= password_field_tag 'password', nil, :tabindex => '2'
-      - if Setting.openid?
-        %tr
-          %td{:style => "text-align:right;"}
-            %label{:for => "openid_url"}= l(:field_identity_url)
-          %td{:style => "text-align:left;"}= text_field_tag "openid_url", nil, :tabindex => '3'
-      %tr
-        %td
-        %td{:style => "text-align:left;"}
-          - if Setting.autologin?
-            %label{:for => "autologin"}
-              = check_box_tag 'autologin', 1, false, :tabindex => 4
-              = l(:label_stay_logged_in)
-      %tr
-        %td{:style => "text-align:left;"}
-          - if Setting.lost_password?
-            = link_to l(:label_password_lost), lost_password_path
-        %td{:style => "text-align:right;"}
-          %input{:name => "login", :tabindex => "5", :type => "submit", :value => "#{l(:button_login)} »"}/
+.main-container
+  .main-content
+    .row
+      .col-sm-10.col-sm-offset-1
+        .login-container
+          .center
+            %h1
+              %i.ace-icon.fa.fa-leaf.green
+              %span.red
+                = "#{Redmine::Info.app_name}"
+              %span#id-text2.white
+                = "项目管理系统"
+            %h4#id-company-text.blue © 深圳市金立通讯设备有限公司
+          .space-6
+          .position-relative
+            = form_tag(signin_path, onsubmit: 'return keepAnchorOnSignIn(this);') do
+              = back_url_hidden_field_tag
+              #login-box.login-box.visible.widget-box.no-border
+                .widget-body
+                  .widget-main
+                    %h4.header.blue.lighter.bigger
+                      %i.ace-icon.fa.fa-coffee.green
+                      请输入用户名和密码
+                    .space-6
+                    %form
+                      %fieldset
+                        %label.block.clearfix
+                          %span.block.input-icon.input-icon-right
+                            = text_field_tag 'username', params[:username], :tabindex => '1', :class => 'form-control', :placeholder => '用户名'
+                            %i.ace-icon.fa.fa-user
+                        %label.block.clearfix
+                          %span.block.input-icon.input-icon-right
+                            = password_field_tag 'password', nil, :tabindex => '2', :class => 'form-control', :placeholder => '密码'
+                            %i.ace-icon.fa.fa-lock
+                        .space
+                        .clearfix
+                          %label.inline
+                            - if Setting.autologin?
+                              %label{:for => "autologin"}
+                                = check_box_tag 'autologin', 1, false, :tabindex => 4, :class => 'ace'
+                                %span.lbl= l(:label_stay_logged_in)
+                          %button.width-35.pull-right.btn.btn-sm.btn-primary{:type => "submit"}
+                            %i.ace-icon.fa.fa-key
+                            %span.bigger-110 登录
+                        .space-4
+                    .social-or-login.center
+                      %span.bigger-110 或采用以下方式登录
+                    .space-6
+                    .social-login.center
+                      %a.btn.btn-primary
+                        %i.ace-icon.fa.fa-weixin
+                      %a.btn.btn-info
+                        %i.ace-icon.fa.fa-qq
+                      %a.btn.btn-danger
+                        %i.ace-icon.fa.fa-google-plus
+                  .toolbar.clearfix
+                    %div
+                      %a.forgot-password-link{"data-target" => "#forgot-box", :href => "#"}
+                        %i.ace-icon.fa.fa-arrow-left
+                        忘记密码
+                    %div
+                      %a.user-signup-link{"data-target" => "#signup-box", :href => "#"}
+                        注册
+                        %i.ace-icon.fa.fa-arrow-right
+            #forgot-box.forgot-box.widget-box.no-border
+              .widget-body
+                .widget-main
+                  %h4.header.red.lighter.bigger
+                    %i.ace-icon.fa.fa-key
+                    重新找回密码
+                  .space-6
+                  %p
+                    输入您的电子邮件地址并会收到邮件提示
+                  %form
+                    %fieldset
+                      %label.block.clearfix
+                        %span.block.input-icon.input-icon-right
+                          %input.form-control{:placeholder => "电子邮件地址", :type => "email"}/
+                          %i.ace-icon.fa.fa-envelope
+                      .clearfix
+                        %button.width-35.pull-right.btn.btn-sm.btn-danger{:type => "button"}
+                          %i.ace-icon.fa.fa-lightbulb-o
+                          %span.bigger-110 发送给我!
+                .toolbar.center
+                  %a.back-to-login-link{"data-target" => "#login-box", :href => "#"}
+                    返回登录
+                    %i.ace-icon.fa.fa-arrow-right
+            #signup-box.signup-box.widget-box.no-border
+              .widget-body
+                .widget-main
+                  %h4.header.green.lighter.bigger
+                    %i.ace-icon.fa.fa-users.blue
+                    新用户注册
+                  .space-6
+                  %p 请输入注册信息:
+                  %form
+                    %fieldset
+                      %label.block.clearfix
+                        %span.block.input-icon.input-icon-right
+                          %input.form-control{:placeholder => "电子邮件地址", :type => "email"}/
+                          %i.ace-icon.fa.fa-envelope
+                      %label.block.clearfix
+                        %span.block.input-icon.input-icon-right
+                          %input.form-control{:placeholder => "用户名", :type => "text"}/
+                          %i.ace-icon.fa.fa-user
+                      %label.block.clearfix
+                        %span.block.input-icon.input-icon-right
+                          %input.form-control{:placeholder => "密码", :type => "password"}/
+                          %i.ace-icon.fa.fa-lock
+                      %label.block.clearfix
+                        %span.block.input-icon.input-icon-right
+                          %input.form-control{:placeholder => "确认密码", :type => "password"}/
+                          %i.ace-icon.fa.fa-retweet
+                      %label.block
+                        %input.ace{:type => "checkbox"}/
+                        %span.lbl
+                          我接受
+                          %a{:href => "#"} 用户协议
+                      .space-24
+                      .clearfix
+                        %button.width-30.pull-left.btn.btn-sm{:type => "reset"}
+                          %i.ace-icon.fa.fa-refresh
+                          %span.bigger-110 重置
+                        %button.width-65.pull-right.btn.btn-sm.btn-success{:type => "button"}
+                          %span.bigger-110 注册
+                          %i.ace-icon.fa.fa-arrow-right.icon-on-right
+                .toolbar.center
+                  %a.back-to-login-link{"data-target" => "#login-box", :href => "#"}
+                    %i.ace-icon.fa.fa-arrow-left
+                    返回登录
+          .navbar-fixed-top.align-right
+            %br/
+            \ 
+            %a#btn-login-dark{:href => "#"} 纯黑
+            \ 
+            %span.blue /
+            \ 
+            %a#btn-login-blur{:href => "#"} 蓝色
+            \ 
+            %span.blue /
+            \ 
+            %a#btn-login-light{:href => "#"} 清新
+            \     
 = call_hook :view_account_login_bottom
 - if params[:username].present?
   = javascript_tag "$('#password').focus();"
 - else
   = javascript_tag "$('#username').focus();"
+
+-#= call_hook :view_account_login_top
+-##login-form
+-#  = form_tag(signin_path, onsubmit: 'return keepAnchorOnSignIn(this);') do
+-#    = back_url_hidden_field_tag
+-#    %table
+-#      %tr
+-#        %td{:style => "text-align:right;"}
+-#          %label{:for => "username"}
+-#            = l(:field_login)
+-#            \:
+-#        %td{:style => "text-align:left;"}= text_field_tag 'username', params[:username], :tabindex => '1'
+-#      %tr
+-#        %td{:style => "text-align:right;"}
+-#          %label{:for => "password"}
+-#            = l(:field_password)
+-#            \:
+-#        %td{:style => "text-align:left;"}= password_field_tag 'password', nil, :tabindex => '2'
+-#      - if Setting.openid?
+-#        %tr
+-#          %td{:style => "text-align:right;"}
+-#            %label{:for => "openid_url"}= l(:field_identity_url)
+-#          %td{:style => "text-align:left;"}= text_field_tag "openid_url", nil, :tabindex => '3'
+-#      %tr
+-#        %td
+-#        %td{:style => "text-align:left;"}
+-#          - if Setting.autologin?
+-#            %label{:for => "autologin"}
+-#              = check_box_tag 'autologin', 1, false, :tabindex => 4
+-#              = l(:label_stay_logged_in)
+-#      %tr
+-#        %td{:style => "text-align:left;"}
+-#          - if Setting.lost_password?
+-#            = link_to l(:label_password_lost), lost_password_path
+-#        %td{:style => "text-align:right;"}
+-#          %input{:name => "login", :tabindex => "5", :type => "submit", :value => "#{l(:button_login)} »"}/
+-#= call_hook :view_account_login_bottom
+-#- if params[:username].present?
+-#  = javascript_tag "$('#password').focus();"
+-#- else
+-#  = javascript_tag "$('#username').focus();"
+
+
+:javascript
+  jQuery(function($) {
+   $(document).on('click', '.toolbar a[data-target]', function(e) {
+      e.preventDefault();
+      var target = $(this).data('target');
+      $('.widget-box.visible').removeClass('visible');//hide others
+      $(target).addClass('visible');//show target
+   });
+  });
+
+  /*
+    每隔一秒钟换一种主题
+  */
+  var themes = [{zt_klass1: "login-layout", zt_klass2: "white", zt_klass3: "blue"},
+                {zt_klass1: "login-layout light-login", zt_klass2: "grey", zt_klass3: "blue"},
+                {zt_klass1: "login-layout blur-login", zt_klass2: "white", zt_klass3: "light-blue"}];
+  var recordCount = 1;
+  jQuery(function($) {
+    setInterval(function () {
+        if (recordCount > 3)
+          recordCount = recordCount % 3;
+        var theme = themes[recordCount - 1];
+
+        $('body').attr('class', theme.zt_klass1);
+        $('#id-text2').attr('class', theme.zt_klass2);
+        $('#id-company-text').attr('class', theme.zt_klass3);
+
+        recordCount += 1;
+    }, 1000);
+  });
+
+  //you don't need this, just used for changing background
+  jQuery(function($) {
+   $('#btn-login-dark').on('click', function(e) {
+      $('body').attr('class', 'login-layout');
+      $('#id-text2').attr('class', 'white');
+      $('#id-company-text').attr('class', 'blue');
+
+      e.preventDefault();
+   });
+   $('#btn-login-light').on('click', function(e) {
+      $('body').attr('class', 'login-layout light-login');
+      $('#id-text2').attr('class', 'grey');
+      $('#id-company-text').attr('class', 'blue');
+
+      e.preventDefault();
+   });
+   $('#btn-login-blur').on('click', function(e) {
+      $('body').attr('class', 'login-layout blur-login');
+      $('#id-text2').attr('class', 'white');
+      $('#id-company-text').attr('class', 'light-blue');
+
+      e.preventDefault();
+   });
+
+  });

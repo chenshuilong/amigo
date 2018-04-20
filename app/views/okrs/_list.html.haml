@@ -1,0 +1,19 @@
+= form_tag({}) do
+  %table{:class => "list table table-striped table-bordered", id: "#{category}OkrTable"}
+    %thead
+      %tr
+        %th.hide-when-print{width: 60}
+          = check_box_tag 'check_all', '', false, :class => 'check_all', 'data-category': category, |
+            :title => "#{l(:button_check_all)}/#{l(:button_uncheck_all)}"
+        %th 标题
+        %th{width: 60} 上传月份
+        %th{width: 60} 状态
+        %th{width: 60} 当前审批人 
+    %tbody
+      - okrs.each do |okr|
+        %tr
+          %td.hide-when-print= check_box_tag 'ids[]', okr.id, false, :id => nil
+          %td= okrs_links(okr, params[:action])
+          %td= okr.created_at.try(:strftime, "%Y.%m")
+          %td= l("okrs_records_status_#{okr.status}".to_sym)
+          %td= link_to_user okr.try(:approver) if okr.status != "submitted"

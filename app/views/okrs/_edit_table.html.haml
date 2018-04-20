@@ -1,0 +1,123 @@
+.filter-right
+  .panel.panel-default{:style => "margin-top:20px;"}
+    .panel-heading
+      %h5
+        %strong{style: "text-align: center"}= "#{@okr.title}"
+    .panel-body
+      %table#okrsEditTable.list.table.table-bordered{style: "margin-bottom: 50px;"}
+        %thead
+          %tr
+            %th= l(:okrs_objects_name)
+            %th= l(:okrs_key_result_name)
+            %th= l(:okrs_key_result_supported_by)
+            - if %w(self_scoring other_scoring finished).include?(@okr.status)
+              %th{width: 120}= l(:okrs_key_result_self_score)
+            - if %w(other_scoring finished).include?(@okr.status)
+              %th{width: 120}= l(:okrs_key_result_other_score)
+        %tbody
+          - @okr_table.each do |k, v|
+            = render_ork_tbody(@okr, v)
+
+      = labelled_form_for @okr, :url => @okr.new_record? ? okrs_path(category: @type) : okr_update_path(id: @okr.id, type: "edit_notes", category: @type), html: {id: "okrsForm" } do |f|
+        #update
+          #all_attributes
+            = render :partial => 'notes', :locals => {:f => f}
+        .text-center
+          %a.btn.btn-primary.btn-sm{class: "btn btn-primary btn-sm", class: 'okrs-form-submit', remote: true}= l(:button_save)
+
+%hr
+= render :partial => 'history'
+:css
+  .popup_menu{position:absolute; 
+              z-index:90; border:1px solid #ccc; font-size: 0.9em}  
+  .popup_menu ul{
+    width: 150px;
+    background: #fff;
+    list-style: none;
+    padding: 2px;
+    margin: 0;
+  }
+  .popup_menu li{
+    position: relative;
+    display: block;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .popup_menu li>a {
+    width: auto;
+  }
+  .popup_menu a:hover{ background:#f5f5f5; color:#f88829;}
+  .popup_menu a {
+    display: block;
+    margin: 0;
+    border: 0;
+    color: #333;
+    cursor: pointer;
+    text-decoration: none !important;
+    background-repeat: no-repeat;
+    background-position: 1px 50%;
+    padding: 7px 13px;
+    width: 100%}
+
+:javascript
+  $(".okrs-form-submit").on("click", function(){
+    window.onbeforeunload = null;
+    
+    var $Form = $("form#okrsForm")
+    var data = $Form.serialize();
+    var action = $Form.attr("action");
+    var method = $Form.attr("method");
+    var url = action + '.json?key=#{User.current.api_key}&type=edit_notes'
+    $.ajax({
+      url: url,
+      type: method,
+      data: data,
+      dataType: "json"
+    }).done( function(result){
+      success = result.success;
+      messages = result.message;
+      if(success == 1){
+        var url = "/#{@type}/okrs/#{@okr.id}/edit";
+        window.parent.location.href = url;
+      }else if(success == 0){
+        layer.msg(result.message[0])
+      }
+    });
+  })
+
+  var kyoPopupMenu={};  
+  kyoPopupMenu = (function(){  
+    return {  
+      sys: function (id, type) {  
+        $('.popup_menu').remove();  
+        popupMenuApp = $('<div class="popup_menu app-menu"><ul><li><a menu="menu1" data-category="object">设为我的Object</a></li><li><a menu="menu2" data-category="result">设为我的Key Result</a></li></ul></div>').find('a').attr('href','javascript:;').end().appendTo('body');  
+        //绑定事件  
+        $('.popup_menu a[menu="menu1"], a[menu="menu2"]').on('click', function (){  
+          var category = $(this).data("category");
+          var url = '/okrs/set_to_mine?id='+id+'&type='+type+'&category='+category;
+          $.ajax({
+            type: "GET",
+            url: url,
+            success: function(result){
+              layer.msg(result.message);
+            }
+          });               
+        });  
+        return popupMenuApp;  
+      }  
+    }})();  
+    //取消右键  
+    $('html').on('contextmenu', function (){return false;}).click(function(){  
+        $('.popup_menu').hide();  
+    });  
+    //桌面点击右击  
+    $('html').on('contextmenu', '.showcontextmenu',function (e){
+        var obj_id = $(this).data("id");
+        var obj_type = $(this).data("type");
+        var popupmenu = kyoPopupMenu.sys(obj_id, obj_type);  
+        l = ($(document).width() - e.clientX) < popupmenu.width() ? (e.clientX - popupmenu.width()) : e.clientX;  
+        t = ($(document).height() - e.clientY) < popupmenu.height() ? (e.clientY - popupmenu.height()) : e.clientY;  
+        popupmenu.css({left: l,top: t}).show();  
+        return false;  
+    });  

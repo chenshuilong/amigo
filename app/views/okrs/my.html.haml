@@ -1,0 +1,26 @@
+- provide :nav, "1,7"
+- provide :css, "bootstrap"
+
+.top-action-menu.pull-right
+  - if @current_user.admin?
+    = link_to("设置", @setting.new_record? ? new_okrs_setting_path : edit_okrs_setting_path(@setting), :class => 'btn btn-primary btn-sm')
+  = link_to("新增", new_okr_path, :class => 'btn btn-primary btn-sm')
+  = link_to(l(:label_okrs_recall), void_js, :class => 'btn btn-primary btn-sm', id: "recall_okrs")
+  = link_to(l(:label_export_to), void_js, :class => 'btn btn-primary btn-sm', id: "export_okrs")
+
+.h2= l(:label_my_okrs)
+
+#roadmap
+  - if @okrs.present?
+    =render :partial => 'list', :locals => {:okrs => @okrs, :category => "my"}
+
+    %span.pagination= pagination_links_full @pages, @count
+    %hr
+  - if @approvings.present?
+    .h2= "待处理的OKR"
+    =render :partial => 'list', :locals => {:okrs => @approvings, :category => "approve"}
+
+  - if @supports.present?
+    %hr
+    .h2= "与我相关的OKR"
+    =render :partial => 'support'
