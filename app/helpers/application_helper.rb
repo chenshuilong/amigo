@@ -2035,7 +2035,7 @@ module ApplicationHelper
                   case i + 1
                     when 1 then
                       content_tag :li, class: "" do
-                        content_tag(:a, '#') do
+                        link_to my_account_path do
                           content_tag(:i, '', class: "fa fa-user") + current_user.name
                         end
                       end
