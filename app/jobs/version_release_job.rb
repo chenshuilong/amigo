@@ -67,6 +67,9 @@ class VersionReleaseJob < ActiveJob::Base
     version_fullname = version_release.version.fullname
     # find repos that need to update spec.yml
     repos = ReposHelper.get_repos_by_version_id(version_id)
+    # repos = repos.find_all { |repo|
+    #   repo['project_id'].to_s.in?(version_release.tested_mobile.to_s.split(',').compact.delete_if { |pid| pid.to_s.strip.empty? }) unless repo['project_id'].to_s.strip.empty?
+    # }
     repos.each do |r|
       release_path = r['repo_url']
       # Create log folder
@@ -310,7 +313,7 @@ class VersionReleaseJob < ActiveJob::Base
     project_name = repo['project_name'] # GBL7553A
     spec_file_dir = project_name[0 .. 6] # GBL7553
     spec_file_name = "#{project_name.to_s.include?('_TASTE') ? project_name[0..7] : project_name}#{project_spec_name}.yml" # GBL7553A02_B.yml
-    git_repo[:repo_uri] = git_repo[:repo_uri].gsub('/gn_project', '') if project_name.to_s.start_with?('BJ')
+    git_repo[:repo_uri] = git_repo[:repo_uri].gsub('/gn_project', '') if project_name.to_s.start_with?('BJ') || repo_branch.eql?("vm4_gionee_local")
 
     if project_name.to_s.start_with?('BJ')
       uri = File.join(git_repo[:repo_uri], "config", spec_file_dir, spec_file_name) # ssh://USER@19.9.0.152:29418/android_mtk_m_6755_c66_mp/gn_project/config/GBL7553/GBL7553A02_B.yml
@@ -341,6 +344,10 @@ class VersionReleaseJob < ActiveJob::Base
       end
       uri = File.join(git_repo[:repo_uri], "gn_project", spec_file_dir, spec_file_name) # ssh://auto_rom_release@19.9.0.151:29418/android_qc_n_qrd8920_cs/SW17G15/gn_project/SW17G17/SW17G17Z50_A.yml
       repo_branch = "master"
+    end
+
+    if repo_branch.eql?("vm4_gionee_local")
+      uri = File.join(git_repo[:repo_uri], "mt6763o/gn_project", spec_file_dir, spec_file_name)
     end
 
     status = 1
@@ -375,6 +382,10 @@ class VersionReleaseJob < ActiveJob::Base
       spec_file = File.join(git.dir.to_s, 'gn_project', spec_file_dir, spec_file_name)
     end
 
+    if repo_branch.eql?("vm4_gionee_local")
+      spec_file = File.join(git.dir.to_s, 'mt6763o/gn_project', spec_file_dir, spec_file_name)
+    end
+
     md5_old = Digest::MD5.file(spec_file).hexdigest if File.exist?(spec_file)
     logger.info("Start write apps to #{spec_file}")
     msg = write_spec_yml(spec_file, project_spec_id, production_version_id, production_name, production_full_version)
@@ -393,6 +404,10 @@ class VersionReleaseJob < ActiveJob::Base
     if repo_url.to_s.end_with?("android_qc_n_qrd8920_cs/branch_sw17g15_master") || repo_url.to_s.end_with?("android_qc_n_qrd8920_cs/branch_sw17g15_gionee_master") ||
         repo_url.to_s.end_with?("android_mtk_n_6739_mp/branch_sw17g18_gionee_master") || repo_url.to_s.end_with?("android_mtk_n_6739_mp/branch_sw17g18_master")
       spec_file_git_path = File.join('gn_project', spec_file_dir, spec_file_name)
+    end
+
+    if repo_branch.eql?("vm4_gionee_local")
+      spec_file_git_path = File.join('mt6763o/gn_project', spec_file_dir, spec_file_name)
     end
 
     gst = git.status[spec_file_git_path]

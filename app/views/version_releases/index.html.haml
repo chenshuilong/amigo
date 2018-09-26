@@ -102,7 +102,11 @@
                   %td= release.version.project.name
                   %td= link_to_version release.version
                   %td= load_value(release, :status)
-                  %td= render_failed_count release
+                  - failed_count = release.failed_count.to_i
+                  - if failed_count > 0
+                    %td= render_release_failed_result(release)
+                  - else
+                    %td= render_failed_count release
                   %td= render_tested_mobile release
                   %td= render_just_adapted release
                   %td= release.version_applicable_to

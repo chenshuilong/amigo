@@ -498,6 +498,9 @@ class IssueQuery < Query
         redis = Redis.new
         issue_ids = redis.smembers("amigo_issues") # Get from Redis
         if issue_ids.present?
+          if issue_ids.size < max_cache_number
+            redis.sadd("amigo_issues", Issue.select(:id).order(id: :desc).limit(max_cache_number).pluck(:id))
+          end
           expired_on = redis.hget("amigo_issue_latest", "expired_on")
           lateset_id = redis.hget("amigo_issue_latest", "id")
           if expired_on.try(:>=, Time.now) && issue_ids.include?(lateset_id) # check

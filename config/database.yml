@@ -20,8 +20,9 @@ production:
 
 development:
   <<: *default
-  database: amigo_tt_2017_dec # amigo_tt_2018_mar # amigo_2016_dec
-  host: dev.os.gionee.com # localhost # 18.8.5.10
+  database: amigo # amigo_tt_2017_dec # amigo_tt_2018_mar # amigo_2016_dec
+  host: 18.8.5.10 # dev.os.gionee.com # localhost
+
 
 test:
   adapter: mysql2

@@ -9,7 +9,7 @@
     .h2= release_heading @third
   .col-sm-6.text-right
     .top-action-menu
-      - if @third.attachments.last.disk_filename.to_s.end_with?('.zip')
+      - if @third.attachments.present? && @third.attachments.last.disk_filename.to_s.end_with?('.zip')
         = link_to l(:thirdparty_version_release_reupload), void_js, :onclick => "reupload()"
       - if User.current.allowed_to?({:controller=>"thirdparty_version_releases", :action=>"rerelease"}, @third.spec.project)
         - if @third.completed?

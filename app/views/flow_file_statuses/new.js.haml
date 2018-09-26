@@ -1,0 +1,35 @@
+:plain
+  $("#ajax-modal").html('#{j render :partial => "form"}')
+    layer.open({
+      type: 1,
+      title: '<b>#{l(:label_flow_file_status_new)}</b>',
+      area: ['400px', 'auto'],
+      zIndex: 666,
+      moveType: 1,
+      shadeClose: false,
+      content: $("#ajax-modal"),
+      btn: ['取消', '确定'],
+      yes: function(index, layero){
+        layer.close(index)
+      }
+  });
+
+  $(".layui-layer-btn1").on("click", function(){
+    var $Form = $("#fileStatusForm");
+    var data = $Form.serialize();
+    $.ajax({
+       url: '/flow_file_statuses',
+       type: "post",
+       data: data,
+       success: function (data) {
+          console.log(data)
+          if(data.success == 1){
+            window.onbeforeunload = null;
+            window.location.href = "/flow_files/manage"
+          }else{
+            layer.msg(data.message);
+          }
+       }
+    });
+
+  })

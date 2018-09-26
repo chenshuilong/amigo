@@ -10,6 +10,13 @@ module ResourcingsHelper
     Dept.options_group_for_select
   end
 
+  def list_for_permissions
+    Resourcing.setable_permissions.group_by(&:block).collect{|parent, children|
+      block_name = l("resourcing_block_#{parent.to_s}")
+      ["<optgroup label=\"#{block_name}\" >", children.map{|c| "<option value=\"#{c.name.to_s}\">&nbsp;&nbsp;&nbsp;&nbsp;#{l(c.label)}</option>"}]
+    }.flatten.uniq
+  end
+
   def render_set_user_notice
     user_text = if @users.size <= 5
       @users.map(&:name).join(", ")

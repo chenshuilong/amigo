@@ -81,7 +81,7 @@ class User < Principal
 
   KEY = "test"
   CATEGORY = %w(member external supervisor manager majordomo vice_president)
-  DEFAULT_PASSWORD = '123456'
+  DEFAULT_PASSWORD = '888888'
 
   has_and_belongs_to_many :groups,
                           :join_table   => "#{table_name_prefix}groups_users#{table_name_suffix}",
@@ -367,6 +367,7 @@ class User < Principal
     if auth_source_id.present?
       auth_source.authenticate(self.login, clear_password)
     else
+      p "---#{User.hash_password("#{salt}#{User.hash_password clear_password}")}---"
       User.hash_password("#{salt}#{User.hash_password clear_password}") == hashed_password
     end
   end

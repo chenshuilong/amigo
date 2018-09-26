@@ -124,7 +124,9 @@ class RepoRequest < ActiveRecord::Base
 
       can &&= submitted?
     elsif agreed?
-      can = project.users_of_role(11).map(&:id).include?(User.current.id)
+      #软件负责人为空时,默认为孙龙龙(id=555)
+      softwares = project.users_of_role(11).map(&:id) || [555]
+      can = softwares.include?(User.current.id)
     end
     return can
   end

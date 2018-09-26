@@ -3094,9 +3094,3 @@ function deleteApp(id){
 function searchBaidu() {
     window.open("https://www.baidu.com/s?wd=" + $(".inp-srh").val())
 }
-
-//产生begin到end之间的随机数, 包括begin和end本身
-function randomRangeNumber(begin, end) {
-    if (!begin && begin != 0 || !end) { return 0; }
-    return Math.floor(( Math.random() * end ) + begin);
-}

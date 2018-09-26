@@ -43,6 +43,20 @@ module VersionReleasesHelper
     end.join.html_safe
   end
 
+  def render_release_failed_result(release)
+    results = release.result.find_all{|r| r[:status].to_i == 0}
+    results.map do |result|
+      result = result.inject({}){|r, (k, v)| r[k.to_sym] = v; r} unless result.keys.first.is_a?(Hash)
+      release_status = content_tag :span, l(:version_release_result_fail) << (results.index(result) + 1).to_s, class: "tag tag-danger"
+      content_tag :div, release_status + (
+      link_to(
+          l(:version_release_result_view_log), void_js,
+          :data => {:log => view_log_version_release_url(release, result[:log])},
+          :class => "view_release_log"
+      ) if result[:log].present? )
+    end.join.html_safe
+  end
+
   def avaliable_statues(release)
     release.allowed_statuses.map do |status|
       [l("version_release_status_#{status.to_s}"), status]

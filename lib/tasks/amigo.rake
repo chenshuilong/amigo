@@ -35,6 +35,7 @@ namespace :amigo do
           :vice_president2_number => dept["zhuGuanFuZong2No"],
           :vice_president2_name => dept["zhuGuanFuZong2Nm"]
       }
+
       d = Dept.find_by(orgNo: dept['deptNo'])
       unless d
         dt = Dept.create(dept_columns)
@@ -507,6 +508,28 @@ namespace :amigo do
 
     rescue => e
       puts "=======#{e.message.to_s}========"
+    end
+  end
+
+  desc 'Batch add members to project'
+  task :batch_add_members => :environment do
+    projects = ['GBL7370A','GBL7370L','GBL7358A','GBL7358B','GBL7319A','17G04A','17G04L','GBL7359A','GBL7359L','SW17G02A','SW17G02L','CBL7513A','17G07A','17G07L','BBL7332A','SWG1613A','SW17G03A','SWG1608A','GBL7523A','BBL7505A','GBL7335A','17G01A','17G01L','GBL7529A','SW17G15A','SW17G15L','GBL7553A','GBL7356A']
+
+    projects.each do |p|
+      @project = Project.find_by_name(p)
+      if @project.present?
+        members = []
+        user_ids = Array.wrap(4437)
+        role_ids = [8]
+        user_ids << nil if user_ids.empty?
+        user_ids.each do |user_id|
+          member = Member.find_or_new(@project.id, user_id)
+          all_ids = role_ids + member.role_ids
+          member.set_editable_role_ids(all_ids)
+          members << member
+        end
+        @project.members << members
+      end
     end
   end
 

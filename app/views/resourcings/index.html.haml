@@ -10,6 +10,9 @@
   = select_tag 'category', list_for_user_category
   = label_tag 'dept_no', l(:field_dept)
   = select_tag "dept_no", [], :name => "dept_no"
+  = label_tag 'permissions', l(:label_permissions)
+  = select_tag 'permissions', options_for_select([]), {include_blank: true, :multiple => true}
+  = select2_for "permissions"
   = label_tag 'name', l(:user_contact_name)
   = text_field_tag 'name', @name
   = hidden_field_tag 'per_page', @per_page
@@ -30,3 +33,7 @@
   $('#dept_no').empty().append(#{list_for_depts});
   $('#dept_no').select2();
   $("#dept_no").val(#{@dept_no}).trigger("change");
+
+  $('#permissions').empty().append(#{list_for_permissions});
+  $('#permissions').select2();
+  $("#permissions").val(#{@perms}).trigger("change");

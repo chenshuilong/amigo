@@ -551,3 +551,56 @@ $(document).on("click", "#recall_okrs", function(){
 $(function () { 
   $("#okr_desc").popover({html: true});
 });
+
+// Public function
+(function($){
+  $.fn.select2_remote_with_json = function(arg) {
+    var arg = arg || {};
+    var holder = arg.holder || "--- 请选择 ---";
+    var url = arg.url || "/users/assigned";
+    var project = arg.project || "";
+    var status = arg.status || "";
+    var clear = this[0].hasAttribute("multiple") ? false : true;
+    var withme = arg.withme == false ? false : true;
+    this.addClass("ajax-loading");
+    this.select2({
+      allowClear: clear,
+      placeholder: holder,
+      ajax: {
+        url: url,
+        dataType: "json",
+        delay: 250,
+        data: function(params){
+          var para = {name: params.term, page: params.page};
+          if(!!project){para.project_id = project}
+          if(!!status){para.status = status}
+          para.withme = withme
+          return para;
+        },
+        cache: true,
+        processResults:  function (result, params) {
+          console.log(result);
+          return {
+            results: result.options,
+            pagination:  {
+              more: 2
+            }
+          };
+        },
+        escapeMarkup: function (markup) { return markup; },
+        minimumInputLength: 1
+      }
+    });
+  };
+})(jQuery);
+
+function changeNo(obj, file_id){
+  var url = "/flow_files/get_no?format=js&file_type_id="+obj.value+"&id="+file_id;
+  $.ajax({
+    type: "GET",
+    url: url,
+    success: function(result){
+      $("#flow_file_no").html(result.no);
+    }
+  });
+}

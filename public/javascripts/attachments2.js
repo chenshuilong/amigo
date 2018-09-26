@@ -19,8 +19,14 @@ $(function(){
     var uploadCode = filePickerObj.attr('id');
     var uploadDiv = row.find('#uploader_list_'+uploadCode);
     var uploader_uniq_key;
-    
-    var fileNum = uploadCode == "gsi" ? 20 : 1;
+    var fileNum;
+
+    if(uploadCode == 'flow_file' || uploadCode == 'gsi'){
+      fileNum = 50;
+    }else{
+      fileNum = 1;
+    }
+    console.log(uploadCode, fileNum);
     // 注册上传控件到uploaderArr : 控件对象, uploadCode,
     uploaderArr[index] = WebUploader.create({
         auto:true,

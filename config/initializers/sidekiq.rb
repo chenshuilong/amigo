@@ -1,5 +1,5 @@
 Sidekiq.configure_server do |config|
-  config.redis = { url: 'redis://18.8.5.8:6379/0' }
+  config.redis = { url: 'redis://localhost:6379/0' }
 
   # 控制获取任务的方式
   # 这里是平均 5 秒才去抓去一次任务
@@ -7,7 +7,7 @@ Sidekiq.configure_server do |config|
 end
 
 Sidekiq.configure_client do |config|
-  config.redis = { url: 'redis://18.8.5.8:6379/0' }
+  config.redis = { url: 'redis://localhost:6379/0' }
 end
 
 Sidekiq.remove_delay!

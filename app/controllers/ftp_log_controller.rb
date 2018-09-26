@@ -5,6 +5,8 @@ class FtpLogController < ApplicationController
 
     if is_beijing?(rip)
       url = to_beijing_ftp(url) if hasfile?(url)
+    else
+      url = url.gsub('19.9.0.162', 'log.gionee.com')
     end
 
     redirect_to url

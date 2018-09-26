@@ -1,0 +1,10 @@
+#file-type-new
+  = form_for(@type, url: '', html: {class: 'form-horizontal', remote: true, id:"fileTypeForm", method: "post"}) do |f|
+    .form-group
+      = label_tag :name, l(:flow_file_type_name), class: "control-label col-sm-2"
+      .col-xs-9
+        = f.text_field :name, class: 'form-control', style: 'width:100%'
+    .form-group
+      = label_tag :code, l(:flow_file_type_code), class: "control-label col-sm-2"
+      .col-xs-9
+        = f.text_field :code, class: 'form-control', style: 'width:100%'

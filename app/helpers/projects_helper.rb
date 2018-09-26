@@ -152,7 +152,7 @@ module ProjectsHelper
   end
 
   def productions_menu_list
-    productions = policy(:production).view_all? ? Production.active : User.current.productions
+    productions = User.current.resourcing.permissions.include?(:view_production) ? Production.active : User.current.productions
 
     productions = productions.where(:production_type => @type) if @type
     productions.group_by(&:production_type).map { |type, productions|

@@ -1331,6 +1331,30 @@ module ApplicationHelper
     )
   end
 
+  #远程返回结果就是 select2 的最终数据结构, 不需重新构建数据
+  #
+  def select2_remote_with_json(field_id, obj = nil, content = nil, options = {})
+    project_id = obj.is_a?(Project) ? obj.id : obj.project.id unless obj.nil?
+    content ||= "--- %s ---" % l(:actionview_instancetag_blank_option)
+    additional = options.to_json[1..-2].prepend(",") if options.present?
+    javascript_tag(
+      <<~STRING
+          $(function() {
+            if(!/select/i.test($('##{field_id}').prop('tagName'))){
+              var val = $('##{field_id}').val();
+              var attrs = {};
+              $.each($('##{field_id}').prop('attributes'), function(k, v){
+                if(!/type|value/i.test(v.nodeName)) attrs[v.nodeName] = v.nodeValue;
+              });
+              $('##{field_id}').replaceWith($('<select/>', attrs));
+              $('##{field_id}').append("<option value='"+val+"'>"+val+"</option>");
+            }
+            $('##{field_id}').select2_remote_with_json({project: '#{project_id}', holder: '#{content}' #{additional}})
+          });
+      STRING
+    )
+  end
+
   def select2_tag(field_id, slice = nil)
     slice ||= [",", " "]
     slice = slice.map{|m| "'" + m + "'"}.join(", ")
@@ -1930,7 +1954,7 @@ module ApplicationHelper
          :lis => [{:name => "需求管理", :href => demands_path, :allowed => true}]
      }, {
          :tab => "processes",
-         :lis => [{:name => "绩效", :href => criterions_path, :allowed => true}]
+         :lis => [{:name => "流程文档", :href => flow_files_path, :allowed => true}]
      }, {
          :tab => "sharing",
          :lis => [{:name => "工具聚合", :href => (policy(:tool).index? ? tools_path : google_tools_path), :allowed => true},

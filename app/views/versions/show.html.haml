@@ -11,7 +11,7 @@
       - if User.current.allowed_to?(:manage_versions, @version.project)
         = link_to(l(:version_stop_compiling), stop_compiling_version_path(@version), :class => 'icon', :method => :post, :remote => true) if @version.is_compiling?
         = link_to(l(:button_edit), edit_version_path(@version), :class => 'icon icon-edit')
-        = delete_link version_path(@version, :back_url => url_for(:controller => 'versions', :action => 'index', :project_id => @version.project))
+        = delete_link version_path(@version, :back_url => url_for(:controller => 'versions', :action => 'index', :project_id => @version.project)) if @version.deletable?
       = link_to_if_authorized(l(:button_edit_associated_wikipage, :page_title => @version.wiki_page_title), {:controller => 'wiki', :action => 'edit', :project_id => @version.project, :id => Wiki.titleize(@version.wiki_page_title)}, :class => 'icon icon-edit') unless @version.wiki_page_title.blank? || @version.project.wiki.nil?
       = call_hook(:view_versions_show_contextual, { :version => @version, :project => @project })
 

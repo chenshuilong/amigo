@@ -1,0 +1,80 @@
+- provide :nav, "7,1"
+- provide :css, "bootstrap"
+
+.top-action-menu.pull-right
+  - if policy(:flow_file).manage?
+    = link_to(l(:label_flow_files_manage), manage_flow_files_path, :class => 'btn btn-primary btn-sm')
+  - if policy(:flow_file).new?
+    = link_to(l(:label_flow_files_new), new_flow_file_path, :class => 'btn btn-primary btn-sm')
+
+.h2= l(:label_flow_files)
+
+.clearfix
+.issue-details
+  .roadmap-query{:style => "width:100%;"}
+    %ul.notification-list
+      %li.notification-list-item
+        .notification-menu
+          %i.fa.fa-chevron-up
+        .notification-content
+          %p
+            %strong= "查询条件"
+        .clearfix
+        .notification-acton.select2-rectify{:style => "display:block;"}
+          = form_tag({}, {method: :get, class: 'form-horizontal'}) do |f|
+            .form-group
+              = label_tag 'name', l(:flow_file_name), class: "col-sm-2 control-label"
+              .col-sm-2
+                = text_field_tag 'name', @name, class: "form-control"
+              = label_tag 'file_type_id', l(:flow_file_file_type_id), class: "col-sm-2 control-label"
+              .col-sm-2
+                = select_tag 'file_type_id', options_for_select(@types.unshift([l(:label_all), nil]), @type), class: "form-control", :onchange => "this.form.submit(); return false;"
+              = label_tag 'author_id', l(:flow_file_author_id), class: "col-sm-2 control-label"
+              .col-sm-2
+                = select_tag 'author_id', author_option_for_select(@author), class: "form-control", id: "author_id", :onchange => "this.form.submit(); return false;"
+                = select2_remote('author_id', nil, nil, {withme: false})
+            .form-group
+              = label_tag 'file_status_id', l(:flow_file_file_status_id), class: "col-sm-2 control-label"
+              .col-sm-2
+                = select_tag 'file_status_id', options_for_select(@statuses.unshift([l(:label_all), nil]), @status), class: "form-control", :onchange => "this.form.submit(); return false;"
+              .col-sm-2.col-sm-offset-2
+                = submit_tag l(:button_query), :name => nil, class: "btn btn-primary btn-sm"
+  
+  %hr
+  - if @files.empty?
+    %p.nodata= l(:label_no_data)
+  - else
+    .roadmap-table
+      .panel.panel-default
+        .panel-body  
+          %table#versionTable.list.table.table-striped.table-bordered
+            %thead
+              %tr
+                %th{width: 100}= l(:flow_file_no)
+                %th{width: 160}= l(:flow_file_file_type_id)
+                %th= l(:flow_file_name)
+                %th= l(:flow_file_version)
+                %th{width: 160}= l(:flow_file_author_id)
+                %th{width: 160}= l(:flow_file_created_at)
+                %th{width: 120}= l(:flow_file_file_status_id)
+                %th{width: 100}= l(:option_all)    
+            %tbody
+              - @files.each do |file|
+                %tr
+                  %td= link_to "OS-#{file.file_type_code}-#{file.no}", flow_file_path(file.id)
+                  %td= file.file_type_name
+                  %td= file.name
+                  %td= file.version
+                  %td= link_to_user file.author
+                  %td= file.created_at.try(:strftime, "%F %T")
+                  %td= file.file_status_name
+                  %td
+                    - if file.file_status_name != "废弃"
+                      - if policy(:flow_file).edit?
+                        = link_to icon("edit"), edit_flow_file_path(file.id)
+                      - if policy(:flow_file).edit? && policy(:flow_file).destroy?
+                        = "|"
+                      - if policy(:flow_file).destroy? 
+                        = link_to icon("close"), flow_file_path(file.id), "data-confirm" => "确定废弃吗？", method: :delete
+
+          %span.pagination= pagination_links_full @pages, @count

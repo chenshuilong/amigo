@@ -100,7 +100,7 @@ class ThirdpartyVersionReleasesController < VersionReleasesController
   private
 
   def upload_params
-    params.require(:thirdparty).permit(:spec_id, :note, :status, :category, :release_type)
+    params.require(:thirdparty).permit(:spec_id, :note, :status, :category, :release_type, :mk_type)
   end
 
   def find_model_object

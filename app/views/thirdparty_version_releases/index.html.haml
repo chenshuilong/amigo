@@ -79,6 +79,13 @@
               %input#type_one{:name => "thirdparty[release_type]", :type => "radio", :value => "1", :checked => "checked"} 预装
             %label.radio-inline
               %input#type_two{:name => "thirdparty[release_type]", :type => "radio", :value => "2"} 内置
+        .form-group
+          = label_tag :name, "Andriod.mk", class: "control-label col-sm-3"
+          .col-sm-9
+            %label.radio-inline
+              %input{:name => "thirdparty[mk_type]", :type => "radio", :value => "1", :checked => "checked"} 自动生成
+            %label.radio-inline
+              %input{:name => "thirdparty[mk_type]", :type => "radio", :value => "2"} zip包提供
       .form-group
         = label_tag :spec_id, @category == Thirdparty::Thirdparty_CATEGORY[:resource] ? l(:spec_name) : l(:version_spec_id), class: 'control-label col-sm-3'
         .col-xs-9

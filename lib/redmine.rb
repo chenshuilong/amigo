@@ -245,7 +245,7 @@ Redmine::MenuManager.map :top_menu do |menu|
   menu.push :repos, :repos_path, :caption => :label_repos, :html => {"data-toggle" => "tabs"}
   # menu.push :processes, :criterions_path, :caption => :label_processes, :html => {"data-toggle" => "tabs"}
   menu.push :demands, :demands_path, :caption => :label_library, :html => {"data-toggle" => "tabs"}
-  menu.push :processes, nil, :caption => :label_processes, :html => {"data-toggle" => "tabs", :href => "#"}
+  menu.push :processes, :flow_files_path, :caption => :label_processes, :html => {"data-toggle" => "tabs"}
   menu.push :sharing, :tools_path, :caption => :label_shares, :html => {"data-toggle" => "tabs"}
   menu.push :help, :help_path, :caption => :label_help, :html => {"data-toggle" => "tabs"}
   menu.push :administration, { :controller => 'admin', :action => 'index' }, :html => {"data-toggle" => "tabs"}, :if => Proc.new { User.current.admin? }, :last => true
@@ -422,6 +422,14 @@ PolicyControl.map do |map|
     map.permission :manage_google_tool, {:google_tool => [:category?, :new?, :create?, :edit?, :update?, :destroy?, :operate?]}, :label => :permission_manage_google_tool
     map.permission :view_tool, {:tool => [:index?]}, :label => :permission_view_tool
     map.permission :manage_tool, {:tool => [:new?, :create?, :edit?, :update?, :destroy?, :operate?]}, :label => :permission_manage_tool
+  end
+
+  map.block :process do |map|
+    map.permission :view_flow_file, {:flow_file => [:index?, :show?]}, :label => :permission_view_flow_file
+    map.permission :new_flow_file, {:flow_file => [:new?, :create?]}, :label => :permission_new_flow_file
+    map.permission :edit_flow_file, {:flow_file => [:edit?, :update?]}, :label => :permission_edit_flow_file
+    map.permission :manage_flow_file, {:flow_file => [:manage?]}, :label => :permission_manage_flow_file
+    map.permission :destroy_flow_file, {:flow_file => [:destroy?]}, :label => :permission_destroy_flow_file
   end
 end
 

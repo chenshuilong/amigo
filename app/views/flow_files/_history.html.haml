@@ -1,0 +1,9 @@
+.history-details
+  .journal.has_details
+    - @records.each_with_index do |r, idx|
+      #note
+        .note-title
+          = authoring_at r.created_at, r.user, {:label => :label_updated_time_at}
+        %ul.details
+          - change_details(r.details).each do |string|
+            %li= string

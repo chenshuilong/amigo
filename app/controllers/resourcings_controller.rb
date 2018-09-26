@@ -37,6 +37,7 @@ class ResourcingsController < ApplicationController
   def query_user
     @category = params[:category]
     @dept_no  = params[:dept_no] || []
+    @perms    = params[:permissions] || []
     @name     = params[:name]
     @names    = params[:name].split(",").map(&:strip) if @name && /\,/ === @name
     @page     = params[:page] || 1
@@ -47,6 +48,7 @@ class ResourcingsController < ApplicationController
     scope = scope.like(@name)                 if @name.present? && @names.nil?
     scope = scope.where(:firstname => @names) if @names.present?
     scope = scope.where(:orgNo => Dept.find(@dept_no).all_down_depts)   if @dept_no.present?
+    scope = scope.where(:id => Resourcing.all.find_all{|res| (res.permissions | @perms.collect{|p| p.to_sym}) == res.permissions}.map(&:user_id))  if @perms.present?
 
     @users_all_count = scope.count
     scope = scope.limit(@per_page) if @per_page.present?

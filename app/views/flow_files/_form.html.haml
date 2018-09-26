@@ -1,0 +1,28 @@
+= error_messages_for @file
+#update.issue-details
+  #all_attributes
+    %p.col-sm-offset-1
+      %label
+        = l(:flow_file_no)
+        %span.required *
+      %span#flow_file_no= @file.new_record? ? @no : "OS-#{@file.try(:file_type_code)}-#{@file.try(:no)}"
+    %p.col-sm-offset-1= f.select :file_type_id, options_for_select(@types, @file.file_type_id), {required: true, label: :flow_file_file_type_id, :style => "width: 60%"}, :onchange => "changeNo(this, '#{@file.id}'); return false;"
+    %p.col-sm-offset-1= f.text_field :name, required: true, label: :flow_file_name, :style => "width: 50%"
+    %p.col-sm-offset-1= f.text_field :version, required: true, label: :flow_file_version, :style => "width: 50%"
+    %p.col-sm-offset-1= f.text_area :use, label: :flow_file_use, :style => "width: 50%; height: 100px"
+    .box.tabular.col-sm-offset-1
+      %p#attachments_form
+        %label.col-sm-2
+          = l(:flow_file_attachments)
+          %span.required *
+        %p.col-sm-6
+          = render :partial => 'attachment'
+    %p.col-sm-offset-1
+      %label.col-sm-2
+        = l(:label_flow_file_attachments)
+      = select_tag "flow_file_attachments", attachments_option_for_select(@file, @ffa_ids), id: "flow_file_attachments", multiple: true
+      = select2_remote_with_json("flow_file_attachments", nil, "--- 请选择 ---", {url: flow_file_attachments_flow_files_path(id: @file.id)})
+    %p.col-sm-offset-1= f.select :file_status_id, options_for_select(@statuses, @file.file_status_id), required: true, label: :flow_file_file_status_id
+
+- content_for :header_tags do
+  = javascript_include_tag 'attachments2'

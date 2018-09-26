@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180412025720) do
+ActiveRecord::Schema.define(version: 20180525090243) do
 
   create_table "alter_record_details", force: :cascade do |t|
     t.integer  "alter_record_id", limit: 4
@@ -100,19 +100,22 @@ ActiveRecord::Schema.define(version: 20180412025720) do
   create_table "attachments", force: :cascade do |t|
     t.integer  "container_id",   limit: 4
     t.string   "container_type", limit: 30
-    t.string   "filename",       limit: 255, default: "", null: false
-    t.string   "disk_filename",  limit: 255, default: "", null: false
-    t.integer  "filesize",       limit: 8,   default: 0,  null: false
+    t.string   "filename",       limit: 255, default: "",    null: false
+    t.string   "disk_filename",  limit: 255, default: "",    null: false
+    t.integer  "filesize",       limit: 8,   default: 0,     null: false
     t.string   "content_type",   limit: 255, default: ""
-    t.string   "digest",         limit: 40,  default: "", null: false
-    t.integer  "downloads",      limit: 4,   default: 0,  null: false
-    t.integer  "author_id",      limit: 4,   default: 0,  null: false
+    t.string   "digest",         limit: 40,  default: "",    null: false
+    t.integer  "downloads",      limit: 4,   default: 0,     null: false
+    t.integer  "author_id",      limit: 4,   default: 0,     null: false
     t.datetime "created_on"
     t.string   "description",    limit: 255
     t.string   "disk_directory", limit: 255
     t.string   "uniq_key",       limit: 255
     t.string   "ftp_ip",         limit: 255
     t.string   "extra_type",     limit: 255
+    t.boolean  "deleted",                    default: false
+    t.integer  "deleted_by_id",  limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "attachments", ["author_id"], name: "index_attachments_on_author_id", using: :btree
@@ -543,6 +546,60 @@ ActiveRecord::Schema.define(version: 20180412025720) do
     t.datetime "updated_at",                               null: false
   end
 
+  create_table "flow_file_attachments", force: :cascade do |t|
+    t.integer  "flow_file_id",        limit: 4
+    t.integer  "attachment_id",       limit: 4
+    t.integer  "parent_flow_file_id", limit: 4
+    t.integer  "author_id",           limit: 4
+    t.string   "status",              limit: 255
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+  end
+
+  add_index "flow_file_attachments", ["attachment_id"], name: "index_flow_file_attachments_on_attachment_id", using: :btree
+  add_index "flow_file_attachments", ["author_id"], name: "index_flow_file_attachments_on_author_id", using: :btree
+  add_index "flow_file_attachments", ["flow_file_id"], name: "index_flow_file_attachments_on_flow_file_id", using: :btree
+
+  create_table "flow_file_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.boolean  "editable",               default: true
+    t.integer  "author_id",  limit: 4
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+  end
+
+  add_index "flow_file_statuses", ["author_id"], name: "index_flow_file_statuses_on_author_id", using: :btree
+
+  create_table "flow_file_types", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.string   "code",       limit: 255
+    t.integer  "author_id",  limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "flow_file_types", ["author_id"], name: "index_flow_file_types_on_author_id", using: :btree
+
+  create_table "flow_files", force: :cascade do |t|
+    t.string   "no",               limit: 255
+    t.string   "name",             limit: 255
+    t.string   "version",          limit: 255
+    t.integer  "file_type_id",     limit: 4
+    t.string   "file_type_name",   limit: 255
+    t.string   "file_type_code",   limit: 255
+    t.integer  "file_status_id",   limit: 4
+    t.string   "file_status_name", limit: 255
+    t.text     "use",              limit: 65535
+    t.text     "notes",            limit: 65535
+    t.integer  "author_id",        limit: 4
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+  end
+
+  add_index "flow_files", ["author_id"], name: "index_flow_files_on_author_id", using: :btree
+  add_index "flow_files", ["file_status_id"], name: "index_flow_files_on_file_status_id", using: :btree
+  add_index "flow_files", ["file_type_id"], name: "index_flow_files_on_file_type_id", using: :btree
+
   create_table "google_tools", force: :cascade do |t|
     t.integer  "category",        limit: 4
     t.string   "android_version", limit: 255
@@ -727,6 +784,17 @@ ActiveRecord::Schema.define(version: 20180412025720) do
     t.integer  "integration_version_id", limit: 4
     t.text     "umpirage_approver_id",   limit: 65535
     t.integer  "umpire_id",              limit: 4
+    t.text     "test_emphasis",          limit: 65535
+    t.text     "releate_mokuai",         limit: 65535
+    t.string   "solve_version",          limit: 255
+    t.string   "discovery_version",      limit: 255
+    t.string   "phenomena_category",     limit: 255
+    t.string   "releate_case",           limit: 255
+    t.string   "verificate_version",     limit: 255
+    t.string   "releate_quality_case",   limit: 255
+    t.string   "quality_category",       limit: 255
+    t.string   "blueprint_issue",        limit: 255
+    t.string   "back_log",               limit: 255
   end
 
   add_index "issues", ["app_version_id"], name: "index_issues_on_app_version_id", using: :btree
@@ -790,13 +858,13 @@ ActiveRecord::Schema.define(version: 20180412025720) do
 
   create_table "library_files", force: :cascade do |t|
     t.integer  "library_id",    limit: 4
-    t.text     "name",          limit: 65535
+    t.text     "name",          limit: 16777215
     t.string   "status",        limit: 255
-    t.text     "conflict_type", limit: 65535
+    t.text     "conflict_type", limit: 16777215
     t.string   "email",         limit: 255
     t.integer  "user_id",       limit: 4
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
   end
 
   add_index "library_files", ["library_id", "user_id"], name: "index_library_files_on_library_id_and_user_id", using: :btree
@@ -921,7 +989,6 @@ ActiveRecord::Schema.define(version: 20180412025720) do
     t.string   "container_type", limit: 255
     t.float    "self_score",     limit: 24
     t.float    "other_score",    limit: 24
-    t.text     "supported_by",   limit: 65535
     t.string   "uniq_key",       limit: 255
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
@@ -998,8 +1065,8 @@ ActiveRecord::Schema.define(version: 20180412025720) do
     t.string   "name",                limit: 255
     t.integer  "object_id",           limit: 4
     t.string   "object_name",         limit: 255
-    t.text     "version_url",         limit: 65535
-    t.text     "version_log",         limit: 65535
+    t.text     "version_url",         limit: 16777215
+    t.text     "version_log",         limit: 16777215
     t.string   "status",              limit: 255
     t.string   "result",              limit: 255
     t.string   "operate_type",        limit: 255
@@ -1008,8 +1075,8 @@ ActiveRecord::Schema.define(version: 20180412025720) do
     t.integer  "user_id",             limit: 4
     t.string   "role_type",           limit: 255
     t.datetime "due_at"
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
   end
 
   add_index "patch_versions", ["patch_id"], name: "index_patch_versions_on_patch_id", using: :btree
@@ -1474,6 +1541,7 @@ ActiveRecord::Schema.define(version: 20180412025720) do
     t.integer  "category",     limit: 4
     t.text     "release_ids",  limit: 65535
     t.integer  "release_type", limit: 4
+    t.integer  "mk_type",      limit: 4
   end
 
   create_table "time_entries", force: :cascade do |t|

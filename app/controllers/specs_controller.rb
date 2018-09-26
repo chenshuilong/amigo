@@ -392,7 +392,9 @@ class SpecsController < ApplicationController
       end
     }
 
-    render :text => {:success => 1, :app_cn_name => app.cn_name || "", :rows => opts.uniq}.to_json
+    opts = opts.to_h.values.uniq.collect { |o| opts.find { |k, v| v == o } }
+
+    render :text => {:success => 1, :app_cn_name => app.cn_name || "", :rows => opts}.to_json
   rescue => e
     render :text => {:success => 0, :rows => e.to_s}.to_json
   end

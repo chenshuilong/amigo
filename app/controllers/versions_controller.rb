@@ -633,7 +633,7 @@ class VersionsController < ApplicationController
   end
 
   def allow_jenkins_update_params
-    jenkins_params = params.require(:version).permit(:name, :compile_status, :log_url, :compile_machine, :compile_start_on, :compile_end_on, :baseline, :path, :status, :label, :finger_print)
+    jenkins_params = params.require(:version).permit(:name, :compile_status, :log_url, :compile_machine, :compile_start_on, :compile_end_on, :baseline, :path, :status, :label, :finger_print, :as_increase_version)
     jenkins_params[:system_space] = params[:version]["system_space"] if params[:version].present? && params[:version]["system_space"].present?
     return jenkins_params
   end

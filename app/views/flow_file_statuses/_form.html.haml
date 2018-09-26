@@ -1,0 +1,6 @@
+#file-type-new
+  = form_for(@status, url: '', html: {class: 'form-horizontal', remote: true, id:"fileStatusForm", method: "post"}) do |f|
+    .form-group
+      = label_tag :name, '状态', class: "control-label col-sm-2"
+      .col-xs-9
+        = f.text_field :name, class: 'form-control', style: 'width:100%'

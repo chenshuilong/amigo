@@ -21,11 +21,13 @@ require "fileutils"
 class Attachment < ActiveRecord::Base
   belongs_to :container, :polymorphic => true
   belongs_to :author, :class_name => "User"
+  has_many :flow_file_attachments, :class_name => "FlowFileAttachment", :foreign_key => "attachment_id"
 
   IPS = {"1" => {:path=>"/data/amigo", :ftp => "ftp://cqlog:cqlog@19.9.0.162/amige_log"},
          "2" => {:path=>"/data/amigo_signature/Application/upload", :ftp => "ftp://cqlog:cqlog@19.9.0.162/Sign/Application/unsign"},
          "3" => {:path=>"/data/amigo_tools", :ftp => "ftp://cqlog:cqlog@19.9.0.162/Amige/amigo_tools"},
-         "4" => {:path=>"/data/google_tools", :ftp => "ftp://cqlog:cqlog@19.9.0.162/Amige/google_tools"}}
+         "4" => {:path=>"/data/google_tools", :ftp => "ftp://cqlog:cqlog@19.9.0.162/Amige/google_tools"},
+         "5" => {:path=>"/data/flow_files", :ftp => "ftp://cqlog:cqlog@19.9.0.162/Amige/flow_files"}} 
 
   ROOT_DIR = Rails.env.production? ? Pathname.new("/data/amigo") : Rails.root
 
@@ -485,7 +487,7 @@ class Attachment < ActiveRecord::Base
   def add_to_file_merger_job
     if container_type == "Signature"
       SignFileMergeJob.perform_later(self.id)
-    elsif %w(Tool GoogleTool).include?(container_type)
+    elsif %w(Tool GoogleTool FlowFile).include?(container_type)
       ToolFileMergeJob.perform_later(self.id)
     else
       if !new_record? && ftp_ip.blank?

@@ -7,15 +7,15 @@ class ToolFileMergeJob < ActiveJob::Base
 
   def perform(attachment_id)
     new_atta = Attachment.find_by(:id => attachment_id)
-    tool = new_atta.container
+    object = new_atta.container
     
     if new_atta.container_type == "Tool"
       ftp_ip = 3
-      old_attas = tool.attachments.where(extra_type: new_atta.extra_type).where.not(id: new_atta.id)
+      old_attas = object.attachments.where(extra_type: new_atta.extra_type).where.not(id: new_atta.id)
       if old_attas.present?
         invalid_files = []
         old_attas.each do |atta|
-          invalid_files << File.join(Attachment::IPS[ftp_ip.to_s][:path], "#{tool.id}/#{atta.id}")
+          invalid_files << File.join(Attachment::IPS[ftp_ip.to_s][:path], "#{object.id}/#{atta.id}")
         end
         FileUtils.rm_rf(invalid_files)
         old_attas.destroy_all
@@ -24,6 +24,8 @@ class ToolFileMergeJob < ActiveJob::Base
       puts new_atta.to_json # atta info
     elsif new_atta.container_type == "GoogleTool"
       ftp_ip = 4
+    elsif new_atta.container_type == "FlowFile"
+      ftp_ip = 5
     end
 
     files = Dir.glob(new_atta.diskfile(new_atta.uniq_key + '*'))
@@ -32,7 +34,7 @@ class ToolFileMergeJob < ActiveJob::Base
     puts filename
 
     # Create folder
-    path = File.join(Attachment::IPS[ftp_ip.to_s][:path], "#{tool.id}", "#{new_atta.id}")
+    path = File.join(Attachment::IPS[ftp_ip.to_s][:path], "#{object.id}", "#{new_atta.id}")
     puts path
     FileUtils.mkdir_p(path) unless File.directory?(path)
 

@@ -37,6 +37,10 @@ class Thirdparty < ActiveRecord::Base
     self.category == Thirdparty_CATEGORY[:resource]
   end
 
+  def auto_android_mk?
+    self.mk_type == 1 || self.mk_type.nil?
+  end
+
   def extract_zip_file
     FileUtils.mkdir_p(File.dirname(extract_path)) unless Dir.exist?(extract_path)
 
@@ -154,34 +158,38 @@ class Thirdparty < ActiveRecord::Base
 
     apk_files.uniq.each do |apk_file|
       begin
-        ver_name = version_name
+
+        ver_name = version_fullname # version_name
         file_path = apk_file.to_s.split('/')
         product = production_name(file_path[-2])
         mk_file = "#{file_path[0..-2].join('/')}/Android.mk"
 
-        unless THIRDPARTY_PRIVILEGED_MODULE.include?(product.identifier)
-          mk_text = android_mk_content(product.identifier)
-          mk_text.pop if self.release_type.to_i == 2
+        if auto_android_mk? || !File.exist?(mk_file)
+          unless THIRDPARTY_PRIVILEGED_MODULE.include?(product.identifier)
+            mk_text = android_mk_content(product.identifier)
+            mk_text.pop if self.release_type.to_i == 2
 
-          # List all so files in a apk
-          so_files = list_so_files(cmd, apk_file)
-          unless so_files.blank?
-            # Check 32bit or 64bit
-            so_files = so_files.map { |so| so.to_s.split('/')[1] }
-            if (THIRDPARTY_32LABEL.first.in?(so_files) || THIRDPARTY_32LABEL.last.in?(so_files)) && THIRDPARTY_64LABEL.first.in?(so_files)
-              mk_text.insert(-1, 'LOCAL_MULTILIB := both')
-            elsif (THIRDPARTY_32LABEL.in?(so_files) || THIRDPARTY_32LABEL.last.in?(so_files)) && !THIRDPARTY_64LABEL.first.in?(so_files)
-              mk_text.insert(-1, 'LOCAL_MULTILIB := 32')
-            elsif !(THIRDPARTY_32LABEL.in?(so_files) || THIRDPARTY_32LABEL.last.in?(so_files)) && THIRDPARTY_64LABEL.first.in?(so_files)
-              mk_text.insert(-1, 'LOCAL_MULTILIB := 64')
+            # List all so files in a apk
+            so_files = list_so_files(cmd, apk_file)
+            unless so_files.blank?
+              # Check 32bit or 64bit
+              so_files = so_files.map { |so| so.to_s.split('/')[1] }
+              if (THIRDPARTY_32LABEL.first.in?(so_files) || THIRDPARTY_32LABEL.last.in?(so_files)) && THIRDPARTY_64LABEL.first.in?(so_files)
+                mk_text.insert(-1, 'LOCAL_MULTILIB := both')
+              elsif (THIRDPARTY_32LABEL.in?(so_files) || THIRDPARTY_32LABEL.last.in?(so_files)) && !THIRDPARTY_64LABEL.first.in?(so_files)
+                mk_text.insert(-1, 'LOCAL_MULTILIB := 32')
+              elsif !(THIRDPARTY_32LABEL.in?(so_files) || THIRDPARTY_32LABEL.last.in?(so_files)) && THIRDPARTY_64LABEL.first.in?(so_files)
+                mk_text.insert(-1, 'LOCAL_MULTILIB := 64')
+              end
             end
+
+            mk_text.insert(-1, 'PRODUCT_COPY_FILES += $(LOCAL_PATH)/' + product.config_info.to_s + ':system/etc/' + product.config_info.to_s) unless product.config_info.blank?
+            mk_text.insert(-1, 'GN_UNCHECK_SHARED_LIBS := true')
+            mk_text.insert(-1, 'include $(BUILD_PREBUILT)', 'endif')
+
+            # Write content to Android.mk
+            write_mk_file(mk_file, mk_text.join("\n"))
           end
-
-          mk_text.insert(-1, 'PRODUCT_COPY_FILES += $(LOCAL_PATH)/' + product.config_info.to_s + ':system/etc/' + product.config_info.to_s) unless product.config_info.blank?
-          mk_text.insert(-1, 'include $(BUILD_PREBUILT)', 'endif')
-
-          # Write content to Android.mk
-          write_mk_file(mk_file, mk_text.join("\n"))
         end
 
         # Rename apk file
@@ -190,21 +198,20 @@ class Thirdparty < ActiveRecord::Base
         # Generate version for production
         project_version = product.versions.find_by_name(ver_name)
         project_spec = product.specs.find_by_name(self.spec_name)
-        product.versions << Version.new({:name => ver_name,
-                                         :spec_id => project_spec.id,
-                                         :description => "Thirdparty version",
-                                         :compile_status => 6,
-                                         :status => 1,
-                                         :unit_test => 0,
-                                         :priority => 3,
-                                         :repo_one_id => 3,
-                                         :sharing => 'none'
-                                        }) if project_version.blank? && project_spec.present?
-
-        if project_version.present?
-          version_ids << project_version.id unless version_ids.include?(project_version.id)
-        else
+        if project_version.blank?
+          product.versions << Version.new({:name => ver_name,
+                                           :spec_id => project_spec.id,
+                                           :description => "Thirdparty version",
+                                           :compile_status => 6,
+                                           :status => 1,
+                                           :unit_test => 0,
+                                           :priority => 3,
+                                           :repo_one_id => 3,
+                                           :sharing => 'none'
+                                          }) if project_spec.present?
           version_ids << product.versions.find_by_name(ver_name).id unless version_ids.include?(product.versions.find_by_name(ver_name).id)
+        else
+          version_ids << project_version.id unless version_ids.include?(project_version.id)
         end
 
         # Package zip

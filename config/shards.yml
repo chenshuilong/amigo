@@ -7,8 +7,8 @@ octopus:
   development:
     slave:
       adapter: mysql2
-      database: amigo_tt_2017_dec # amigo_tt_2018_mar
-      host: dev.os.gionee.com # 18.8.5.10
+      database: amigo # amigo_tt_2017_dec # amigo_tt_2018_mar
+      host: 18.8.5.10 # dev.os.gionee.com
 
       username: root
       password: root

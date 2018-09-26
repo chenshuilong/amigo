@@ -824,6 +824,16 @@ Rails.application.routes.draw do
   match '/:category/okrs/:id/edit', :controller => 'okrs', :action => 'edit', :via => :get, :as => "edit_okr"
   match '/:category/okrs/:id/update', :controller => 'okrs', :action => 'update', :via => [:patch, :put, :post], :as => "okr_update"
 
+  resources :flow_files do 
+    get :manage, :on => :collection
+    get :flow_file_attachments, :on => :collection
+    get :get_no, :on => :collection
+  end
+
+  resources :flow_file_types
+  
+  resources :flow_file_statuses
+
   Dir.glob File.expand_path("plugins/*", Rails.root) do |plugin_dir|
     file = File.join(plugin_dir, "config/routes.rb")
     if File.exists?(file)

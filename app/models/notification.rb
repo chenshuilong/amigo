@@ -337,6 +337,7 @@ class Notification < ActiveRecord::Base
 
     admin_id = User.find_by(login: 'admin').id
 
+    #软件负责人为空时,默认为孙龙龙(id=555)
     case recipient.status
     when "submitted"
       case recipient.category.to_i
@@ -346,19 +347,19 @@ class Notification < ActiveRecord::Base
         to_user_ids = []
       end  
     when "agreed"
-      to_user_ids = recipient.project.users_of_role(11).map(&:id)
+      to_user_ids = recipient.project.users_of_role(11).map(&:id) || [555]
     when "refused"
       to_user_ids = [recipient.author_id]
     when "successful", "failed"
       to_user_ids = [recipient.author_id]
       case recipient.category.to_i
       when 1
-        to_user_ids += recipient.project.users_of_role(11).map(&:id)
+        to_user_ids += recipient.project.users_of_role(11).map(&:id) || [555]
       when 3
         to_user_ids += CustomPermission.where(permission_type: key+"_judge", locked: false).map(&:user_id)
       end
     when "abandoned"
-      to_user_ids = recipient.project.users_of_role(11).map(&:id)
+      to_user_ids = recipient.project.users_of_role(11).map(&:id) || [555]
     end
 
     if to_user_ids.present?

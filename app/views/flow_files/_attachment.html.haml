@@ -1,0 +1,14 @@
+%span#uploader.attachment-form
+  %span.uploader-container
+    %span{id: "uploader_list_flow_file"}
+      - if @attachments.present?
+        - @attachments.each do |atta|
+          %span{:id => "WU_FILE_#{atta.id}", class: "item upload-state-done"}
+            = text_field_tag("attachments[#{atta.extra_type}][#{atta.id}][filename]", atta.filename, :class => 'filename readonly')
+            = link_to((icon "trash"), void_js, :class => 'remove-uploaded', :id => "remove_uploaded_#{atta.extra_type}")
+            = hidden_field_tag "attachments[#{atta.extra_type}][#{atta.id}][token]", "#{atta.token}"
+    %span.attachment_area{style: "width: 100%"}
+      %span.attachment_area_content
+        = link_to void_js, class: "filePicker", id: "flow_file", data: {:upload_path => uploads_path(:format => 'js', :extra_type => "flow_file")} do
+          = icon "plus"
+          = l(:notice_click_to_choose_file)

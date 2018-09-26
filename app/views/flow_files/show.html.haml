@@ -1,0 +1,55 @@
+- provide :nav, "7,1"
+- provide :css, "bootstrap"
+
+= title [l(:label_flow_files), flow_files_path], l(:label_flow_files_show)
+
+- if @file.file_status_name != "废弃"
+  .top-action-menu.pull-right
+    - if policy(:flow_file).edit?
+      = link_to(l(:label_edit), edit_flow_file_path(@file), :class => 'btn btn-primary btn-sm')
+    - if policy(:flow_file).destroy? 
+      = link_to("废弃", flow_file_path(@file.id), "data-confirm" => "确定废弃吗？", method: :delete, :class => 'btn btn-danger btn-sm')
+
+.clearfix
+.issue-details
+  .attributes
+    %table.table.table-borderless
+      %tbody
+        %tr
+          %th.col-sm-2= l(:flow_file_no)
+          %td.col-sm-10= "OS-#{@file.file_type_code}-#{@file.no}"
+        %tr
+          %th.col-sm-2= l(:flow_file_file_type_id)
+          %td.col-sm-10= @file.file_type_name
+        %tr
+          %th.col-sm-2= l(:flow_file_name)
+          %td.col-sm-10= @file.name
+        %tr
+          %th.col-sm-2= l(:flow_file_version)
+          %td.col-sm-10= @file.version
+        %tr
+          %th.col-sm-2= l(:flow_file_author_id)
+          %td.col-sm-10= link_to_user @file.try(:author)
+        %tr
+          %th.col-sm-2= l(:flow_file_file_status_id)
+          %td.col-sm-10= @file.file_status_name
+        %tr
+          %th.col-sm-2= l(:flow_file_use)
+          %td.col-sm-10= simple_format(@file.use)
+        %tr
+          %th.col-sm-2= l(:flow_file_attachments)
+          %td.col-sm-10= attachments_link(@file)
+        %tr
+          %th.col-sm-2= l(:flow_file_flow_file_attachments)
+          %td.col-sm-10= flow_file_attachments_link(@file)
+
+  .allchange
+    %ul.nav.nav-tabs
+      %li{:class => "active" }
+        %a{"data-toggle" => "tab", :href => "#history"}= l(:label_history)
+    .tab-content
+      #history.tab-pane.fade{:class => "in active" }
+        - if @records.present?
+          = render :partial => 'history'#, :locals => { :issue => @issue, :journals => @journals }  
+        - else
+          %p 暂无任何记录。

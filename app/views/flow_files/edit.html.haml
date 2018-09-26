@@ -1,0 +1,9 @@
+- provide :nav, "7,1"
+- provide :css, "bootstrap"
+
+= title [l(:label_flow_files), flow_files_path], l(:label_flow_files_edit)
+
+= labelled_form_for @file, :url => flow_file_path(@file) do |f|
+  = render :partial => 'form', :locals => { :f => f }
+  .button-group.text-center
+    = submit_tag l(:button_save), class: "btn btn-primary"

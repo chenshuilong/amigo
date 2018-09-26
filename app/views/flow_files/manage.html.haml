@@ -1,0 +1,65 @@
+- provide :nav, "7,1"
+- provide :css, "bootstrap"
+
+= title [l(:label_flow_files), flow_files_path], l(:label_flow_files_manage)
+%hr
+
+.filter-right
+  .panel.panel-default{:style => "margin-top:20px;"}
+    .panel-heading
+      .issues-head
+        .row.issues-head-title
+          .col-sm-6
+            %h5= l(:label_flow_file_status)
+          .col-sm-6.text-right
+            = link_to(l(:label_flow_file_status_new), new_flow_file_status_path, remote: true, class: "bth btn-sm btn-primary")  
+    .panel-body
+      - if @statuses.empty?
+        %p= l(:label_no_data)
+      - else
+        %table.list.table.table-striped.table-bordered
+          %thead
+            %tr
+              %th{width: 100} #
+              %th= l(:flow_file_status_name)
+              %th{width: 60}= l(:option_all)
+          %tbody
+            - @statuses.each do |status|
+              %tr
+                %td= status.id
+                %td= status.name 
+                %td
+                  - if status.editable?
+                    = link_to icon("close"), flow_file_status_path(status.id), "data-confirm" => "确定删除吗？", method: :delete
+
+
+%hr
+
+.filter-right
+  .panel.panel-default{:style => "margin-top:20px;"}
+    .panel-heading
+      .issues-head
+        .row.issues-head-title
+          .col-sm-6
+            %h5= l(:label_flow_file_types)
+          .col-sm-6.text-right
+            = link_to(l(:label_flow_file_types_new), new_flow_file_type_path, remote: true, class: "bth btn-sm btn-primary")  
+    .panel-body
+      - if @types.empty?
+        %p= l(:label_no_data)
+      - else
+        %table.list.table.table-striped.table-bordered
+          %thead
+            %tr
+              %th{width: 100} #
+              %th= l(:flow_file_type_name)
+              %th= l(:flow_file_type_code)
+              %th{width: 60}= l(:option_all)
+          %tbody
+            - @types.each do |type|
+              %tr
+                %td= type.id
+                %td= type.name 
+                %td= type.code
+                %td
+                  = link_to icon("close"), flow_file_type_path(type.id), "data-confirm" => "确定删除吗？", method: :delete

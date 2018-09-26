@@ -1045,6 +1045,16 @@ zh:
   label_okrs_add_key_result: 增加Key Results
   label_okrs_add_object: 增加Object
   label_okrs_recall: 撤回
+  label_flow_files: 流程文档
+  label_flow_files_new: 新增
+  label_flow_files_edit: 编辑
+  label_flow_files_show: 详情
+  label_flow_files_manage: 管理
+  label_flow_file_status: 状态设置 
+  label_flow_file_types: 类型设置
+  label_flow_file_status_new: 新增状态
+  label_flow_file_types_new: 新增类型
+  label_flow_file_attachments: 相关附件
 
   label_remark: 备注
   label_repo_request_project_branch: 项目分支申请
@@ -2123,6 +2133,7 @@ zh:
   resourcing_block_report: 报表
   resourcing_block_patch: Patch管理
   resourcing_block_sharing: 分享
+  resourcing_block_process: 过程管理
 
   demand_category_id: 需求分类
   demand_sub_category_id: 来源分类
@@ -2172,6 +2183,11 @@ zh:
   permission_manage_google_tool: 管理Google工具版本
   permission_view_tool: 查看工具分享
   permission_manage_tool: 管理工具分享
+  permission_view_flow_file: 查看流程文档
+  permission_new_flow_file: 新建流程文档
+  permission_edit_flow_file: 编辑流程文档
+  permission_manage_flow_file: 管理流程文档类型和状态信息
+  permission_destroy_flow_file: 废弃流程文档
 
   native_applist_new: 新增原生应用
   native_applist_edit: 编辑原生应用
@@ -2390,3 +2406,22 @@ zh:
 
   okrs_support_user: 需求支持方
   okrs_support_record_author: 需求方 
+
+  flow_file_no: 编号
+  flow_file_name: 名称
+  flow_file_version: 版本号  
+  flow_file_use: 用途说明
+  flow_file_file_type_id: 类型
+  flow_file_file_status_id: 状态
+  flow_file_attachments: 流程文件
+  flow_file_flow_file_attachments: 相关附件
+  flow_file_author_id: 作者
+  flow_file_created_at: 创建时间
+
+  flow_file_status_name: 名称
+
+  flow_file_type_name: 名称
+  flow_file_type_code: 代号
+
+  flow_file_attachments_new: 新增
+  flow_file_attachments_delete: 删除
